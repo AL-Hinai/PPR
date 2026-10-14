@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Welcome" %}{% endblock %}
+{% block main_class %}{% endblock %}
+{% block content %}
+<div class="relative isolate overflow-hidden bg-brand-950">
+  <div class="absolute inset-0 -z-10 bg-[radial-gradient(60rem_40rem_at_80%_-10%,rgba(66,186,169,0.35),transparent)]"></div>
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between py-6">
+      <div class="flex items-center gap-2.5 text-white">
+        <span class="grid size-9 place-items-center rounded-lg bg-white/10 ring-1 ring-white/20">
+          <svg viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true"><path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z"/></svg>
+        </span>
+        <span class="text-sm font-bold tracking-wide">PPR</span>
+      </div>
+      <div class="flex items-center gap-2">
+        {% include "partials/language_switch.html" with dark=True %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-sm bg-white text-brand-900 hover:bg-brand-50">{% trans "Sign in" %}</a>
+      </div>
+    </div>
+
+    <div class="grid gap-12 py-16 lg:grid-cols-2 lg:py-24">
+      <div>
+        <p class="text-sm font-semibold text-brand-300">{% trans "Pharmacy Department · Marketing authorisation" %}</p>
+        <h1 class="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">{% trans "Pharmaceutical Product Registration" %}</h1>
+        <p class="mt-6 max-w-xl text-lg leading-8 text-brand-100/80">
+          {% blocktrans trimmed %}
+            Submit medicine approval dossiers in the international eCTD format. Every package is technically
+            validated automatically, the way the FDA and EMA do it, before scientific review begins.
+          {% endblocktrans %}
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="{% url 'accounts:login' %}" class="btn bg-brand-400 text-brand-950 hover:bg-brand-300">{% trans "Sign in to your account" %}</a>
+        </div>
+      </div>
+      <div class="rounded-2xl bg-white/5 p-6 ring-1 ring-white/10">
+        <p class="text-sm font-semibold text-white">{% trans "Three-layer technical validation" %}</p>
+        <ol class="mt-5 space-y-4">
+          <li class="flex gap-4">
+            <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-400/15 font-mono text-sm font-bold text-brand-300">1</span>
+            <div><p class="font-medium text-white">{% trans "XML schema validation" %}</p><p class="text-sm text-brand-100/70">{% trans "index.xml is well-formed and valid against the ICH eCTD 3.2 DTD." %}</p></div>
+          </li>
+          <li class="flex gap-4">
+            <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-400/15 font-mono text-sm font-bold text-brand-300">2</span>
+            <div><p class="font-medium text-white">{% trans "Business rule checks" %}</p><p class="text-sm text-brand-100/70">{% trans "Sequence numbers, MD5 checksums, required modules, lifecycle operations and naming rules." %}</p></div>
+          </li>
+          <li class="flex gap-4">
+            <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-400/15 font-mono text-sm font-bold text-brand-300">3</span>
+            <div><p class="font-medium text-white">{% trans "File compliance inspection" %}</p><p class="text-sm text-brand-100/70">{% trans "Accepted formats, PDF version, no passwords or scripts, embedded fonts and size limits." %}</p></div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+  <h2 class="text-2xl font-bold text-slate-900">{% trans "How an application moves" %}</h2>
+  <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="card card-body"><span class="text-brand-700">{% icon "upload" "size-6" %}</span><p class="mt-3 font-semibold">{% trans "1. Submit" %}</p><p class="mt-1 text-sm text-slate-500">{% trans "The company uploads its eCTD sequence as a zip package." %}</p></div>
+    <div class="card card-body"><span class="text-brand-700">{% icon "shield" "size-6" %}</span><p class="mt-3 font-semibold">{% trans "2. Validate" %}</p><p class="mt-1 text-sm text-slate-500">{% trans "The validator returns an instant pass/fail report with every finding." %}</p></div>
+    <div class="card card-body"><span class="text-brand-700">{% icon "beaker" "size-6" %}</span><p class="mt-3 font-semibold">{% trans "3. Review" %}</p><p class="mt-1 text-sm text-slate-500">{% trans "A reviewer assesses each CTD module and can request more information." %}</p></div>
+    <div class="card card-body"><span class="text-brand-700">{% icon "check-circle" "size-6" %}</span><p class="mt-3 font-semibold">{% trans "4. Decide" %}</p><p class="mt-1 text-sm text-slate-500">{% trans "The Head of Department approves or rejects and issues the certificate." %}</p></div>
+  </div>
+</div>
+{% endblock %}

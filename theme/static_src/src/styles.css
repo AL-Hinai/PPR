@@ -1,0 +1,135 @@
+@import "tailwindcss" source(none);
+
+/* Only scan project templates and app code (never .venv). */
+@source "../../../templates";
+@source "../../../apps";
+
+@theme {
+  --font-sans: "Inter", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Clinical teal brand scale */
+  --color-brand-50: #eefbf8;
+  --color-brand-100: #d5f4ee;
+  --color-brand-200: #aee8dd;
+  --color-brand-300: #78d5c6;
+  --color-brand-400: #42baa9;
+  --color-brand-500: #229e8e;
+  --color-brand-600: #157f74;
+  --color-brand-700: #13665e;
+  --color-brand-800: #13514c;
+  --color-brand-900: #134440;
+  --color-brand-950: #042825;
+}
+
+@layer base {
+  [dir="rtl"] body {
+    font-family: var(--font-arabic);
+  }
+  [x-cloak] {
+    display: none !important;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold whitespace-nowrap shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-brand-700 text-white hover:bg-brand-800 focus-visible:outline-brand-700;
+  }
+  .btn-secondary {
+    @apply bg-white text-slate-700 ring-1 ring-slate-300 ring-inset hover:bg-slate-50 focus-visible:outline-slate-400;
+  }
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:outline-emerald-600;
+  }
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-600;
+  }
+  .btn-sm {
+    @apply px-2.5 py-1.5 text-xs;
+  }
+
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm;
+  }
+  .card-header {
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4;
+  }
+  .card-title {
+    @apply text-base font-semibold text-slate-900;
+  }
+  .card-body {
+    @apply p-5;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-slate-700;
+  }
+  .help {
+    @apply text-xs text-slate-500;
+  }
+  .error {
+    @apply text-xs font-medium text-red-600;
+  }
+  .input {
+    @apply block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm ring-1 ring-slate-300 ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-brand-600 focus:outline-none focus:ring-inset;
+  }
+  .input[aria-invalid="true"] {
+    @apply ring-red-400;
+  }
+  .file-input {
+    @apply block w-full rounded-lg text-sm text-slate-600 ring-1 ring-slate-200 file:me-3 file:cursor-pointer file:rounded-s-lg file:border-0 file:bg-brand-50 file:px-3.5 file:py-2.5 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100;
+  }
+  .checkbox,
+  .radio {
+    @apply size-4 accent-brand-700;
+  }
+  .choice {
+    @apply flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 hover:bg-slate-50 has-checked:bg-brand-50 has-checked:ring-brand-600;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ring-1 ring-inset;
+  }
+
+  .table {
+    @apply min-w-full divide-y divide-slate-200 text-sm;
+  }
+  .table th {
+    @apply bg-slate-50 px-4 py-3 text-start text-xs font-semibold tracking-wide text-slate-500;
+  }
+  .table td {
+    @apply px-4 py-3 align-top text-slate-700;
+  }
+  .table tbody {
+    @apply divide-y divide-slate-100;
+  }
+  .table tbody tr {
+    @apply hover:bg-slate-50/70;
+  }
+
+  .nav-link {
+    @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-brand-50/80 hover:bg-white/10 hover:text-white;
+  }
+  .nav-link-active {
+    @apply bg-white/15 text-white;
+  }
+  .tab {
+    @apply inline-flex items-center gap-2 border-b-2 border-transparent px-1 pb-3 text-sm font-medium whitespace-nowrap text-slate-500 hover:border-slate-300 hover:text-slate-700;
+  }
+  .tab-active {
+    @apply border-brand-600 text-brand-700 hover:border-brand-600 hover:text-brand-700;
+  }
+
+  .dl-row {
+    @apply grid grid-cols-3 gap-4 py-2.5;
+  }
+  .dl-row dt {
+    @apply text-sm text-slate-500;
+  }
+  .dl-row dd {
+    @apply col-span-2 text-sm font-medium break-words text-slate-900;
+  }
+}

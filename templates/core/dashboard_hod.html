@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+{% block content %}
+<div>
+  <p class="text-sm text-slate-500">{% trans "Head of Department" %}</p>
+  <h1 class="text-2xl font-bold text-slate-900">{% trans "Approvals overview" %}</h1>
+</div>
+
+<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "Awaiting assignment" %}</p><p class="mt-1 text-3xl font-bold text-indigo-600">{{ awaiting_assignment|length }}</p></div>
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "Awaiting your decision" %}</p><p class="mt-1 text-3xl font-bold text-violet-600">{{ awaiting_decision|length }}</p></div>
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "In scientific review" %}</p><p class="mt-1 text-3xl font-bold text-amber-600">{{ in_review }}</p></div>
+  <div class="card card-body">
+    <p class="text-sm text-slate-500">{% blocktrans %}Decisions in {{ year }}{% endblocktrans %}</p>
+    <p class="mt-1 text-3xl font-bold text-slate-900">{{ approved_this_year }} <span class="text-base font-medium text-emerald-600">{% trans "approved" %}</span></p>
+    <p class="text-xs text-slate-500">{{ rejected_this_year }} {% trans "rejected" %}{% if avg_days is not None %} · {% blocktrans %}{{ avg_days }} days average{% endblocktrans %}{% endif %}</p>
+  </div>
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">{% trans "Awaiting your decision" %}</h2></div>
+      {% if awaiting_decision %}
+        <ul class="divide-y divide-slate-100">
+          {% for app in awaiting_decision %}
+            <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+              <div>
+                <a href="{{ app.get_absolute_url }}?tab=review" class="font-medium text-slate-900 hover:text-brand-700">{{ app.product_name }}</a>
+                <p class="text-xs text-slate-500">{{ app.reference_no }} · {{ app.company.name }} · {% trans "Reviewer" %}: {{ app.assigned_reviewer.display_name }}</p>
+              </div>
+              <div class="flex items-center gap-3">
+                {% if app.recommendation == "APPROVE" %}<span class="badge bg-emerald-50 text-emerald-700 ring-emerald-600/20">{% trans "Recommends approval" %}</span>{% else %}<span class="badge bg-red-50 text-red-700 ring-red-600/20">{% trans "Recommends rejection" %}</span>{% endif %}
+                <a href="{{ app.get_absolute_url }}?tab=review" class="btn btn-primary btn-sm">{% trans "Decide" %}</a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        {% trans "No decisions pending" as t %}{% include "components/empty.html" with title=t icon="check-circle" %}
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">{% trans "Validated – assign a reviewer" %}</h2></div>
+      {% if awaiting_assignment %}
+        <ul class="divide-y divide-slate-100">
+          {% for app in awaiting_assignment %}
+            <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+              <div>
+                <a href="{{ app.get_absolute_url }}" class="font-medium text-slate-900 hover:text-brand-700">{{ app.product_name }}</a>
+                <p class="text-xs text-slate-500">{{ app.reference_no }} · {{ app.company.name }} · {{ app.get_application_type_display }}</p>
+              </div>
+              <a href="{{ app.get_absolute_url }}" class="btn btn-secondary btn-sm">{% trans "Assign" %}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        {% trans "Nothing to assign" as t %}{% include "components/empty.html" with title=t icon="users" %}
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="space-y-6">
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">{% trans "Applications by status" %}</h2></div>
+      <div class="card-body space-y-3">
+        {% for value, label, count, pct in counts %}
+          <a href="{% url 'applications:list' %}?status={{ value }}" class="block group">
+            <div class="flex justify-between text-sm"><span class="text-slate-600 group-hover:text-brand-700">{{ label }}</span><span class="font-semibold tabular-nums text-slate-900">{{ count }}</span></div>
+            <div class="mt-1 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full {% status_dot value %}" style="width: {{ pct }}%"></div></div>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">{% trans "Reviewer workload" %}</h2></div>
+      <ul class="divide-y divide-slate-100">
+        {% for row in workload %}
+          <li class="flex justify-between px-5 py-2.5 text-sm"><span>{{ row.name }}</span><span class="font-semibold tabular-nums">{{ row.n }}</span></li>
+        {% empty %}
+          <li class="px-5 py-4 text-sm text-slate-500">{% trans "No active reviews." %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

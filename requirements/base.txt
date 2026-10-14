@@ -1,0 +1,6 @@
+Django>=5.2,<5.3
+django-environ>=0.11
+django-tailwind>=4.6
+django-htmx>=1.19
+lxml>=5.3
+pypdf>=5.0

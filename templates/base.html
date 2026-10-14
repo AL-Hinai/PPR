@@ -1,0 +1,119 @@
+{% load static i18n ui tailwind_tags %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" class="h-full bg-slate-50">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% trans "Dashboard" %}{% endblock %} · {% trans "PPR" %}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2313665e'/%3E%3Cpath d='M13 8h6v5h5v6h-5v5h-6v-5H8v-6h5z' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {% tailwind_css %}
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="min-h-full text-slate-800 antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+{% if user.is_authenticated %}
+  <header class="bg-brand-900 print:hidden" x-data="{ open: false }">
+    <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <a href="{% url 'core:dashboard' %}" class="flex shrink-0 items-center gap-2.5 text-white">
+        <span class="grid size-9 place-items-center rounded-lg bg-white/10 ring-1 ring-white/20">
+          <svg viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true"><path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z"/></svg>
+        </span>
+        <span class="leading-tight">
+          <span class="block text-sm font-bold tracking-wide">PPR</span>
+          <span class="hidden text-[11px] text-brand-200 sm:block">{% trans "Pharmaceutical Product Registration" %}</span>
+        </span>
+      </a>
+
+      {% with url_name=request.resolver_match.url_name ns=request.resolver_match.namespace %}
+      <nav class="ms-6 hidden items-center gap-1 md:flex" aria-label="{% trans 'Main' %}">
+        <a href="{% url 'core:dashboard' %}" class="nav-link {% if ns == 'core' %}nav-link-active{% endif %}">{% icon "home" "size-4" %}{% trans "Dashboard" %}</a>
+        <a href="{% url 'applications:list' %}" class="nav-link {% if ns == 'applications' %}nav-link-active{% endif %}">{% icon "folder" "size-4" %}{% trans "Applications" %}</a>
+        {% if user.is_company %}
+          <a href="{% url 'companies:profile' %}" class="nav-link {% if ns == 'companies' %}nav-link-active{% endif %}">{% icon "building" "size-4" %}{% trans "Company" %}</a>
+        {% endif %}
+      </nav>
+      {% endwith %}
+
+      <div class="ms-auto flex items-center gap-2">
+        {% if user.is_company %}
+          <a href="{% url 'applications:create' %}" class="btn btn-sm hidden bg-white text-brand-800 hover:bg-brand-50 sm:inline-flex">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
+        {% endif %}
+
+        {% include "partials/language_switch.html" with dark=True %}
+
+        <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+          <button type="button" class="relative grid size-9 place-items-center rounded-lg text-brand-100 hover:bg-white/10 hover:text-white"
+                  @click="open = !open" hx-get="{% url 'notifications:dropdown' %}" hx-target="#notification-panel" hx-trigger="click"
+                  aria-label="{% trans 'Notifications' %}">
+            {% icon "bell" %}
+            {% if unread_notifications %}<span class="absolute -top-0.5 -end-0.5 grid min-w-4 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{{ unread_notifications }}</span>{% endif %}
+          </button>
+          <div x-show="open" x-cloak x-transition.origin.top class="absolute end-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-slate-200">
+            <div id="notification-panel" class="p-4 text-sm text-slate-500">{% trans "Loading…" %}</div>
+          </div>
+        </div>
+
+        <div class="relative hidden sm:block" x-data="{ open: false }" @click.outside="open = false">
+          <button type="button" @click="open = !open" class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-start hover:bg-white/10">
+            <span class="grid size-8 place-items-center rounded-full bg-brand-500 text-xs font-bold text-white">{{ user.display_name|slice:":1"|upper }}</span>
+            <span class="hidden leading-tight lg:block">
+              <span class="block text-sm font-medium text-white">{{ user.display_name }}</span>
+              <span class="block text-[11px] text-brand-200">{{ user.get_role_display }}</span>
+            </span>
+          </button>
+          <div x-show="open" x-cloak x-transition.origin.top class="absolute end-0 z-30 mt-2 w-56 rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+            <div class="px-3 py-2">
+              <p class="text-sm font-medium text-slate-900">{{ user.display_name }}</p>
+              <p class="truncate text-xs text-slate-500">{% if user.company %}{{ user.company.name }}{% else %}{{ user.get_role_display }}{% endif %}</p>
+            </div>
+            <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
+              <button class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{% icon "logout" "size-4 rtl:rotate-180" %}{% trans "Sign out" %}</button>
+            </form>
+          </div>
+        </div>
+
+        <button type="button" class="grid size-9 place-items-center rounded-lg text-brand-100 hover:bg-white/10 md:hidden" @click="open = !open" aria-label="{% trans 'Menu' %}">
+          <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <nav x-show="open" x-cloak class="space-y-1 border-t border-white/10 px-4 py-3 md:hidden">
+      <a href="{% url 'core:dashboard' %}" class="nav-link w-full">{% icon "home" "size-4" %}{% trans "Dashboard" %}</a>
+      <a href="{% url 'applications:list' %}" class="nav-link w-full">{% icon "folder" "size-4" %}{% trans "Applications" %}</a>
+      {% if user.is_company %}
+        <a href="{% url 'companies:profile' %}" class="nav-link w-full">{% icon "building" "size-4" %}{% trans "Company" %}</a>
+        <a href="{% url 'applications:create' %}" class="nav-link w-full">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
+      {% endif %}
+      <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
+        <button class="nav-link w-full">{% icon "logout" "size-4 rtl:rotate-180" %}{% trans "Sign out" %} ({{ user.username }})</button>
+      </form>
+    </nav>
+  </header>
+{% endif %}
+
+<main class="{% block main_class %}mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8{% endblock %}">
+  {% if messages %}
+    <div class="mb-6 space-y-2 print:hidden">
+      {% for message in messages %}
+        <div x-data="{ show: true }" x-show="show" class="flex items-start gap-3 rounded-xl px-4 py-3 text-sm ring-1
+          {% if message.tags == 'error' %}bg-red-50 text-red-800 ring-red-200{% elif message.tags == 'warning' %}bg-amber-50 text-amber-900 ring-amber-200{% else %}bg-emerald-50 text-emerald-800 ring-emerald-200{% endif %}" role="status">
+          {% if message.tags == 'error' %}{% icon "x-circle" "size-5 shrink-0" %}{% elif message.tags == 'warning' %}{% icon "warning" "size-5 shrink-0" %}{% else %}{% icon "check-circle" "size-5 shrink-0" %}{% endif %}
+          <p class="flex-1">{{ message }}</p>
+          <button type="button" @click="show = false" class="opacity-60 hover:opacity-100" aria-label="{% trans 'Dismiss' %}">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+{% block footer %}
+<footer class="mx-auto max-w-7xl px-4 pb-8 text-xs text-slate-400 sm:px-6 lg:px-8 print:hidden">
+  {% trans "PPR — Pharmaceutical Product Registration · eCTD-based marketing authorisation" %}
+</footer>
+{% endblock %}
+</body>
+</html>

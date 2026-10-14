@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% if application %}{% trans "Edit application" %}{% else %}{% trans "New application" %}{% endif %}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl">
+  <a href="{% if application %}{{ application.get_absolute_url }}{% else %}{% url 'applications:list' %}{% endif %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700">{% icon "arrow-left" "size-4 rtl:rotate-180" %}{% trans "Back" %}</a>
+  <h1 class="mt-3 text-2xl font-bold text-slate-900">{% if application %}{% trans "Edit application" %}{% else %}{% trans "New marketing authorisation application" %}{% endif %}</h1>
+  <p class="mt-1 text-sm text-slate-500">{% trans "Step 1 of 2: product details. Next, upload the eCTD package." %}</p>
+
+  <form method="post" class="card mt-6">
+    {% csrf_token %}
+    <div class="card-body space-y-5">
+      {% include "components/form_errors.html" %}
+      {% include "components/field.html" with field=form.application_type %}
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "components/field.html" with field=form.product_name class="sm:col-span-2" %}
+        {% include "components/field.html" with field=form.active_ingredients class="sm:col-span-2" %}
+        {% include "components/field.html" with field=form.dosage_form %}
+        {% include "components/field.html" with field=form.strength %}
+        {% include "components/field.html" with field=form.route %}
+        {% include "components/field.html" with field=form.atc_code %}
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 border-t border-slate-100 px-5 py-4">
+      <button class="btn btn-primary">{% if application %}{% trans "Save changes" %}{% else %}{% trans "Create and continue" %}{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

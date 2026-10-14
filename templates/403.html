@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Access denied" %}{% endblock %}
+{% block content %}
+<div class="card card-body mx-auto max-w-lg text-center">
+  <p class="font-mono text-sm font-semibold text-red-600">403</p>
+  <h1 class="mt-2 text-xl font-bold">{% trans "You can't do that here" %}</h1>
+  <p class="mt-2 text-sm text-slate-500">{% trans "Your role doesn't allow this action, or the application is not at the right stage." %}</p>
+  <a href="{% url 'core:dashboard' %}" class="btn btn-primary mx-auto mt-6">{% trans "Back to dashboard" %}</a>
+</div>
+{% endblock %}

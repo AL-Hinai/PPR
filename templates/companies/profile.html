@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Company" %}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-900">{{ company.name }}</h1>
+<p class="mt-1 text-sm text-slate-500">
+  {% if company.is_verified %}<span class="badge bg-emerald-50 text-emerald-700 ring-emerald-600/20">{% trans "Verified applicant" %}</span>{% else %}<span class="badge bg-amber-50 text-amber-800 ring-amber-600/20">{% trans "Verification pending" %}</span>{% endif %}
+</p>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <section class="card">
+    <div class="card-header"><h2 class="card-title">{% trans "Registration" %}</h2></div>
+    <dl class="divide-y divide-slate-100 px-5">
+      <div class="dl-row"><dt>{% trans "Name (English)" %}</dt><dd>{{ company.name_en }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Commercial registration no." %}</dt><dd class="font-mono">{{ company.registration_no }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Pharmaceutical license no." %}</dt><dd class="font-mono">{{ company.license_no|default:"—" }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Country" %}</dt><dd>{{ company.country }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Users" %}</dt><dd>{% for u in company.users.all %}{{ u.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</dd></div>
+    </dl>
+    <p class="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">{% trans "Legal identifiers are maintained by the Pharmacy Department." %}</p>
+  </section>
+
+  <form method="post" class="card">
+    {% csrf_token %}
+    <div class="card-header"><h2 class="card-title">{% trans "Contact details" %}</h2></div>
+    <div class="card-body space-y-4">
+      {% for field in form %}{% include "components/field.html" %}{% endfor %}
+    </div>
+    <div class="flex justify-end border-t border-slate-100 px-5 py-4"><button class="btn btn-primary">{% trans "Save" %}</button></div>
+  </form>
+</div>
+{% endblock %}

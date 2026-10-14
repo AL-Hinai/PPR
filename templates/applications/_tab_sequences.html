@@ -1,0 +1,110 @@
+{% load i18n ui humanize %}
+<div class="space-y-6">
+  {% if upload_form %}
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">{% if application.status == "VALIDATION_FAILED" %}{% trans "Upload a corrected package" %}{% else %}{% trans "Upload eCTD package" %}{% endif %}</h2>
+          <p class="mt-0.5 text-sm text-slate-500">{% blocktrans with no=application.next_sequence_number %}This upload becomes sequence {{ no }}.{% endblocktrans %}</p>
+        </div>
+      </div>
+      <div class="card-body grid gap-6 lg:grid-cols-2">
+        <form method="post" enctype="multipart/form-data" action="{% url 'applications:upload' application.pk %}" class="space-y-4">
+          {% csrf_token %}
+          {% include "components/field.html" with field=upload_form.package %}
+          <button class="btn btn-secondary">{% icon "upload" "size-4" %}{% trans "Upload" %}</button>
+        </form>
+        <div class="rounded-xl bg-slate-50 p-4 text-sm">
+          {% if pending_sequence %}
+            <p class="font-medium text-slate-900">{% blocktrans with no=pending_sequence.number name=pending_sequence.original_filename %}Sequence {{ no }} is ready: {{ name }}{% endblocktrans %}</p>
+            <p class="mt-1 text-slate-500">{% trans "Submitting runs the three-layer technical validation immediately." %}</p>
+            <form method="post" action="{% url 'applications:submit' application.pk %}" class="mt-4" x-data="{ busy: false }" @submit="busy = true">
+              {% csrf_token %}
+              <button class="btn btn-primary" :disabled="busy">
+                {% icon "shield" "size-4" %}
+                <span x-show="!busy">{% if application.status == "DRAFT" %}{% trans "Submit for validation" %}{% else %}{% trans "Resubmit for validation" %}{% endif %}</span>
+                <span x-show="busy" x-cloak>{% trans "Validating…" %}</span>
+              </button>
+            </form>
+          {% else %}
+            <p class="font-medium text-slate-900">{% trans "Package requirements" %}</p>
+            <ul class="mt-2 list-disc space-y-1 ps-5 text-slate-600">
+              <li>{% trans "One sequence folder (e.g. 0000) containing index.xml and index-md5.txt" %}</li>
+              <li>{% trans "Regional Module 1 XML and util/dtd/ich-ectd-3-2.dtd" %}</li>
+              <li>{% trans "Lowercase file names; PDF 1.4–1.7 without passwords" %}</li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {% if response_form %}
+    {% with ir=application.open_info_request %}
+    <section class="card border-orange-200">
+      <div class="card-header bg-orange-50/60">
+        <h2 class="card-title">{% trans "Respond to the information request" %}</h2>
+        {% if ir.due_date %}<span class="badge bg-white text-orange-700 ring-orange-300">{% blocktrans with d=ir.due_date|date:"d M Y" %}Due {{ d }}{% endblocktrans %}</span>{% endif %}
+      </div>
+      <div class="card-body grid gap-6 lg:grid-cols-2">
+        <div class="rounded-xl bg-slate-50 p-4 text-sm">
+          <p class="font-medium text-slate-900">{% trans "Questions from the reviewer" %}</p>
+          <p class="mt-2 whitespace-pre-line text-slate-700">{{ ir.questions }}</p>
+        </div>
+        <form method="post" enctype="multipart/form-data" action="{% url 'applications:upload' application.pk %}" class="space-y-4" x-data="{ busy: false }" @submit="busy = true">
+          {% csrf_token %}
+          <p class="text-sm text-slate-500">{% blocktrans with no=application.next_sequence_number %}Upload your answers as sequence {{ no }}. It is validated before it reaches the reviewer.{% endblocktrans %}</p>
+          {% include "components/field.html" with field=response_form.package %}
+          {% include "components/field.html" with field=response_form.note %}
+          <button class="btn btn-primary" :disabled="busy">{% icon "upload" "size-4" %}<span x-show="!busy">{% trans "Upload and validate" %}</span><span x-show="busy" x-cloak>{% trans "Validating…" %}</span></button>
+        </form>
+      </div>
+    </section>
+    {% endwith %}
+  {% endif %}
+
+  <section class="card overflow-hidden">
+    <div class="card-header"><h2 class="card-title">{% trans "Sequences" %}</h2></div>
+    {% if sequences %}
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead><tr>
+            <th>{% trans "Sequence" %}</th><th>{% trans "Uploaded" %}</th><th>{% trans "Size" %}</th>
+            <th>{% trans "Validation" %}</th><th>{% trans "Findings" %}</th><th></th>
+          </tr></thead>
+          <tbody>
+            {% for seq in sequences %}
+              {% with run=seq.validation_runs.all.0 %}
+              <tr>
+                <td>
+                  <p class="font-mono font-semibold text-slate-900">{{ seq.number }}</p>
+                  {% if seq.description %}<p class="text-xs text-slate-500">{{ seq.description }}</p>{% endif %}
+                </td>
+                <td class="whitespace-nowrap">
+                  {{ seq.uploaded_at|date:"d M Y, H:i" }}
+                  <p class="text-xs text-slate-500">{{ seq.uploaded_by.display_name }}</p>
+                </td>
+                <td class="whitespace-nowrap">{{ seq.size|filesizeformat }}</td>
+                <td>{% validation_badge seq %}</td>
+                <td class="whitespace-nowrap text-xs">
+                  {% if run %}
+                    <span class="font-semibold text-red-600">{{ run.error_count }}</span> {% trans "errors" %} ·
+                    <span class="font-semibold text-amber-600">{{ run.warning_count }}</span> {% trans "warnings" %}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="text-end whitespace-nowrap">
+                  {% if run %}<a href="{% url 'applications:sequence' application.pk seq.pk %}" class="btn btn-secondary btn-sm">{% if seq.is_accepted %}{% trans "Report & dossier" %}{% else %}{% trans "Report" %}{% endif %}</a>{% endif %}
+                  <a href="{% url 'applications:sequence_package' application.pk seq.pk %}" class="btn btn-secondary btn-sm" title="{% trans 'Download zip' %}">{% icon "download" "size-4" %}</a>
+                </td>
+              </tr>
+              {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {% trans "No sequences uploaded" as t %}{% trans "The first upload of an application is sequence 0000." as x %}
+      {% include "components/empty.html" with title=t text=x icon="upload" %}
+    {% endif %}
+  </section>
+</div>

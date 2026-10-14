@@ -1,0 +1,29 @@
+{% load i18n ui %}<div class="overflow-x-auto">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Reference" %}</th>
+        <th>{% trans "Product" %}</th>
+        {% if not user.is_company %}<th>{% trans "Company" %}</th>{% endif %}
+        <th>{% trans "Type" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Updated" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+        <tr>
+          <td class="font-mono text-xs"><a href="{{ app.get_absolute_url }}" class="font-semibold text-brand-700 hover:underline">{{ app.reference_no }}</a></td>
+          <td>
+            <a href="{{ app.get_absolute_url }}" class="font-medium text-slate-900 hover:text-brand-700">{{ app.product_name }}</a>
+            <p class="text-xs text-slate-500">{{ app.active_ingredients }} · {{ app.strength }}</p>
+          </td>
+          {% if not user.is_company %}<td>{{ app.company.name }}</td>{% endif %}
+          <td class="whitespace-nowrap">{{ app.get_application_type_display }}</td>
+          <td>{% status_badge app.status %}</td>
+          <td class="whitespace-nowrap text-slate-500">{{ app.updated_at|date:"d M Y" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

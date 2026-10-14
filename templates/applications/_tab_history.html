@@ -1,0 +1,25 @@
+{% load i18n ui %}
+<section class="card">
+  <div class="card-header"><h2 class="card-title">{% trans "Audit trail" %}</h2></div>
+  <div class="card-body">
+    {% if history %}
+      <ol class="relative space-y-6 border-s border-slate-200 ps-6">
+        {% for entry in history %}
+          <li class="relative">
+            <span class="absolute -start-[1.95rem] top-1 size-3 rounded-full ring-4 ring-white {% status_dot entry.to_status %}"></span>
+            <div class="flex flex-wrap items-center gap-2">
+              {% status_badge entry.to_status %}
+              <span class="text-xs text-slate-500">{{ entry.created_at|date:"d M Y, H:i" }}</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-600">
+              {% if entry.actor %}{{ entry.actor.display_name }} <span class="text-slate-400">({{ entry.actor.get_role_display }})</span>{% else %}{% trans "System (automatic validation)" %}{% endif %}
+            </p>
+            {% if entry.note %}<p class="mt-1 whitespace-pre-line rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">{{ entry.note }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="text-sm text-slate-500">{% blocktrans with d=application.created_at|date:"d M Y" %}Draft created on {{ d }}. Nothing has been submitted yet.{% endblocktrans %}</p>
+    {% endif %}
+  </div>
+</section>

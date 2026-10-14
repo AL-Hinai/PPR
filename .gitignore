@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Environment
+.env
+
+# Django
+db.sqlite3
+/private_media/
+/staticfiles/
+*.log
+
+# Built Tailwind CSS in theme/static/css/dist is committed on purpose.
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated demo packages (manage.py build_sample_packages)
+/sample_packages/

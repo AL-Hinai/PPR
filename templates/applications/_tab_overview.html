@@ -1,0 +1,71 @@
+{% load i18n ui %}
+<div class="grid gap-6 lg:grid-cols-3">
+  <section class="card lg:col-span-2">
+    <div class="card-header"><h2 class="card-title">{% trans "Product details" %}</h2></div>
+    <dl class="divide-y divide-slate-100 px-5">
+      <div class="dl-row"><dt>{% trans "Product name" %}</dt><dd>{{ application.product_name }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Active ingredient(s)" %}</dt><dd>{{ application.active_ingredients }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Dosage form" %}</dt><dd>{{ application.dosage_form }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Strength" %}</dt><dd>{{ application.strength }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Route of administration" %}</dt><dd>{{ application.route }}</dd></div>
+      <div class="dl-row"><dt>{% trans "ATC code" %}</dt><dd class="font-mono">{{ application.atc_code|default:"—" }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Application type" %}</dt><dd>{{ application.get_application_type_display }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Applicant" %}</dt><dd>{{ application.company.name }}{% if application.company.license_no %} <span class="text-slate-500">({% trans "License" %} {{ application.company.license_no }})</span>{% endif %}</dd></div>
+      <div class="dl-row"><dt>{% trans "Submitted" %}</dt><dd>{{ application.submitted_at|date:"d M Y, H:i"|default:"—" }}</dd></div>
+      <div class="dl-row"><dt>{% trans "Assigned reviewer" %}</dt><dd>{{ application.assigned_reviewer.display_name|default:"—" }}</dd></div>
+    </dl>
+  </section>
+
+  <aside class="space-y-6">
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">{% trans "Next step" %}</h2></div>
+      <div class="card-body space-y-4 text-sm">
+        {% if assign_form %}
+          <p class="text-slate-600">{% if application.status == "VALIDATED" %}{% trans "The dossier passed technical validation. Assign a reviewer to start the scientific assessment." %}{% else %}{% trans "You can reassign this application to another reviewer." %}{% endif %}</p>
+          <form method="post" action="{% url 'applications:assign' application.pk %}" class="space-y-3">
+            {% csrf_token %}
+            {% include "components/field.html" with field=assign_form.reviewer %}
+            <button class="btn btn-primary w-full">{% icon "users" "size-4" %}{% if application.status == "VALIDATED" %}{% trans "Assign reviewer" %}{% else %}{% trans "Reassign" %}{% endif %}</button>
+          </form>
+        {% elif is_owner and application.status == "DRAFT" %}
+          <p class="text-slate-600">{% trans "Upload your eCTD sequence 0000 and submit it for technical validation." %}</p>
+          <a href="?tab=sequences" class="btn btn-primary w-full">{% icon "upload" "size-4" %}{% trans "Upload package" %}</a>
+        {% elif is_owner and application.status == "VALIDATION_FAILED" %}
+          <p class="text-slate-600">{% trans "Technical validation failed. Open the report, correct the package and resubmit." %}</p>
+          <a href="?tab=sequences" class="btn btn-primary w-full">{% trans "View report & resubmit" %}</a>
+        {% elif is_owner and application.status == "INFO_REQUESTED" %}
+          <p class="text-slate-600">{% trans "The reviewer has asked for more information. Respond with a new eCTD sequence." %}</p>
+          <a href="?tab=sequences" class="btn btn-primary w-full">{% icon "upload" "size-4" %}{% trans "Upload response" %}</a>
+        {% elif is_assigned and application.status == "UNDER_REVIEW" %}
+          <p class="text-slate-600">{% trans "Assess each CTD module, request information if needed, then submit your recommendation." %}</p>
+          <a href="?tab=review" class="btn btn-primary w-full">{% icon "clipboard" "size-4" %}{% trans "Open assessment" %}</a>
+        {% elif user.is_hod and application.status == "REVIEW_COMPLETE" %}
+          <p class="text-slate-600">{% trans "The review is complete. Read the recommendation and record your decision." %}</p>
+          <a href="?tab=review" class="btn btn-primary w-full">{% trans "Make decision" %}</a>
+        {% elif application.status == "APPROVED" %}
+          <p class="text-slate-600">{% blocktrans with no=decision.approval_no date=decision.valid_until|date:"d M Y" %}Approved under no. {{ no }}, valid until {{ date }}.{% endblocktrans %}</p>
+          <a href="{% url 'applications:certificate' application.pk %}" class="btn btn-success w-full">{% icon "printer" "size-4" %}{% trans "Approval certificate" %}</a>
+        {% elif application.status == "REJECTED" %}
+          <p class="text-slate-600">{% trans "This application was rejected. See the decision in the Assessment tab." %}</p>
+        {% else %}
+          <p class="text-slate-600">{% trans "No action is needed from you at this stage." %}</p>
+        {% endif %}
+      </div>
+    </section>
+
+    {% with latest=sequences.0 %}
+      {% if latest %}
+        <section class="card">
+          <div class="card-header"><h2 class="card-title">{% trans "Latest sequence" %}</h2></div>
+          <div class="card-body flex items-center justify-between gap-3">
+            <div>
+              <p class="font-mono text-lg font-semibold">{{ latest.number }}</p>
+              <p class="text-xs text-slate-500">{{ latest.uploaded_at|date:"d M Y, H:i" }}</p>
+            </div>
+            <a href="{% url 'applications:sequence' application.pk latest.pk %}">{% validation_badge latest %}</a>
+          </div>
+        </section>
+      {% endif %}
+    {% endwith %}
+  </aside>
+</div>

@@ -1,0 +1,11 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with name=user.display_name %}Dear {{ name }},{% endblocktrans %}
+
+{% blocktrans with ref=application.reference_no product=application.product_name status=status_label %}Application {{ ref }} ({{ product }}) is now: {{ status }}.{% endblocktrans %}
+{% if note %}
+{{ note }}
+{% endif %}
+{% trans "Sign in to PPR to view the details." %}
+
+--
+{% trans "PPR — Pharmaceutical Product Registration" %}
+{% endautoescape %}

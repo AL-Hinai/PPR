@@ -1,0 +1,7 @@
+-r base.txt
+django-browser-reload>=1.17
+pytest>=8.3
+pytest-django>=4.9
+# Translation tooling (scripts/i18n.py) so GNU gettext is not needed on Windows
+babel>=2.16
+polib>=1.2

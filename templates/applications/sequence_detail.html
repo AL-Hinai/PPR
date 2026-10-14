@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{{ application.reference_no }} / {{ sequence.number }}{% endblock %}
+{% block content %}
+<a href="{{ application.get_absolute_url }}?tab=sequences" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700">{% icon "arrow-left" "size-4 rtl:rotate-180" %}{{ application.reference_no }} · {{ application.product_name }}</a>
+
+<div class="mt-3 flex flex-wrap items-start justify-between gap-4">
+  <div class="min-w-0">
+    <div class="flex flex-wrap items-center gap-3">
+      <h1 class="text-2xl font-bold text-slate-900">{% trans "Sequence" %} <span class="font-mono">{{ sequence.number }}</span></h1>
+      {% validation_badge sequence %}
+    </div>
+    <p class="mt-1 text-sm text-slate-500">
+      {{ sequence.original_filename }} · {{ sequence.size|filesizeformat }} · {{ sequence.uploaded_by.display_name }} · {{ sequence.uploaded_at|date:"d M Y, H:i" }}
+    </p>
+    <p class="mt-0.5 font-mono text-[11px] break-all text-slate-400" title="SHA-256" dir="ltr">SHA-256 {{ sequence.sha256 }}</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    {% if run %}<a href="{% url 'applications:sequence_csv' application.pk sequence.pk %}" class="btn btn-secondary">{% icon "download" "size-4" %}{% trans "Report (CSV)" %}</a>{% endif %}
+    <a href="{% url 'applications:sequence_package' application.pk sequence.pk %}" class="btn btn-secondary">{% icon "download" "size-4" %}{% trans "Package (zip)" %}</a>
+    <button type="button" onclick="window.print()" class="btn btn-secondary">{% icon "printer" "size-4" %}{% trans "Print" %}</button>
+  </div>
+</div>
+
+{% if not run %}
+  <div class="card card-body mt-6 text-sm text-slate-600">{% trans "This sequence has not been validated yet. Submit it from the application page." %}</div>
+{% else %}
+  {# Layer summary #}
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+    {% for key, layer in layers.items %}
+      {% with count=layer.findings|length %}
+      <a href="#layer-{{ key }}" class="card card-body flex items-start gap-3 hover:ring-2 hover:ring-brand-200">
+        <span class="grid size-10 shrink-0 place-items-center rounded-full font-mono text-sm font-bold {% if count %}bg-red-50 text-red-600{% else %}bg-emerald-50 text-emerald-600{% endif %}">{{ forloop.counter }}</span>
+        <span>
+          <span class="block text-sm font-semibold text-slate-900">{{ layer.label }}</span>
+          <span class="block text-xs {% if count %}text-red-600{% else %}text-emerald-600{% endif %}">
+            {% if count %}{% blocktrans count counter=count %}{{ counter }} finding{% plural %}{{ counter }} findings{% endblocktrans %}{% else %}{% trans "All checks passed" %}{% endif %}
+          </span>
+        </span>
+      </a>
+      {% endwith %}
+    {% endfor %}
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2 text-sm print:hidden">
+    <span class="text-slate-500">{% trans "Show" %}:</span>
+    <a href="?" class="badge {% if not severity %}bg-slate-900 text-white ring-slate-900{% else %}bg-white text-slate-600 ring-slate-300{% endif %}">{% trans "All" %} ({{ run.error_count|add:run.warning_count|add:run.info_count }})</a>
+    <a href="?severity=ERROR" class="badge {% if severity == 'ERROR' %}bg-red-600 text-white ring-red-600{% else %}bg-white text-red-700 ring-red-300{% endif %}">{% trans "Errors" %} ({{ run.error_count }})</a>
+    <a href="?severity=WARNING" class="badge {% if severity == 'WARNING' %}bg-amber-500 text-white ring-amber-500{% else %}bg-white text-amber-700 ring-amber-300{% endif %}">{% trans "Warnings" %} ({{ run.warning_count }})</a>
+    <span class="ms-auto text-xs text-slate-400">{% blocktrans with v=run.validator_version d=run.finished_at|date:"d M Y, H:i" %}Validator v{{ v }} · {{ d }}{% endblocktrans %}</span>
+  </div>
+
+  <div class="mt-4 space-y-6">
+    {% for key, layer in layers.items %}
+      <section id="layer-{{ key }}" class="card overflow-hidden">
+        <div class="card-header"><h2 class="card-title">{{ forloop.counter }}. {{ layer.label }}</h2></div>
+        {% if layer.findings %}
+          <div class="overflow-x-auto">
+            <table class="table">
+              <thead><tr><th>{% trans "Severity" %}</th><th>{% trans "Rule" %}</th><th>{% trans "Criterion and detail" %}</th><th>{% trans "File / location" %}</th></tr></thead>
+              <tbody>
+                {% for f in layer.findings %}
+                  <tr>
+                    <td>{% severity_badge f.severity %}</td>
+                    <td class="font-mono text-xs font-semibold whitespace-nowrap">{{ f.rule_code }}</td>
+                    <td class="min-w-72">
+                      <p class="font-medium text-slate-900">{{ f.title }}</p>
+                      {% if f.detail %}<p class="mt-0.5 text-xs text-slate-600" dir="ltr">{{ f.detail }}</p>{% endif %}
+                    </td>
+                    <td class="font-mono text-xs break-all text-slate-600" dir="ltr">{{ f.file_path|default:"—" }}{% if f.location %}<br><span class="text-slate-400">{{ f.location }}</span>{% endif %}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="flex items-center gap-2 px-5 py-4 text-sm text-emerald-700">{% icon "check-circle" "size-5" %}{% if severity %}{% trans "No findings of this severity." %}{% else %}{% trans "All checks in this layer passed." %}{% endif %}</p>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if tree %}
+  <section class="card mt-6" x-data>
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">{% trans "Dossier viewer" %}</h2>
+        <p class="mt-0.5 text-sm text-slate-500">{% trans "CTD structure from index.xml. Documents open in a new tab." %}</p>
+      </div>
+      <div class="flex gap-2 print:hidden">
+        <button type="button" class="btn btn-secondary btn-sm" @click="$root.querySelectorAll('details').forEach(d => d.open = true)">{% trans "Expand all" %}</button>
+        <button type="button" class="btn btn-secondary btn-sm" @click="$root.querySelectorAll('details').forEach(d => d.open = false)">{% trans "Collapse all" %}</button>
+      </div>
+    </div>
+    <div class="card-body space-y-1" dir="ltr">
+      {% for node in tree %}{% include "applications/_tree_node.html" %}{% endfor %}
+    </div>
+  </section>
+{% elif sequence.validation_status == "FAILED" %}
+  <p class="mt-6 text-sm text-slate-500">{% trans "The dossier viewer is available once a sequence passes technical validation." %}</p>
+{% endif %}
+{% endblock %}

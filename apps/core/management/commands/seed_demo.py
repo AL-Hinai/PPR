@@ -1,0 +1,152 @@
+"""Create demo users, companies and applications at every workflow stage.
+
+    python manage.py seed_demo            # password from DEMO_PASSWORD or the default below
+    python manage.py seed_demo --reset    # delete existing demo data first
+"""
+import os
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management.base import BaseCommand
+from django.db import transaction
+
+from apps.accounts.models import User
+from apps.applications import services
+from apps.applications.models import Application
+from apps.companies.models import Company
+from apps.validation import samples
+
+DEFAULT_PASSWORD = "Demo@2026"
+
+
+class Command(BaseCommand):
+    help = "Seed demo users, companies and applications (local development only)."
+
+    def add_arguments(self, parser):
+        parser.add_argument("--reset", action="store_true", help="Delete existing demo records first.")
+
+    def handle(self, *args, reset=False, **options):
+        password = os.environ.get("DEMO_PASSWORD", DEFAULT_PASSWORD)
+        if reset:
+            self._reset()
+        with transaction.atomic():
+            users = self._users(password)
+        self._applications(users)
+        self.stdout.write(self.style.SUCCESS("Demo data ready. Users (all share the same password):"))
+        for user in users.values():
+            self.stdout.write(f"  {user.username:<12} {user.get_role_display()}")
+
+    def _reset(self):
+        demo_companies = Company.objects.filter(registration_no__startswith="DEMO-")
+        for application in Application.objects.filter(company__in=demo_companies):
+            for sequence in application.sequences.all():
+                sequence.package.delete(save=False)
+            application.delete()
+        User.objects.filter(username__in=["hod", "reviewer1", "reviewer2", "acme", "gulfpharma"]).delete()
+        demo_companies.delete()
+
+    def _user(self, username, password, role, first, last, company=None):
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={"role": role, "first_name": first, "last_name": last, "company": company,
+                      "email": f"{username}@example.com"},
+        )
+        if created:
+            user.set_password(password)
+            user.save()
+        return user
+
+    def _users(self, password):
+        acme, _ = Company.objects.get_or_create(
+            registration_no="DEMO-1001",
+            defaults={"name_en": "Acme Pharmaceuticals LLC", "name_ar": "أكمي للأدوية ش.م.م",
+                      "license_no": "PH-2201", "country": "Oman", "is_verified": True,
+                      "contact_email": "regulatory@acme.example.com"},
+        )
+        gulf, _ = Company.objects.get_or_create(
+            registration_no="DEMO-1002",
+            defaults={"name_en": "Gulf Generics Co.", "name_ar": "شركة الخليج للأدوية الجنيسة",
+                      "license_no": "PH-3307", "country": "United Arab Emirates", "is_verified": True},
+        )
+        R = User.Role
+        return {
+            "hod": self._user("hod", password, R.HOD, "Jokha", "Al-Harthy"),
+            "reviewer1": self._user("reviewer1", password, R.REVIEWER, "Salim", "Al-Busaidi"),
+            "reviewer2": self._user("reviewer2", password, R.REVIEWER, "Maryam", "Al-Rawahi"),
+            "acme": self._user("acme", password, R.COMPANY, "Ahmed", "Al-Kindi", acme),
+            "gulfpharma": self._user("gulfpharma", password, R.COMPANY, "Fatma", "Al-Lawati", gulf),
+        }
+
+    def _upload(self, application, user, data):
+        return services.store_sequence(
+            application, user, SimpleUploadedFile("package.zip", data, content_type="application/zip")
+        )
+
+    def _new(self, user, **fields):
+        return Application.objects.create(company=user.company, created_by=user, **fields)
+
+    def _applications(self, users):
+        if Application.objects.filter(company__registration_no__startswith="DEMO-").exists():
+            self.stdout.write("Demo applications already exist (use --reset to recreate).")
+            return
+        acme, gulf, hod = users["acme"], users["gulfpharma"], users["hod"]
+        rev1, rev2 = users["reviewer1"], users["reviewer2"]
+        paracetamol = {"active_ingredients": "Paracetamol", "dosage_form": "Film-coated tablet",
+                       "strength": "500 mg", "route": "Oral", "atc_code": "N02BE01"}
+
+        # 1. Draft with an uploaded (not yet submitted) package
+        app = self._new(acme, application_type="GENERIC", product_name="Acme-Paracetamol 500 mg", **paracetamol)
+        self._upload(app, acme, samples.build_package("0000", "GENERIC"))
+
+        # 2. Validation failed (broken package)
+        app = self._new(gulf, application_type="GENERIC", product_name="Gulf-Ibuprofen 400 mg",
+                        active_ingredients="Ibuprofen", dosage_form="Tablet", strength="400 mg",
+                        route="Oral", atc_code="M01AE01")
+        broken = samples.build_files("0000", application_type="GENERIC")
+        broken["m2/22-intro/introduction.pdf"] = samples.make_pdf("Edited after checksum")
+        broken["m3/32-body-data/Extra File.PDF"] = samples.make_pdf("Unreferenced", version="1.3")
+        self._upload(app, gulf, samples.to_zip(broken))
+        services.submit(app, gulf)
+
+        # 3. Validated, waiting for the HOD to assign a reviewer
+        app = self._new(acme, application_type="NEW_DRUG", product_name="Cardiolex 10 mg",
+                        active_ingredients="Rosuvastatin calcium", dosage_form="Film-coated tablet",
+                        strength="10 mg", route="Oral", atc_code="C10AA07")
+        self._upload(app, acme, samples.build_package("0000", "NEW_DRUG"))
+        services.submit(app, acme)
+
+        # 4. Under review, with an information request answered by sequence 0001
+        app = self._new(acme, application_type="NEW_DRUG", product_name="Acme-Paracetamol IV 10 mg/ml",
+                        active_ingredients="Paracetamol", dosage_form="Solution for infusion",
+                        strength="10 mg/ml", route="Intravenous", atc_code="N02BE01")
+        self._upload(app, acme, samples.build_package("0000", "NEW_DRUG"))
+        services.submit(app, acme)
+        services.assign_reviewer(app, hod, rev1)
+        services.request_information(app, rev1, "1. Provide 12-month long-term stability data for batch B-003.\n"
+                                                  "2. Clarify the specification limit for impurity C.")
+        response = SimpleUploadedFile("response.zip", samples.build_package("0001", documents=samples.response_documents()))
+        services.respond_to_info_request(app, acme, response, "Updated stability summary provided in 3.2.P.8.1.")
+
+        # 5. Review complete, waiting for the HOD decision
+        app = self._new(gulf, application_type="GENERIC", product_name="Gulf-Metformin 850 mg",
+                        active_ingredients="Metformin hydrochloride", dosage_form="Film-coated tablet",
+                        strength="850 mg", route="Oral", atc_code="A10BA02")
+        self._upload(app, gulf, samples.build_package("0000", "GENERIC"))
+        services.submit(app, gulf)
+        services.assign_reviewer(app, hod, rev2)
+        app.reviews.create(reviewer=rev2, section="M3", assessment="ACCEPTABLE",
+                           comments="Specifications and stability data are adequate.")
+        app.reviews.create(reviewer=rev2, section="M5", assessment="MINOR",
+                           comments="Bioequivalence demonstrated; minor reporting gaps noted.")
+        services.complete_review(app, rev2, Application.Recommendation.APPROVE,
+                                 "Quality and bioequivalence are acceptable. Recommend approval.")
+
+        # 6. Approved
+        app = self._new(acme, application_type="GENERIC", product_name="Acme-Amoxicillin 500 mg",
+                        active_ingredients="Amoxicillin trihydrate", dosage_form="Capsule",
+                        strength="500 mg", route="Oral", atc_code="J01CA04")
+        self._upload(app, acme, samples.build_package("0000", "GENERIC"))
+        services.submit(app, acme)
+        services.assign_reviewer(app, hod, rev1)
+        app.reviews.create(reviewer=rev1, section="M3", assessment="ACCEPTABLE", comments="Acceptable.")
+        services.complete_review(app, rev1, Application.Recommendation.APPROVE, "Recommend approval.")
+        services.decide(app, hod, "APPROVED", "Meets quality, safety and efficacy requirements.")

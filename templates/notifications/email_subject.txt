@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with ref=application.reference_no status=status_label %}[PPR] {{ ref }}: {{ status }}{% endblocktrans %}{% endautoescape %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="card card-body mx-auto max-w-lg text-center">
+  <h1 class="text-lg font-semibold">{% trans "Your account has no role yet" %}</h1>
+  <p class="mt-2 text-sm text-slate-500">{% trans "Ask the system administrator to assign you a role (and company, for applicants)." %}</p>
+</div>
+{% endblock %}

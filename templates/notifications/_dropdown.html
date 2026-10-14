@@ -1,0 +1,22 @@
+{% load i18n ui %}<div class="-m-4">
+  <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+    <p class="text-sm font-semibold text-slate-900">{% trans "Notifications" %}</p>
+    <a href="{% url 'notifications:list' %}" class="text-xs font-medium text-brand-700 hover:underline">{% trans "View all" %}</a>
+  </div>
+  <ul class="max-h-96 divide-y divide-slate-100 overflow-y-auto">
+    {% for n in items %}
+      <li>
+        <a href="{% url 'notifications:open' n.pk %}" class="flex gap-3 px-4 py-3 hover:bg-slate-50 {% if not n.is_read %}bg-brand-50/40{% endif %}">
+          <span class="mt-1.5 size-2 shrink-0 rounded-full {% status_dot n.status %}"></span>
+          <span class="min-w-0">
+            <span class="block text-sm text-slate-800"><span class="font-mono text-xs font-semibold">{{ n.application.reference_no }}</span> · {{ n.get_status_display }}</span>
+            <span class="block truncate text-xs text-slate-500">{{ n.application.product_name }}</span>
+            <span class="block text-[11px] text-slate-400">{{ n.created_at|timesince }}</span>
+          </span>
+        </a>
+      </li>
+    {% empty %}
+      <li class="px-4 py-6 text-center text-sm text-slate-500">{% trans "You're all caught up." %}</li>
+    {% endfor %}
+  </ul>
+</div>

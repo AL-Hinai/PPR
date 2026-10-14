@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Notifications" %}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <h1 class="text-2xl font-bold text-slate-900">{% trans "Notifications" %}</h1>
+  {% if unread_notifications %}
+    <form method="post" action="{% url 'notifications:read_all' %}">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <button class="btn btn-secondary">{% icon "check" "size-4" %}{% trans "Mark all as read" %}</button>
+    </form>
+  {% endif %}
+</div>
+<section class="card mt-6">
+  <ul class="divide-y divide-slate-100">
+    {% for n in items %}
+      <li>
+        <a href="{% url 'notifications:open' n.pk %}" class="flex flex-wrap items-start gap-4 px-5 py-4 hover:bg-slate-50 {% if not n.is_read %}bg-brand-50/40{% endif %}">
+          <span class="mt-1.5 size-2.5 shrink-0 rounded-full {% status_dot n.status %}"></span>
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm text-slate-900"><span class="font-mono text-xs font-semibold">{{ n.application.reference_no }}</span> · {{ n.application.product_name }}</span>
+            <span class="mt-1 block">{% status_badge n.status %}</span>
+            {% if n.note %}<span class="mt-1 block line-clamp-2 text-sm text-slate-600">{{ n.note }}</span>{% endif %}
+          </span>
+          <span class="text-xs whitespace-nowrap text-slate-400">{{ n.created_at|date:"d M Y, H:i" }}</span>
+        </a>
+      </li>
+    {% empty %}
+      <li>{% trans "No notifications yet" as t %}{% include "components/empty.html" with title=t icon="bell" %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

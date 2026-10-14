@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Sign in" %}{% endblock %}
+{% block main_class %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div class="grid min-h-screen lg:grid-cols-2">
+  <div class="relative hidden overflow-hidden bg-brand-950 lg:block">
+    <div class="absolute inset-0 bg-[radial-gradient(50rem_30rem_at_20%_10%,rgba(66,186,169,0.35),transparent)]"></div>
+    <div class="relative flex h-full flex-col justify-between p-12 text-white">
+      <a href="{% url 'core:home' %}" class="flex items-center gap-2.5">
+        <span class="grid size-9 place-items-center rounded-lg bg-white/10 ring-1 ring-white/20">
+          <svg viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true"><path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z"/></svg>
+        </span>
+        <span class="text-sm font-bold tracking-wide">PPR</span>
+      </a>
+      <div>
+        <p class="text-3xl font-bold leading-tight">{% trans "Pharmaceutical Product Registration" %}</p>
+        <p class="mt-4 max-w-md text-brand-100/80">{% trans "Electronic submission, eCTD technical validation and approval of medicinal products." %}</p>
+      </div>
+      <p class="text-xs text-brand-200/60">{% trans "Pharmacy Department" %}</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col px-4 py-8 sm:px-12">
+    <div class="flex justify-end">{% include "partials/language_switch.html" %}</div>
+    <div class="m-auto w-full max-w-sm py-12">
+      <h1 class="text-2xl font-bold text-slate-900">{% trans "Sign in" %}</h1>
+      <p class="mt-2 text-sm text-slate-500">{% trans "Use the account issued to you by the Pharmacy Department." %}</p>
+      <form method="post" class="mt-8 space-y-5">
+        {% csrf_token %}
+        {% include "components/form_errors.html" %}
+        {% include "components/field.html" with field=form.username %}
+        {% include "components/field.html" with field=form.password %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="btn btn-primary w-full py-2.5">{% trans "Sign in" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

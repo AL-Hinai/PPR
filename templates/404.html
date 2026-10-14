@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Not found" %}{% endblock %}
+{% block content %}
+<div class="card card-body mx-auto max-w-lg text-center">
+  <p class="font-mono text-sm font-semibold text-brand-700">404</p>
+  <h1 class="mt-2 text-xl font-bold">{% trans "Page not found" %}</h1>
+  <p class="mt-2 text-sm text-slate-500">{% trans "It may have moved, or you may not have access to it." %}</p>
+  <a href="{% url 'core:home' %}" class="btn btn-primary mx-auto mt-6">{% trans "Go home" %}</a>
+</div>
+{% endblock %}

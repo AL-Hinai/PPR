@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <p class="text-sm text-slate-500">{{ user.company.name }}</p>
+    <h1 class="text-2xl font-bold text-slate-900">{% blocktrans with name=user.first_name|default:user.username %}Welcome, {{ name }}{% endblocktrans %}</h1>
+  </div>
+  <a href="{% url 'applications:create' %}" class="btn btn-primary">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
+</div>
+
+<div class="mt-6 grid gap-4 sm:grid-cols-3">
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "All applications" %}</p><p class="mt-1 text-3xl font-bold text-slate-900">{{ total }}</p></div>
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "In progress" %}</p><p class="mt-1 text-3xl font-bold text-amber-600">{{ in_progress }}</p></div>
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "Approved" %}</p><p class="mt-1 text-3xl font-bold text-emerald-600">{{ approved }}</p></div>
+</div>
+
+{% if action_needed %}
+<section class="card mt-6 border-amber-200">
+  <div class="card-header bg-amber-50/60"><h2 class="card-title flex items-center gap-2">{% icon "warning" "size-5 text-amber-600" %}{% trans "Action needed" %}</h2></div>
+  <ul class="divide-y divide-slate-100">
+    {% for app in action_needed %}
+      <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+        <div>
+          <a href="{{ app.get_absolute_url }}" class="font-medium text-slate-900 hover:text-brand-700">{{ app.product_name }}</a>
+          <p class="text-xs text-slate-500">
+            {{ app.reference_no }} ·
+            {% if app.status == "DRAFT" %}{% trans "Upload your eCTD package and submit." %}
+            {% elif app.status == "VALIDATION_FAILED" %}{% trans "Fix the validation errors and resubmit." %}
+            {% else %}{% trans "The reviewer has questions. Upload a response sequence." %}{% endif %}
+          </p>
+        </div>
+        <div class="flex items-center gap-3">{% status_badge app.status %}<a href="{{ app.get_absolute_url }}?tab=sequences" class="btn btn-secondary btn-sm">{% trans "Open" %}</a></div>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="card mt-6">
+  <div class="card-header">
+    <h2 class="card-title">{% trans "Recent applications" %}</h2>
+    <a href="{% url 'applications:list' %}" class="text-sm font-medium text-brand-700 hover:underline">{% trans "View all" %}</a>
+  </div>
+  {% if recent %}
+    {% include "components/application_table.html" with applications=recent %}
+  {% else %}
+    {% trans "No applications yet" as empty_title %}{% trans "Create your first application to start an eCTD submission." as empty_text %}
+    {% include "components/empty.html" with title=empty_title text=empty_text %}
+  {% endif %}
+</section>
+{% endblock %}

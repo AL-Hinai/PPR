@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Applications" %}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <h1 class="text-2xl font-bold text-slate-900">{% trans "Applications" %}</h1>
+  {% if user.is_company %}<a href="{% url 'applications:create' %}" class="btn btn-primary">{% icon "plus" "size-4" %}{% trans "New application" %}</a>{% endif %}
+</div>
+
+<form method="get" class="mt-6 flex flex-col gap-3 sm:flex-row">
+  <div class="relative flex-1">
+    <span class="pointer-events-none absolute inset-y-0 start-3 grid place-items-center text-slate-400">{% icon "search" "size-4" %}</span>
+    <input type="search" name="q" value="{{ query }}" class="input ps-9" placeholder="{% trans 'Search reference, product, ingredient or company' %}">
+  </div>
+  <select name="status" class="input sm:w-64" onchange="this.form.submit()">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for value, label in statuses %}<option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-secondary">{% trans "Filter" %}</button>
+</form>
+
+<section class="card mt-4 overflow-hidden">
+  {% if page.object_list %}
+    {% include "components/application_table.html" with applications=page.object_list %}
+    {% if page.has_other_pages %}
+      <nav class="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-sm">
+        <span class="text-slate-500">{% blocktrans with n=page.number total=page.paginator.num_pages %}Page {{ n }} of {{ total }}{% endblocktrans %}</span>
+        <div class="flex gap-2">
+          {% if page.has_previous %}<a class="btn btn-secondary btn-sm" href="{% query page=page.previous_page_number %}">{% trans "Previous" %}</a>{% endif %}
+          {% if page.has_next %}<a class="btn btn-secondary btn-sm" href="{% query page=page.next_page_number %}">{% trans "Next" %}</a>{% endif %}
+        </div>
+      </nav>
+    {% endif %}
+  {% else %}
+    {% trans "No applications found" as t %}{% trans "Try a different search or status filter." as x %}
+    {% include "components/empty.html" with title=t text=x %}
+  {% endif %}
+</section>
+{% endblock %}

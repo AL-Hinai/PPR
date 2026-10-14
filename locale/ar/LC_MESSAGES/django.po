@@ -1,0 +1,1629 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PPR\n"
+"POT-Creation-Date: 2026-10-14 08:17+0000\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: templates/core/dashboard_hod.html
+#, python-format
+msgid "%(avg_days)s days average"
+msgstr "متوسط %(avg_days)s يوماً"
+
+#: templates/applications/sequence_detail.html
+#, python-format
+msgid "%(counter)s finding"
+msgid_plural "%(counter)s findings"
+msgstr[0] "%(counter)s ملاحظة"
+msgstr[1] "ملاحظة واحدة"
+msgstr[2] "ملاحظتان"
+msgstr[3] "%(counter)s ملاحظات"
+msgstr[4] "%(counter)s ملاحظة"
+msgstr[5] "%(counter)s ملاحظة"
+
+#: apps/applications/models.py:89
+msgid "(draft)"
+msgstr "(مسودة)"
+
+#: templates/core/home.html
+msgid "1. Submit"
+msgstr "١. التقديم"
+
+#: templates/core/home.html
+msgid "2. Validate"
+msgstr "٢. التحقق"
+
+#: templates/core/home.html
+msgid "3. Review"
+msgstr "٣. المراجعة"
+
+#: templates/core/home.html
+msgid "4. Decide"
+msgstr "٤. القرار"
+
+#: templates/notifications/email_subject.txt
+#, python-format
+msgid "[PPR] %(ref)s: %(status)s"
+msgstr "[PPR] %(ref)s: %(status)s"
+
+#: templates/core/home.html
+msgid "A reviewer assesses each CTD module and can request more information."
+msgstr "يقيّم المراجع كل وحدة من وحدات CTD ويمكنه طلب معلومات إضافية."
+
+#: apps/applications/services.py:97
+msgid "A reviewer cannot be assigned at this stage."
+msgstr "لا يمكن تعيين مراجع في هذه المرحلة."
+
+#: apps/applications/forms.py:34
+msgid "A zip file containing one sequence folder (e.g. 0000/) with index.xml at its root."
+msgstr "ملف مضغوط (zip) يحتوي على مجلد تسلسل واحد (مثل 0000/) وفي جذره الملف index.xml."
+
+#: apps/applications/models.py:201
+msgid "Acceptable"
+msgstr "مقبول"
+
+#: templates/core/home.html
+msgid "Accepted formats, PDF version, no passwords or scripts, embedded fonts and size limits."
+msgstr "الصيغ المقبولة، إصدار PDF، عدم وجود كلمات مرور أو برمجيات نصية، تضمين الخطوط وحدود الحجم."
+
+#: templates/403.html
+msgid "Access denied"
+msgstr "تم رفض الوصول"
+
+#: apps/accounts/apps.py:8
+msgid "Accounts"
+msgstr "الحسابات"
+
+#: templates/core/dashboard_company.html
+msgid "Action needed"
+msgstr "مطلوب إجراء"
+
+#: apps/applications/models.py:56
+msgid "active ingredient(s)"
+msgstr "المادة (المواد) الفعالة"
+
+#: templates/applications/_tab_overview.html
+msgid "Active ingredient(s)"
+msgstr "المادة (المواد) الفعالة"
+
+#: templates/applications/_tab_review.html
+msgid "Add section review"
+msgstr "إضافة مراجعة قسم"
+
+#: apps/companies/models.py:14
+msgid "address"
+msgstr "العنوان"
+
+#: templates/applications/sequence_detail.html
+msgid "All"
+msgstr "الكل"
+
+#: templates/core/dashboard_company.html
+msgid "All applications"
+msgstr "جميع الطلبات"
+
+#: templates/applications/sequence_detail.html
+msgid "All checks in this layer passed."
+msgstr "اجتازت جميع فحوصات هذه الطبقة."
+
+#: templates/applications/sequence_detail.html
+msgid "All checks passed"
+msgstr "اجتازت جميع الفحوصات"
+
+#: templates/applications/list.html
+msgid "All statuses"
+msgstr "جميع الحالات"
+
+#: apps/applications/models.py:223
+msgid "Answered"
+msgstr "تمت الإجابة"
+
+#: templates/applications/_tab_overview.html
+msgid "Applicant"
+msgstr "مقدّم الطلب"
+
+#: templates/applications/_tab_review.html
+msgid "Applicant response"
+msgstr "رد مقدّم الطلب"
+
+#: apps/applications/models.py:85
+msgid "application"
+msgstr "طلب"
+
+#: templates/notifications/email_body.txt
+#, python-format
+msgid "Application %(ref)s (%(product)s) is now: %(status)s."
+msgstr "الطلب %(ref)s (%(product)s) أصبح الآن: %(status)s."
+
+#: apps/applications/views.py:106
+msgid "Application created. Now upload the eCTD package (sequence 0000)."
+msgstr "تم إنشاء الطلب. ارفع الآن حزمة eCTD (التسلسل 0000)."
+
+#: apps/applications/views.py:281
+msgid "Application returned to the reviewer."
+msgstr "تمت إعادة الطلب إلى المراجع."
+
+#: apps/applications/models.py:54
+msgid "application type"
+msgstr "نوع الطلب"
+
+#: templates/applications/_tab_overview.html
+msgid "Application type"
+msgstr "نوع الطلب"
+
+#: apps/applications/views.py:119
+msgid "Application updated."
+msgstr "تم تحديث الطلب."
+
+#: apps/applications/apps.py:8 templates/applications/detail.html templates/applications/list.html templates/applications/list.html templates/base.html templates/base.html
+msgid "Applications"
+msgstr "الطلبات"
+
+#: apps/applications/models.py:86
+msgid "applications"
+msgstr "الطلبات"
+
+#: templates/core/dashboard_hod.html
+msgid "Applications by status"
+msgstr "الطلبات حسب الحالة"
+
+#: templates/applications/_tab_overview.html templates/applications/_tab_review.html templates/applications/detail.html
+msgid "Approval certificate"
+msgstr "شهادة الموافقة"
+
+#: apps/applications/models.py:254
+msgid "approval no."
+msgstr "رقم الموافقة"
+
+#: templates/applications/_tab_review.html
+#, python-format
+msgid "Approval no. <strong>%(no)s</strong>, valid until %(date)s."
+msgstr "رقم الموافقة <strong>%(no)s</strong>، صالحة حتى %(date)s."
+
+#: templates/core/dashboard_hod.html
+msgid "Approvals overview"
+msgstr "نظرة عامة على الموافقات"
+
+#: apps/applications/models.py:47
+msgid "Approve"
+msgstr "الموافقة"
+
+#: apps/applications/models.py:37 apps/applications/models.py:247 templates/core/dashboard_company.html
+msgid "Approved"
+msgstr "تمت الموافقة"
+
+#: templates/core/dashboard_hod.html
+msgid "approved"
+msgstr "موافق عليها"
+
+#: templates/applications/_tab_overview.html
+#, python-format
+msgid "Approved under no. %(no)s, valid until %(date)s."
+msgstr "تمت الموافقة برقم %(no)s، صالحة حتى %(date)s."
+
+#: config/settings/base.py:80
+msgid "Arabic"
+msgstr "العربية"
+
+#: templates/core/no_role.html
+msgid "Ask the system administrator to assign you a role (and company, for applicants)."
+msgstr "اطلب من مسؤول النظام تعيين دور لك (وشركة لمقدّمي الطلبات)."
+
+#: templates/applications/_tab_overview.html
+msgid "Assess each CTD module, request information if needed, then submit your recommendation."
+msgstr "قيّم كل وحدة من وحدات CTD، واطلب معلومات عند الحاجة، ثم قدّم توصيتك."
+
+#: apps/applications/models.py:208
+msgid "assessment"
+msgstr "التقييم"
+
+#: apps/applications/views.py:139
+msgid "Assessment"
+msgstr "التقييم"
+
+#: templates/applications/_tab_review.html
+#, python-format
+msgid "Assessment by %(name)s."
+msgstr "التقييم بواسطة %(name)s."
+
+#: apps/applications/forms.py:77
+msgid "Assessment summary"
+msgstr "ملخص التقييم"
+
+#: templates/core/dashboard_hod.html
+msgid "Assign"
+msgstr "تعيين"
+
+#: templates/applications/_tab_overview.html
+msgid "Assign reviewer"
+msgstr "تعيين مراجع"
+
+#: apps/applications/models.py:64
+msgid "assigned reviewer"
+msgstr "المراجع المعيّن"
+
+#: templates/applications/_tab_overview.html
+msgid "Assigned reviewer"
+msgstr "المراجع المعيّن"
+
+#: apps/applications/services.py:82
+#, python-format
+msgid "Assigned to %(name)s"
+msgstr "تم التعيين إلى %(name)s"
+
+#: apps/applications/views.py:40
+msgid "Assignment"
+msgstr "التعيين"
+
+#: apps/applications/models.py:60 templates/applications/_tab_overview.html
+msgid "ATC code"
+msgstr "رمز ATC"
+
+#: templates/applications/_tab_history.html
+msgid "Audit trail"
+msgstr "سجل التدقيق"
+
+#: templates/core/dashboard_hod.html
+msgid "Awaiting assignment"
+msgstr "بانتظار التعيين"
+
+#: templates/core/dashboard_hod.html templates/core/dashboard_hod.html
+msgid "Awaiting your decision"
+msgstr "بانتظار قرارك"
+
+#: templates/applications/certificate.html templates/applications/form.html
+msgid "Back"
+msgstr "رجوع"
+
+#: templates/403.html
+msgid "Back to dashboard"
+msgstr "العودة إلى لوحة التحكم"
+
+#: apps/applications/forms.py:51
+msgid "Briefly describe how the questions are answered."
+msgstr "صف باختصار كيف تمت الإجابة عن الأسئلة."
+
+#: apps/validation/models.py:36 templates/core/home.html
+msgid "Business rule checks"
+msgstr "فحص قواعد العمل"
+
+#: templates/core/dashboard_reviewer.html
+msgid "Clock stopped – waiting for responses"
+msgstr "الساعة متوقفة – بانتظار الردود"
+
+#: templates/applications/sequence_detail.html
+msgid "Collapse all"
+msgstr "طيّ الكل"
+
+#: apps/applications/models.py:209
+msgid "comments"
+msgstr "الملاحظات"
+
+#: apps/companies/models.py:11
+msgid "commercial registration no."
+msgstr "رقم السجل التجاري"
+
+#: templates/companies/profile.html
+msgid "Commercial registration no."
+msgstr "رقم السجل التجاري"
+
+#: apps/companies/apps.py:8
+msgid "Companies"
+msgstr "الشركات"
+
+#: apps/companies/models.py:23
+msgid "companies"
+msgstr "الشركات"
+
+#: apps/accounts/models.py:17 apps/applications/models.py:52 apps/companies/models.py:22
+msgid "company"
+msgstr "الشركة"
+
+#: templates/base.html templates/base.html templates/companies/profile.html templates/components/application_table.html
+msgid "Company"
+msgstr "الشركة"
+
+#: apps/accounts/models.py:10
+msgid "Company applicant"
+msgstr "شركة مقدّمة للطلب"
+
+#: apps/accounts/models.py:30
+msgid "Company applicants must belong to a company."
+msgstr "يجب أن ينتمي مقدّمو الطلبات إلى شركة."
+
+#: apps/companies/views.py:16
+msgid "Company profile updated."
+msgstr "تم تحديث ملف الشركة."
+
+#: templates/applications/_tab_review.html
+msgid "Complete review"
+msgstr "إكمال المراجعة"
+
+#: templates/core/dashboard_reviewer.html
+msgid "Completed"
+msgstr "مكتملة"
+
+#: templates/applications/_tab_review.html
+msgid "Confirm decision"
+msgstr "تأكيد القرار"
+
+#: templates/companies/profile.html
+msgid "Contact details"
+msgstr "بيانات التواصل"
+
+#: apps/companies/models.py:15
+msgid "contact email"
+msgstr "البريد الإلكتروني للتواصل"
+
+#: apps/companies/models.py:16
+msgid "contact phone"
+msgstr "هاتف التواصل"
+
+#: apps/companies/models.py:13
+msgid "country"
+msgstr "الدولة"
+
+#: templates/companies/profile.html
+msgid "Country"
+msgstr "الدولة"
+
+#: templates/applications/form.html
+msgid "Create and continue"
+msgstr "إنشاء ومتابعة"
+
+#: templates/core/dashboard_company.html
+msgid "Create your first application to start an eCTD submission."
+msgstr "أنشئ طلبك الأول لبدء تقديم ملف eCTD."
+
+#: templates/applications/sequence_detail.html
+msgid "Criterion and detail"
+msgstr "المعيار والتفاصيل"
+
+#: templates/applications/sequence_detail.html
+msgid "CTD structure from index.xml. Documents open in a new tab."
+msgstr "هيكل CTD من ملف index.xml. تُفتح المستندات في علامة تبويب جديدة."
+
+#: templates/base.html templates/base.html templates/base.html templates/core/dashboard_company.html templates/core/dashboard_hod.html templates/core/dashboard_reviewer.html
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+#: templates/notifications/email_body.txt
+#, python-format
+msgid "Dear %(name)s,"
+msgstr "عزيزي/عزيزتي %(name)s،"
+
+#: templates/core/dashboard_hod.html
+msgid "Decide"
+msgstr "اتخاذ القرار"
+
+#: apps/applications/forms.py:81 templates/applications/_tab_review.html
+msgid "Decision"
+msgstr "القرار"
+
+#: apps/applications/models.py:259
+msgid "decision"
+msgstr "قرار"
+
+#: apps/applications/views.py:43
+msgid "Decision issued"
+msgstr "صدور القرار"
+
+#: apps/applications/views.py:267
+#, python-format
+msgid "Decision recorded: %(outcome)s."
+msgstr "تم تسجيل القرار: %(outcome)s."
+
+#: apps/applications/models.py:260
+msgid "decisions"
+msgstr "القرارات"
+
+#: templates/core/dashboard_hod.html
+#, python-format
+msgid "Decisions in %(year)s"
+msgstr "قرارات عام %(year)s"
+
+#: apps/applications/models.py:146
+msgid "description"
+msgstr "الوصف"
+
+#: templates/base.html
+msgid "Dismiss"
+msgstr "إغلاق"
+
+#: apps/applications/models.py:57
+msgid "dosage form"
+msgstr "الشكل الصيدلاني"
+
+#: templates/applications/_tab_overview.html
+msgid "Dosage form"
+msgstr "الشكل الصيدلاني"
+
+#: templates/applications/sequence_detail.html
+msgid "Dossier viewer"
+msgstr "عارض الملف"
+
+#: templates/applications/_tab_sequences.html
+msgid "Download zip"
+msgstr "تنزيل الملف المضغوط"
+
+#: apps/applications/models.py:29
+msgid "Draft"
+msgstr "مسودة"
+
+#: templates/applications/_tab_history.html
+#, python-format
+msgid "Draft created on %(d)s. Nothing has been submitted yet."
+msgstr "أُنشئت المسودة في %(d)s. لم يُقدَّم شيء بعد."
+
+#: templates/applications/_tab_review.html
+#, python-format
+msgid "due %(d)s"
+msgstr "الموعد النهائي %(d)s"
+
+#: templates/applications/_tab_sequences.html
+#, python-format
+msgid "Due %(d)s"
+msgstr "الموعد النهائي %(d)s"
+
+#: apps/applications/forms.py:32
+msgid "eCTD package (.zip)"
+msgstr "حزمة eCTD (.zip)"
+
+#: apps/applications/models.py:138
+msgid "eCTD package (zip)"
+msgstr "حزمة eCTD (zip)"
+
+#: apps/applications/views.py:138
+msgid "eCTD sequences"
+msgstr "تسلسلات eCTD"
+
+#: apps/validation/apps.py:10
+msgid "eCTD validation"
+msgstr "التحقق من eCTD"
+
+#: templates/applications/detail.html
+msgid "Edit"
+msgstr "تعديل"
+
+#: templates/applications/form.html templates/applications/form.html
+msgid "Edit application"
+msgstr "تعديل الطلب"
+
+#: templates/accounts/login.html
+msgid "Electronic submission, eCTD technical validation and approval of medicinal products."
+msgstr "التقديم الإلكتروني والتحقق الفني بصيغة eCTD والموافقة على المستحضرات الدوائية."
+
+#: config/settings/base.py:80
+msgid "English"
+msgstr "الإنجليزية"
+
+#: apps/validation/models.py:40
+msgid "Error"
+msgstr "خطأ"
+
+#: templates/applications/_tab_sequences.html
+msgid "errors"
+msgstr "أخطاء"
+
+#: templates/applications/sequence_detail.html
+msgid "Errors"
+msgstr "الأخطاء"
+
+#: apps/validation/rules/business.py:66
+msgid "Every document reference (leaf) must point to a file inside the sequence"
+msgstr "يجب أن يشير كل مرجع مستند (leaf) إلى ملف داخل التسلسل"
+
+#: apps/validation/rules/business.py:93
+msgid "Every document's MD5 checksum must match the value declared in the XML"
+msgstr "يجب أن يطابق المجموع الاختباري MD5 لكل مستند القيمة المصرّح بها في XML"
+
+#: templates/applications/sequence_detail.html
+msgid "Expand all"
+msgstr "توسيع الكل"
+
+#: apps/applications/models.py:132
+msgid "Failed"
+msgstr "فشل"
+
+#: templates/applications/sequence_detail.html
+msgid "File / location"
+msgstr "الملف / الموقع"
+
+#: apps/validation/rules/business.py:222
+msgid "File and folder names must follow ICH naming conventions"
+msgstr "يجب أن تتبع أسماء الملفات والمجلدات قواعد التسمية الخاصة بـ ICH"
+
+#: apps/validation/models.py:37 templates/core/home.html
+msgid "File compliance inspection"
+msgstr "فحص امتثال الملفات"
+
+#: apps/validation/rules/business.py:123
+msgid "Files in the package should be referenced by the XML backbone"
+msgstr "يُفضّل أن تكون جميع ملفات الحزمة مُشاراً إليها في ملف XML الرئيسي"
+
+#: apps/validation/rules/files.py:112
+msgid "Files must not be empty"
+msgstr "يجب ألا تكون الملفات فارغة"
+
+#: templates/applications/list.html
+msgid "Filter"
+msgstr "تصفية"
+
+#: apps/validation/models.py:54
+msgid "finding"
+msgstr "ملاحظة"
+
+#: apps/validation/models.py:55
+msgid "findings"
+msgstr "ملاحظات"
+
+#: templates/applications/_tab_sequences.html
+msgid "Findings"
+msgstr "الملاحظات"
+
+#: templates/core/dashboard_company.html
+msgid "Fix the validation errors and resubmit."
+msgstr "صحّح أخطاء التحقق وأعد التقديم."
+
+#: apps/validation/rules/files.py:82
+msgid "Fonts used in PDF files should be embedded"
+msgstr "يُفضّل تضمين الخطوط المستخدمة في ملفات PDF"
+
+#: apps/applications/models.py:42
+msgid "Generic"
+msgstr "جنيس"
+
+#: templates/404.html
+msgid "Go home"
+msgstr "الصفحة الرئيسية"
+
+#: apps/accounts/models.py:12 templates/core/dashboard_hod.html
+msgid "Head of Department"
+msgstr "رئيس القسم"
+
+#: apps/applications/views.py:140
+msgid "History"
+msgstr "السجل"
+
+#: apps/applications/views.py:42
+msgid "HOD decision"
+msgstr "قرار رئيس القسم"
+
+#: templates/core/home.html
+msgid "How an application moves"
+msgstr "مسار الطلب"
+
+#: templates/core/dashboard_company.html
+msgid "In progress"
+msgstr "قيد الإجراء"
+
+#: templates/core/dashboard_hod.html
+msgid "In scientific review"
+msgstr "قيد المراجعة العلمية"
+
+#: apps/validation/rules/business.py:44
+msgid "index-md5.txt must exist and match the MD5 checksum of index.xml"
+msgstr "يجب وجود الملف index-md5.txt ومطابقته للمجموع الاختباري MD5 لملف index.xml"
+
+#: templates/core/home.html
+msgid "index.xml is well-formed and valid against the ICH eCTD 3.2 DTD."
+msgstr "ملف index.xml سليم البنية ومطابق لتعريف DTD الخاص بـ ICH eCTD 3.2."
+
+#: apps/validation/rules/schema.py:48
+msgid "index.xml must be valid against the ICH eCTD 3.2 DTD"
+msgstr "يجب أن يكون index.xml مطابقاً لتعريف DTD الخاص بـ ICH eCTD 3.2"
+
+#: apps/validation/rules/schema.py:37
+msgid "index.xml must be well-formed XML"
+msgstr "يجب أن يكون index.xml ملف XML سليم البنية"
+
+#: apps/validation/rules/files.py:96
+msgid "Individual files must not exceed the maximum file size"
+msgstr "يجب ألا يتجاوز أي ملف الحد الأقصى للحجم"
+
+#: apps/validation/models.py:42
+msgid "Info"
+msgstr "معلومة"
+
+#: apps/applications/models.py:239
+msgid "information request"
+msgstr "طلب معلومات"
+
+#: apps/applications/models.py:35
+msgid "Information requested"
+msgstr "مطلوب معلومات"
+
+#: apps/applications/models.py:240
+msgid "information requests"
+msgstr "طلبات المعلومات"
+
+#: templates/applications/_tab_review.html
+msgid "Information requests"
+msgstr "طلبات المعلومات"
+
+#: templates/404.html
+msgid "It may have moved, or you may not have access to it."
+msgstr "ربما نُقلت الصفحة، أو ليست لديك صلاحية الوصول إليها."
+
+#: apps/applications/forms.py:82
+msgid "Justification"
+msgstr "المبررات"
+
+#: apps/applications/models.py:253
+msgid "justification"
+msgstr "المبررات"
+
+#: templates/applications/_tab_overview.html
+msgid "Latest sequence"
+msgstr "أحدث تسلسل"
+
+#: templates/companies/profile.html
+msgid "Legal identifiers are maintained by the Pharmacy Department."
+msgstr "تتولى دائرة الصيدلة إدارة البيانات القانونية."
+
+#: templates/applications/_tab_overview.html
+msgid "License"
+msgstr "الترخيص"
+
+#: apps/validation/rules/business.py:163
+msgid "Lifecycle operations must be valid and refer to documents in earlier sequences"
+msgstr "يجب أن تكون عمليات دورة الحياة صحيحة وتشير إلى مستندات في تسلسلات سابقة"
+
+#: templates/base.html
+msgid "Loading…"
+msgstr "جارٍ التحميل…"
+
+#: templates/applications/_tab_sequences.html
+msgid "Lowercase file names; PDF 1.4–1.7 without passwords"
+msgstr "أسماء ملفات بأحرف صغيرة؛ ملفات PDF من الإصدار 1.4 إلى 1.7 بدون كلمات مرور"
+
+#: templates/base.html
+msgid "Main"
+msgstr "الرئيسية"
+
+#: apps/applications/models.py:203
+msgid "Major issues"
+msgstr "ملاحظات جوهرية"
+
+#: templates/applications/_tab_overview.html
+msgid "Make decision"
+msgstr "اتخاذ القرار"
+
+#: templates/notifications/list.html
+msgid "Mark all as read"
+msgstr "تعليم الكل كمقروء"
+
+#: templates/base.html
+msgid "Menu"
+msgstr "القائمة"
+
+#: apps/applications/models.py:202
+msgid "Minor issues"
+msgstr "ملاحظات بسيطة"
+
+#: apps/applications/models.py:194
+msgid "Module 1 – Administrative & labelling"
+msgstr "الوحدة 1 – المعلومات الإدارية والنشرات"
+
+#: apps/applications/models.py:195
+msgid "Module 2 – Summaries"
+msgstr "الوحدة 2 – الملخصات"
+
+#: apps/applications/models.py:196
+msgid "Module 3 – Quality"
+msgstr "الوحدة 3 – الجودة"
+
+#: apps/applications/models.py:197
+msgid "Module 4 – Non-clinical"
+msgstr "الوحدة 4 – الدراسات غير السريرية"
+
+#: apps/applications/models.py:198
+msgid "Module 5 – Clinical"
+msgstr "الوحدة 5 – الدراسات السريرية"
+
+#: templates/core/dashboard_reviewer.html
+msgid "My review queue"
+msgstr "قائمة مراجعاتي"
+
+#: apps/companies/models.py:10
+msgid "name (Arabic)"
+msgstr "الاسم (بالعربية)"
+
+#: apps/companies/models.py:9
+msgid "name (English)"
+msgstr "الاسم (بالإنجليزية)"
+
+#: templates/companies/profile.html
+msgid "Name (English)"
+msgstr "الاسم (بالإنجليزية)"
+
+#: templates/applications/form.html templates/applications/list.html templates/base.html templates/base.html templates/core/dashboard_company.html
+msgid "New application"
+msgstr "طلب جديد"
+
+#: templates/core/dashboard_reviewer.html
+msgid "New assignments from the Head of Department appear here."
+msgstr "تظهر هنا المهام الجديدة المحالة من رئيس القسم."
+
+#: apps/applications/models.py:41
+msgid "New drug (innovator)"
+msgstr "دواء جديد (مبتكر)"
+
+#: templates/applications/form.html
+msgid "New marketing authorisation application"
+msgstr "طلب ترخيص تسويق جديد"
+
+#: templates/applications/list.html
+msgid "Next"
+msgstr "التالي"
+
+#: templates/applications/_tab_overview.html
+msgid "Next step"
+msgstr "الخطوة التالية"
+
+#: templates/applications/_tab_overview.html
+msgid "No action is needed from you at this stage."
+msgstr "لا يلزمك أي إجراء في هذه المرحلة."
+
+#: templates/core/dashboard_hod.html
+msgid "No active reviews."
+msgstr "لا توجد مراجعات نشطة."
+
+#: templates/applications/list.html
+msgid "No applications found"
+msgstr "لم يتم العثور على طلبات"
+
+#: templates/core/dashboard_company.html
+msgid "No applications yet"
+msgstr "لا توجد طلبات بعد"
+
+#: templates/core/dashboard_hod.html
+msgid "No decisions pending"
+msgstr "لا توجد قرارات معلقة"
+
+#: templates/applications/sequence_detail.html
+msgid "No findings of this severity."
+msgstr "لا توجد ملاحظات بهذه الدرجة."
+
+#: templates/applications/_tab_review.html
+msgid "No information requests"
+msgstr "لا توجد طلبات معلومات"
+
+#: templates/notifications/list.html
+msgid "No notifications yet"
+msgstr "لا توجد إشعارات بعد"
+
+#: templates/applications/_tab_review.html
+msgid "No section reviews yet"
+msgstr "لا توجد مراجعات أقسام بعد"
+
+#: templates/applications/_tab_sequences.html
+msgid "No sequences uploaded"
+msgstr "لم يتم رفع أي تسلسل"
+
+#: templates/404.html
+msgid "Not found"
+msgstr "غير موجود"
+
+#: apps/applications/models.py:129
+msgid "Not yet validated"
+msgstr "لم يتم التحقق بعد"
+
+#: templates/core/dashboard_hod.html
+msgid "Nothing to assign"
+msgstr "لا يوجد ما يُعيَّن"
+
+#: templates/core/dashboard_reviewer.html
+msgid "Nothing to review"
+msgstr "لا يوجد ما يُراجَع"
+
+#: apps/notifications/models.py:23
+msgid "notification"
+msgstr "إشعار"
+
+#: apps/notifications/apps.py:8 templates/base.html templates/notifications/_dropdown.html templates/notifications/list.html templates/notifications/list.html
+msgid "Notifications"
+msgstr "الإشعارات"
+
+#: apps/notifications/models.py:24
+msgid "notifications"
+msgstr "الإشعارات"
+
+#: templates/applications/_tab_sequences.html
+msgid "One sequence folder (e.g. 0000) containing index.xml and index-md5.txt"
+msgstr "مجلد تسلسل واحد (مثل 0000) يحتوي على index.xml و index-md5.txt"
+
+#: apps/validation/rules/files.py:25
+msgid "Only accepted file formats may be submitted"
+msgstr "لا يجوز تقديم إلا صيغ الملفات المقبولة"
+
+#: apps/accounts/models.py:32
+msgid "Only company applicants can belong to a company."
+msgstr "لا ينتمي إلى الشركات إلا مقدّمو الطلبات."
+
+#: apps/applications/models.py:222 templates/core/dashboard_company.html
+msgid "Open"
+msgstr "فتح"
+
+#: templates/applications/_tab_overview.html
+msgid "Open assessment"
+msgstr "فتح التقييم"
+
+#: apps/applications/models.py:252
+msgid "outcome"
+msgstr "النتيجة"
+
+#: apps/applications/views.py:137
+msgid "Overview"
+msgstr "نظرة عامة"
+
+#: templates/applications/sequence_detail.html
+msgid "Package (zip)"
+msgstr "الحزمة (zip)"
+
+#: templates/applications/_tab_sequences.html
+msgid "Package requirements"
+msgstr "متطلبات الحزمة"
+
+#: apps/applications/views.py:212
+#, python-format
+msgid "Package uploaded as sequence %(no)s. Submit it to start technical validation."
+msgstr "تم رفع الحزمة كتسلسل %(no)s. قدّمها لبدء التحقق الفني."
+
+#: templates/applications/list.html
+#, python-format
+msgid "Page %(n)s of %(total)s"
+msgstr "صفحة %(n)s من %(total)s"
+
+#: templates/404.html
+msgid "Page not found"
+msgstr "الصفحة غير موجودة"
+
+#: apps/applications/models.py:130
+msgid "Passed"
+msgstr "ناجح"
+
+#: apps/applications/models.py:131
+msgid "Passed with warnings"
+msgstr "ناجح مع تحذيرات"
+
+#: apps/validation/rules/files.py:57
+msgid "PDF files must be version 1.4 to 1.7"
+msgstr "يجب أن تكون ملفات PDF من الإصدار 1.4 إلى 1.7"
+
+#: apps/validation/rules/files.py:69
+msgid "PDF files must not contain JavaScript or launch actions"
+msgstr "يجب ألا تحتوي ملفات PDF على JavaScript أو أوامر تشغيل"
+
+#: apps/validation/rules/files.py:43
+msgid "PDF files must open without passwords or security restrictions"
+msgstr "يجب أن تُفتح ملفات PDF دون كلمات مرور أو قيود أمنية"
+
+#: apps/companies/models.py:12
+msgid "pharmaceutical license no."
+msgstr "رقم الترخيص الصيدلاني"
+
+#: templates/companies/profile.html
+msgid "Pharmaceutical license no."
+msgstr "رقم الترخيص الصيدلاني"
+
+#: templates/accounts/login.html templates/base.html templates/core/home.html
+msgid "Pharmaceutical Product Registration"
+msgstr "تسجيل المستحضرات الصيدلانية"
+
+#: templates/accounts/login.html
+msgid "Pharmacy Department"
+msgstr "دائرة الصيدلة"
+
+#: templates/core/home.html
+msgid "Pharmacy Department · Marketing authorisation"
+msgstr "دائرة الصيدلة · ترخيص التسويق"
+
+#: apps/accounts/admin.py:14 apps/accounts/admin.py:18 templates/base.html
+msgid "PPR"
+msgstr "PPR"
+
+#: templates/notifications/email_body.txt
+msgid "PPR — Pharmaceutical Product Registration"
+msgstr "PPR — تسجيل المستحضرات الصيدلانية"
+
+#: templates/base.html
+msgid "PPR — Pharmaceutical Product Registration · eCTD-based marketing authorisation"
+msgstr "PPR — تسجيل المستحضرات الصيدلانية · ترخيص التسويق بنظام eCTD"
+
+#: apps/accounts/models.py:24
+msgid "preferred language"
+msgstr "اللغة المفضلة"
+
+#: apps/applications/views.py:38
+msgid "Preparation"
+msgstr "الإعداد"
+
+#: templates/applications/list.html
+msgid "Previous"
+msgstr "السابق"
+
+#: templates/applications/certificate.html templates/applications/sequence_detail.html
+msgid "Print"
+msgstr "طباعة"
+
+#: templates/components/application_table.html
+msgid "Product"
+msgstr "المستحضر"
+
+#: templates/applications/_tab_overview.html
+msgid "Product details"
+msgstr "بيانات المستحضر"
+
+#: apps/applications/models.py:55
+msgid "product name"
+msgstr "اسم المستحضر"
+
+#: templates/applications/_tab_overview.html
+msgid "Product name"
+msgstr "اسم المستحضر"
+
+#: apps/applications/models.py:227
+msgid "questions"
+msgstr "الأسئلة"
+
+#: templates/applications/_tab_sequences.html
+msgid "Questions from the reviewer"
+msgstr "أسئلة المراجع"
+
+#: apps/applications/views.py:319
+msgid "Questions sent to the applicant. The review clock is stopped."
+msgstr "أُرسلت الأسئلة إلى مقدّم الطلب. تم إيقاف ساعة المراجعة."
+
+#: apps/applications/forms.py:69
+msgid "Questions to the applicant"
+msgstr "الأسئلة الموجهة لمقدّم الطلب"
+
+#: templates/applications/_tab_overview.html
+msgid "Reassign"
+msgstr "إعادة التعيين"
+
+#: templates/core/dashboard_company.html
+msgid "Recent applications"
+msgstr "أحدث الطلبات"
+
+#: templates/core/dashboard_reviewer.html
+msgid "Recently completed"
+msgstr "المكتملة مؤخراً"
+
+#: apps/applications/forms.py:75
+msgid "Recommendation"
+msgstr "التوصية"
+
+#: apps/applications/models.py:73
+msgid "recommendation summary"
+msgstr "ملخص التوصية"
+
+#: templates/core/dashboard_hod.html
+msgid "Recommends approval"
+msgstr "يوصي بالموافقة"
+
+#: templates/core/dashboard_hod.html
+msgid "Recommends rejection"
+msgstr "يوصي بالرفض"
+
+#: apps/applications/services.py:110
+msgid "Record at least one section review before completing the review."
+msgstr "سجّل مراجعة قسم واحد على الأقل قبل إكمال المراجعة."
+
+#: templates/applications/_tab_review.html
+msgid "Record your decision"
+msgstr "سجّل قرارك"
+
+#: templates/components/application_table.html
+msgid "Reference"
+msgstr "المرجع"
+
+#: apps/applications/models.py:50
+msgid "reference no."
+msgstr "الرقم المرجعي"
+
+#: templates/applications/_tab_sequences.html
+msgid "Regional Module 1 XML and util/dtd/ich-ectd-3-2.dtd"
+msgstr "ملف XML الإقليمي للوحدة 1 والملف util/dtd/ich-ectd-3-2.dtd"
+
+#: templates/companies/profile.html
+msgid "Registration"
+msgstr "التسجيل"
+
+#: apps/applications/models.py:48
+msgid "Reject"
+msgstr "الرفض"
+
+#: apps/applications/models.py:38 apps/applications/models.py:248
+msgid "Rejected"
+msgstr "مرفوض"
+
+#: templates/core/dashboard_hod.html
+msgid "rejected"
+msgstr "مرفوضة"
+
+#: apps/applications/models.py:44
+msgid "Renewal"
+msgstr "تجديد"
+
+#: templates/applications/_tab_sequences.html
+msgid "Report"
+msgstr "التقرير"
+
+#: templates/applications/_tab_sequences.html
+msgid "Report & dossier"
+msgstr "التقرير والملف"
+
+#: templates/applications/sequence_detail.html
+msgid "Report (CSV)"
+msgstr "التقرير (CSV)"
+
+#: templates/applications/_tab_review.html
+msgid "Request information"
+msgstr "طلب معلومات"
+
+#: templates/applications/_tab_sequences.html
+msgid "Respond to the information request"
+msgstr "الرد على طلب المعلومات"
+
+#: apps/applications/forms.py:70
+msgid "Response due"
+msgstr "موعد الرد"
+
+#: apps/applications/models.py:228
+msgid "response due"
+msgstr "موعد الرد"
+
+#: apps/applications/models.py:230
+msgid "response note"
+msgstr "ملاحظة الرد"
+
+#: apps/applications/views.py:204
+#, python-format
+msgid "Response sequence %(no)s failed technical validation. Fix the errors and upload again."
+msgstr "فشل تسلسل الرد %(no)s في التحقق الفني. صحّح الأخطاء وارفعه مجدداً."
+
+#: apps/applications/views.py:202
+#, python-format
+msgid "Response sequence %(no)s passed validation and was sent to the reviewer."
+msgstr "اجتاز تسلسل الرد %(no)s التحقق وأُرسل إلى المراجع."
+
+#: apps/applications/forms.py:49
+msgid "Response summary"
+msgstr "ملخص الرد"
+
+#: apps/applications/services.py:64
+msgid "Response to questions"
+msgstr "الرد على الأسئلة"
+
+#: templates/applications/_tab_sequences.html
+msgid "Resubmit for validation"
+msgstr "إعادة التقديم للتحقق"
+
+#: templates/applications/_tab_review.html
+msgid "Return for further review"
+msgstr "إعادة لمزيد من المراجعة"
+
+#: templates/applications/_tab_review.html
+msgid "Return to the reviewer instead"
+msgstr "أو أعده إلى المراجع"
+
+#: apps/applications/models.py:214
+msgid "review"
+msgstr "مراجعة"
+
+#: apps/applications/models.py:36
+msgid "Review complete – awaiting decision"
+msgstr "اكتملت المراجعة – بانتظار القرار"
+
+#: apps/applications/views.py:337
+msgid "Review completed and sent to the Head of Department."
+msgstr "اكتملت المراجعة وأُرسلت إلى رئيس القسم."
+
+#: apps/accounts/models.py:11 apps/applications/forms.py:57 templates/core/dashboard_hod.html
+msgid "Reviewer"
+msgstr "المراجع"
+
+#: apps/applications/views.py:253
+msgid "Reviewer assigned."
+msgstr "تم تعيين المراجع."
+
+#: apps/applications/models.py:71
+msgid "reviewer recommendation"
+msgstr "توصية المراجع"
+
+#: templates/applications/_tab_review.html
+msgid "Reviewer recommendation"
+msgstr "توصية المراجع"
+
+#: templates/core/dashboard_hod.html
+msgid "Reviewer workload"
+msgstr "عبء عمل المراجعين"
+
+#: templates/core/dashboard_reviewer.html
+msgid "Reviewer workspace"
+msgstr "مساحة عمل المراجع"
+
+#: apps/applications/models.py:215
+msgid "reviews"
+msgstr "المراجعات"
+
+#: apps/accounts/models.py:14
+msgid "role"
+msgstr "الدور"
+
+#: apps/applications/models.py:59
+msgid "route of administration"
+msgstr "طريقة الاستعمال"
+
+#: templates/applications/_tab_overview.html
+msgid "Route of administration"
+msgstr "طريقة الاستعمال"
+
+#: templates/applications/sequence_detail.html
+msgid "Rule"
+msgstr "القاعدة"
+
+#: templates/companies/profile.html
+msgid "Save"
+msgstr "حفظ"
+
+#: templates/applications/form.html
+msgid "Save changes"
+msgstr "حفظ التغييرات"
+
+#: templates/applications/_tab_review.html
+msgid "Save review"
+msgstr "حفظ المراجعة"
+
+#: apps/applications/views.py:41
+msgid "Scientific review"
+msgstr "المراجعة العلمية"
+
+#: templates/applications/list.html
+msgid "Search reference, product, ingredient or company"
+msgstr "ابحث بالرقم المرجعي أو المستحضر أو المادة الفعالة أو الشركة"
+
+#: apps/applications/models.py:207
+msgid "section"
+msgstr "القسم"
+
+#: apps/applications/views.py:305
+msgid "Section review saved."
+msgstr "تم حفظ مراجعة القسم."
+
+#: templates/applications/_tab_review.html
+msgid "Section reviews"
+msgstr "مراجعات الأقسام"
+
+#: templates/applications/detail.html
+msgid "Sections"
+msgstr "الأقسام"
+
+#: templates/applications/_tab_review.html
+msgid "Send questions (clock stop)"
+msgstr "إرسال الأسئلة (إيقاف الساعة)"
+
+#: templates/applications/_tab_review.html
+msgid "Send to Head of Department"
+msgstr "إرسال إلى رئيس القسم"
+
+#: apps/applications/forms.py:25
+msgid "Separate multiple ingredients with commas."
+msgstr "افصل بين المواد المتعددة بفواصل."
+
+#: apps/applications/models.py:137 apps/applications/models.py:152 templates/applications/_tab_review.html
+msgid "sequence"
+msgstr "التسلسل"
+
+#: templates/applications/_tab_sequences.html templates/applications/sequence_detail.html
+msgid "Sequence"
+msgstr "التسلسل"
+
+#: templates/applications/_tab_sequences.html
+#, python-format
+msgid "Sequence %(no)s is ready: %(name)s"
+msgstr "التسلسل %(no)s جاهز: %(name)s"
+
+#: templates/core/home.html
+msgid "Sequence numbers, MD5 checksums, required modules, lifecycle operations and naming rules."
+msgstr "أرقام التسلسل، والمجاميع الاختبارية MD5، والوحدات المطلوبة، وعمليات دورة الحياة، وقواعد التسمية."
+
+#: apps/applications/models.py:153
+msgid "sequences"
+msgstr "التسلسلات"
+
+#: templates/applications/_tab_sequences.html
+msgid "Sequences"
+msgstr "التسلسلات"
+
+#: templates/applications/sequence_detail.html
+msgid "Severity"
+msgstr "الدرجة"
+
+#: templates/applications/sequence_detail.html
+msgid "Show"
+msgstr "عرض"
+
+#: templates/accounts/login.html templates/accounts/login.html templates/accounts/login.html templates/core/home.html
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+#: templates/notifications/email_body.txt
+msgid "Sign in to PPR to view the details."
+msgstr "سجّل الدخول إلى PPR لعرض التفاصيل."
+
+#: templates/core/home.html
+msgid "Sign in to your account"
+msgstr "تسجيل الدخول إلى حسابك"
+
+#: templates/base.html templates/base.html
+msgid "Sign out"
+msgstr "تسجيل الخروج"
+
+#: templates/applications/_tab_sequences.html
+msgid "Size"
+msgstr "الحجم"
+
+#: apps/applications/models.py:61
+msgid "status"
+msgstr "الحالة"
+
+#: templates/components/application_table.html
+msgid "Status"
+msgstr "الحالة"
+
+#: apps/applications/models.py:186
+msgid "status change"
+msgstr "تغيير الحالة"
+
+#: apps/applications/models.py:187
+msgid "status history"
+msgstr "سجل الحالات"
+
+#: templates/applications/form.html
+msgid "Step 1 of 2: product details. Next, upload the eCTD package."
+msgstr "الخطوة 1 من 2: بيانات المستحضر. بعدها ارفع حزمة eCTD."
+
+#: apps/applications/models.py:58
+msgid "strength"
+msgstr "التركيز"
+
+#: templates/applications/_tab_overview.html
+msgid "Strength"
+msgstr "التركيز"
+
+#: templates/applications/_tab_sequences.html
+msgid "Submit for validation"
+msgstr "التقديم للتحقق"
+
+#: templates/core/home.html
+msgid "Submit medicine approval dossiers in the international eCTD format. Every package is technically validated automatically, the way the FDA and EMA do it, before scientific review begins."
+msgstr "قدّم ملفات طلبات الموافقة على الأدوية بصيغة eCTD الدولية. يتم التحقق الفني من كل حزمة تلقائياً، كما تفعل هيئتا FDA و EMA، قبل بدء المراجعة العلمية."
+
+#: apps/applications/models.py:30 templates/applications/_tab_overview.html
+msgid "Submitted"
+msgstr "مقدَّم"
+
+#: apps/applications/models.py:79
+msgid "submitted at"
+msgstr "تاريخ التقديم"
+
+#: templates/applications/_tab_sequences.html
+msgid "Submitting runs the three-layer technical validation immediately."
+msgstr "يؤدي التقديم إلى تشغيل التحقق الفني ثلاثي الطبقات فوراً."
+
+#: templates/applications/_tab_history.html
+msgid "System (automatic validation)"
+msgstr "النظام (تحقق تلقائي)"
+
+#: apps/applications/models.py:31 apps/applications/views.py:39
+msgid "Technical validation"
+msgstr "التحقق الفني"
+
+#: apps/applications/views.py:233
+#, python-format
+msgid "Technical validation failed with %(count)s error(s). Review the report, fix the package and resubmit."
+msgstr "فشل التحقق الفني بعدد %(count)s خطأ. راجع التقرير وصحّح الحزمة ثم أعد التقديم."
+
+#: templates/applications/_tab_overview.html
+msgid "Technical validation failed. Open the report, correct the package and resubmit."
+msgstr "فشل التحقق الفني. افتح التقرير وصحّح الحزمة ثم أعد التقديم."
+
+#: templates/core/home.html
+msgid "The company uploads its eCTD sequence as a zip package."
+msgstr "ترفع الشركة تسلسل eCTD كحزمة مضغوطة."
+
+#: templates/applications/_tab_overview.html
+msgid "The dossier passed technical validation. Assign a reviewer to start the scientific assessment."
+msgstr "اجتاز الملف التحقق الفني. عيّن مراجعاً لبدء التقييم العلمي."
+
+#: templates/applications/sequence_detail.html
+msgid "The dossier viewer is available once a sequence passes technical validation."
+msgstr "يتوفر عارض الملف بعد اجتياز التسلسل للتحقق الفني."
+
+#: templates/applications/_tab_sequences.html
+msgid "The first upload of an application is sequence 0000."
+msgstr "أول رفع للطلب هو التسلسل 0000."
+
+#: templates/core/home.html
+msgid "The Head of Department approves or rejects and issues the certificate."
+msgstr "يوافق رئيس القسم أو يرفض ويصدر الشهادة."
+
+#: apps/validation/rules/business.py:142
+msgid "The modules required for this application type must contain documents"
+msgstr "يجب أن تحتوي الوحدات المطلوبة لنوع الطلب هذا على مستندات"
+
+#: apps/applications/forms.py:42
+#, python-format
+msgid "The package is larger than %(limit)s MB."
+msgstr "حجم الحزمة أكبر من %(limit)s ميغابايت."
+
+#: apps/validation/rules/files.py:16
+msgid "The package must be a valid, safe ZIP archive"
+msgstr "يجب أن تكون الحزمة ملف ZIP سليماً وآمناً"
+
+#: apps/validation/rules/business.py:27
+msgid "The package must contain one sequence folder with the expected 4-digit number"
+msgstr "يجب أن تحتوي الحزمة على مجلد تسلسل واحد بالرقم المتوقع المكوّن من 4 أرقام"
+
+#: apps/validation/rules/schema.py:65
+msgid "The regional Module 1 XML must exist and be well-formed"
+msgstr "يجب وجود ملف XML الإقليمي للوحدة 1 وأن يكون سليم البنية"
+
+#: templates/applications/_tab_review.html
+msgid "The review clock is stopped until the applicant responds."
+msgstr "ساعة المراجعة متوقفة حتى يرد مقدّم الطلب."
+
+#: templates/applications/_tab_overview.html
+msgid "The review is complete. Read the recommendation and record your decision."
+msgstr "اكتملت المراجعة. اطّلع على التوصية وسجّل قرارك."
+
+#: templates/applications/_tab_overview.html
+msgid "The reviewer has asked for more information. Respond with a new eCTD sequence."
+msgstr "طلب المراجع معلومات إضافية. قدّم الرد في تسلسل eCTD جديد."
+
+#: templates/core/dashboard_company.html
+msgid "The reviewer has questions. Upload a response sequence."
+msgstr "لدى المراجع أسئلة. ارفع تسلسل الرد."
+
+#: templates/applications/_tab_review.html
+msgid "The scientific assessment starts once a reviewer is assigned."
+msgstr "يبدأ التقييم العلمي بعد تعيين مراجع."
+
+#: apps/validation/rules/schema.py:24
+msgid "The sequence must contain an index.xml backbone file"
+msgstr "يجب أن يحتوي التسلسل على ملف index.xml الرئيسي"
+
+#: apps/validation/rules/business.py:248
+msgid "The util/dtd folder must contain the eCTD DTD"
+msgstr "يجب أن يحتوي المجلد util/dtd على ملف DTD الخاص بـ eCTD"
+
+#: templates/core/home.html
+msgid "The validator returns an instant pass/fail report with every finding."
+msgstr "يُصدر المدقق تقريراً فورياً بالنجاح أو الفشل مع جميع الملاحظات."
+
+#: apps/applications/services.py:63
+msgid "There is no open information request."
+msgstr "لا يوجد طلب معلومات مفتوح."
+
+#: templates/applications/_tab_overview.html
+msgid "This application was rejected. See the decision in the Assessment tab."
+msgstr "تم رفض هذا الطلب. راجع القرار في تبويب التقييم."
+
+#: templates/applications/sequence_detail.html
+msgid "This sequence has not been validated yet. Submit it from the application page."
+msgstr "لم يتم التحقق من هذا التسلسل بعد. قدّمه من صفحة الطلب."
+
+#: templates/applications/_tab_sequences.html
+#, python-format
+msgid "This upload becomes sequence %(no)s."
+msgstr "سيصبح هذا الرفع التسلسل %(no)s."
+
+#: templates/core/home.html
+msgid "Three-layer technical validation"
+msgstr "تحقق فني ثلاثي الطبقات"
+
+#: templates/core/dashboard_reviewer.html
+msgid "To review"
+msgstr "للمراجعة"
+
+#: templates/applications/list.html
+msgid "Try a different search or status filter."
+msgstr "جرّب بحثاً مختلفاً أو حالة أخرى."
+
+#: templates/components/application_table.html
+msgid "Type"
+msgstr "النوع"
+
+#: apps/applications/models.py:34
+msgid "Under review"
+msgstr "قيد المراجعة"
+
+#: templates/components/application_table.html
+msgid "Updated"
+msgstr "آخر تحديث"
+
+#: templates/applications/_tab_sequences.html
+msgid "Upload"
+msgstr "رفع"
+
+#: templates/applications/_tab_sequences.html
+msgid "Upload a corrected package"
+msgstr "رفع حزمة مصححة"
+
+#: apps/applications/services.py:48
+msgid "Upload an eCTD package before submitting."
+msgstr "ارفع حزمة eCTD قبل التقديم."
+
+#: templates/applications/_tab_sequences.html
+msgid "Upload and validate"
+msgstr "رفع وتحقق"
+
+#: templates/applications/_tab_sequences.html
+msgid "Upload eCTD package"
+msgstr "رفع حزمة eCTD"
+
+#: templates/applications/_tab_overview.html
+msgid "Upload package"
+msgstr "رفع الحزمة"
+
+#: templates/applications/_tab_overview.html
+msgid "Upload response"
+msgstr "رفع الرد"
+
+#: templates/applications/_tab_sequences.html
+#, python-format
+msgid "Upload your answers as sequence %(no)s. It is validated before it reaches the reviewer."
+msgstr "ارفع إجاباتك كتسلسل %(no)s. سيتم التحقق منه قبل وصوله إلى المراجع."
+
+#: templates/core/dashboard_company.html
+msgid "Upload your eCTD package and submit."
+msgstr "ارفع حزمة eCTD وقدّمها."
+
+#: templates/applications/_tab_overview.html
+msgid "Upload your eCTD sequence 0000 and submit it for technical validation."
+msgstr "ارفع تسلسل eCTD رقم 0000 وقدّمه للتحقق الفني."
+
+#: templates/applications/_tab_sequences.html
+msgid "Uploaded"
+msgstr "تاريخ الرفع"
+
+#: templates/accounts/login.html
+msgid "Use the account issued to you by the Pharmacy Department."
+msgstr "استخدم الحساب الصادر لك من دائرة الصيدلة."
+
+#: templates/companies/profile.html
+msgid "Users"
+msgstr "المستخدمون"
+
+#: apps/applications/models.py:255
+msgid "valid until"
+msgstr "صالح حتى"
+
+#: templates/core/dashboard_hod.html
+msgid "Validated – assign a reviewer"
+msgstr "تم التحقق – عيّن مراجعاً"
+
+#: apps/applications/models.py:33
+msgid "Validated – awaiting assignment"
+msgstr "تم التحقق – بانتظار التعيين"
+
+#: templates/applications/_tab_sequences.html templates/applications/_tab_sequences.html
+msgid "Validating…"
+msgstr "جارٍ التحقق…"
+
+#: templates/applications/_tab_sequences.html
+msgid "Validation"
+msgstr "التحقق"
+
+#: apps/applications/models.py:32
+msgid "Validation failed"
+msgstr "فشل التحقق"
+
+#: apps/validation/models.py:20
+msgid "validation run"
+msgstr "عملية تحقق"
+
+#: apps/validation/models.py:21
+msgid "validation runs"
+msgstr "عمليات التحقق"
+
+#: apps/applications/models.py:144
+msgid "validation status"
+msgstr "حالة التحقق"
+
+#: templates/applications/sequence_detail.html
+#, python-format
+msgid "Validator v%(v)s · %(d)s"
+msgstr "المدقق الإصدار %(v)s · %(d)s"
+
+#: apps/applications/models.py:43
+msgid "Variation"
+msgstr "تعديل"
+
+#: templates/companies/profile.html
+msgid "Verification pending"
+msgstr "بانتظار التوثيق"
+
+#: apps/companies/models.py:17
+msgid "verified"
+msgstr "موثّقة"
+
+#: templates/companies/profile.html
+msgid "Verified applicant"
+msgstr "مقدّم طلب موثّق"
+
+#: templates/core/dashboard_company.html templates/notifications/_dropdown.html
+msgid "View all"
+msgstr "عرض الكل"
+
+#: templates/applications/_tab_overview.html
+msgid "View report & resubmit"
+msgstr "عرض التقرير وإعادة التقديم"
+
+#: templates/core/dashboard_reviewer.html
+msgid "Waiting for applicant"
+msgstr "بانتظار مقدّم الطلب"
+
+#: apps/validation/models.py:41
+msgid "Warning"
+msgstr "تحذير"
+
+#: templates/applications/_tab_sequences.html
+msgid "warnings"
+msgstr "تحذيرات"
+
+#: templates/applications/sequence_detail.html
+msgid "Warnings"
+msgstr "التحذيرات"
+
+#: templates/core/home.html
+msgid "Welcome"
+msgstr "مرحباً"
+
+#: templates/core/dashboard_company.html templates/core/dashboard_reviewer.html
+#, python-format
+msgid "Welcome, %(name)s"
+msgstr "مرحباً، %(name)s"
+
+#: apps/applications/forms.py:87
+msgid "What should the reviewer re-examine?"
+msgstr "ما الذي يجب أن يعيد المراجع دراسته؟"
+
+#: apps/applications/forms.py:26
+msgid "WHO Anatomical Therapeutic Chemical code, e.g. N02BE01."
+msgstr "رمز التصنيف التشريحي العلاجي الكيميائي لمنظمة الصحة العالمية، مثل N02BE01."
+
+#: apps/validation/models.py:35 templates/core/home.html
+msgid "XML schema validation"
+msgstr "التحقق من مخطط XML"
+
+#: templates/applications/_tab_overview.html
+msgid "You can reassign this application to another reviewer."
+msgstr "يمكنك إعادة تعيين هذا الطلب لمراجع آخر."
+
+#: templates/403.html
+msgid "You can't do that here"
+msgstr "لا يمكنك تنفيذ هذا الإجراء"
+
+#: templates/notifications/_dropdown.html
+msgid "You're all caught up."
+msgstr "لا توجد إشعارات جديدة."
+
+#: templates/core/no_role.html
+msgid "Your account has no role yet"
+msgstr "لم يُعيَّن دور لحسابك بعد"
+
+#: templates/403.html
+msgid "Your role doesn't allow this action, or the application is not at the right stage."
+msgstr "دورك لا يسمح بهذا الإجراء، أو أن الطلب ليس في المرحلة المناسبة."
+
+#: apps/applications/views.py:229
+msgid "Your submission passed technical validation and is waiting for review."
+msgstr "اجتاز طلبك التحقق الفني وهو بانتظار المراجعة."

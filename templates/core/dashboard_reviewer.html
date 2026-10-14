@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+{% block content %}
+<div>
+  <p class="text-sm text-slate-500">{% trans "Reviewer workspace" %}</p>
+  <h1 class="text-2xl font-bold text-slate-900">{% blocktrans with name=user.first_name|default:user.username %}Welcome, {{ name }}{% endblocktrans %}</h1>
+</div>
+
+<div class="mt-6 grid gap-4 sm:grid-cols-3">
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "To review" %}</p><p class="mt-1 text-3xl font-bold text-amber-600">{{ to_review|length }}</p></div>
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "Waiting for applicant" %}</p><p class="mt-1 text-3xl font-bold text-orange-600">{{ waiting|length }}</p></div>
+  <div class="card card-body"><p class="text-sm text-slate-500">{% trans "Completed" %}</p><p class="mt-1 text-3xl font-bold text-slate-900">{{ done|length }}</p></div>
+</div>
+
+<section class="card mt-6">
+  <div class="card-header"><h2 class="card-title">{% trans "My review queue" %}</h2></div>
+  {% if to_review %}
+    {% include "components/application_table.html" with applications=to_review %}
+  {% else %}
+    {% trans "Nothing to review" as t %}{% trans "New assignments from the Head of Department appear here." as x %}
+    {% include "components/empty.html" with title=t text=x icon="check-circle" %}
+  {% endif %}
+</section>
+
+{% if waiting %}
+<section class="card mt-6">
+  <div class="card-header"><h2 class="card-title">{% trans "Clock stopped – waiting for responses" %}</h2></div>
+  {% include "components/application_table.html" with applications=waiting %}
+</section>
+{% endif %}
+
+{% if done %}
+<section class="card mt-6">
+  <div class="card-header"><h2 class="card-title">{% trans "Recently completed" %}</h2></div>
+  {% include "components/application_table.html" with applications=done %}
+</section>
+{% endif %}
+{% endblock %}
