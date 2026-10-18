@@ -14,26 +14,29 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_POST
 
 from apps.accounts.permissions import any_role_required, company_required, hod_required, reviewer_required
+from apps.assistant.context import remember_application, remember_document
 from apps.validation.ectd import build_dossier_tree, locate_sequence_dir
 from apps.validation.models import Finding
 
 from . import services
 from .forms import (
     ApplicationForm,
-    AssignReviewerForm,
     CompleteReviewForm,
     DecisionForm,
     InfoRequestForm,
     ResponseUploadForm,
     ReturnForm,
     ReviewForm,
+    ReviewTeamForm,
     SequenceUploadForm,
 )
 from .models import Application, Sequence
 
 S = Application.Status
 TABS = ("overview", "sequences", "review", "history")
-INLINE_TYPES = {".pdf", ".png", ".jpg", ".jpeg", ".gif", ".txt"}
+INLINE_TYPES = {".pdf", ".png", ".jpg", ".jpeg", ".gif"}
+# Markup/text shown as plain source so applicant files can never run script in a reviewer's browser.
+TEXT_TYPES = {".txt", ".xml", ".xsd", ".xsl", ".dtd", ".mod", ".ent", ".csv", ".json", ".md5", ".sgm", ".htm", ".html"}
 PROGRESS_STEPS = [
     (gettext_lazy("Preparation"), {S.DRAFT}),
     (gettext_lazy("Technical validation"), {S.SUBMITTED, S.VALIDATING, S.VALIDATION_FAILED}),
@@ -63,7 +66,10 @@ def _get_application(request, pk):
     queryset = Application.objects.visible_to(request.user).select_related(
         "company", "assigned_reviewer", "created_by"
     )
-    return get_object_or_404(queryset, pk=pk)
+    application = get_object_or_404(queryset, pk=pk)
+    # The dossier assistant uses this to know which medicine the reader is working on.
+    remember_application(request, application)
+    return application
 
 
 def _detail_url(application, tab="overview"):
@@ -123,11 +129,24 @@ def application_edit(request, pk):
 
 # --- detail page ------------------------------------------------------------------
 
+def _history_for(user, application):
+    """The audit trail as this user may see it: applicants get no team changes, internal notes or reviewer names."""
+    entries = []
+    for entry in application.history.select_related("actor"):
+        if user.is_company and entry.is_team_change:
+            continue
+        entry.shown_note = entry.note_for(user)
+        entry.hide_actor = user.is_company and entry.actor is not None and entry.actor.is_reviewer
+        entries.append(entry)
+    return entries
+
+
 def _detail_context(request, application, tab, **forms):
     user = request.user
     status = application.status
     is_owner = user.is_company and user.company_id == application.company_id
-    is_assigned = user.is_reviewer and application.assigned_reviewer_id == user.pk
+    is_lead = user.is_reviewer and application.assigned_reviewer_id == user.pk
+    my_sections = application.sections_for(user) if user.is_reviewer else []
     pending = application.pending_sequence()
 
     context = {
@@ -140,15 +159,22 @@ def _detail_context(request, application, tab, **forms):
             ("history", _("History")),
         ],
         "sequences": application.sequences.select_related("uploaded_by").prefetch_related("validation_runs"),
-        "history": application.history.select_related("actor"),
+        "history": _history_for(user, application),
         "reviews": application.reviews.select_related("reviewer"),
         "info_requests": application.info_requests.select_related("raised_by", "response_sequence"),
         "decision": getattr(application, "decision", None),
         "pending_sequence": pending,
         "progress": _progress(status),
         "is_owner": is_owner,
-        "is_assigned": is_assigned,
+        "is_lead": is_lead,
+        "my_sections": my_sections,
+        "is_assigned": is_lead or bool(my_sections),
+        "review_progress": application.review_progress(),
+        "missing_sections": application.missing_sections(),
     }
+    if user.is_company:
+        # Applicants see the questions sent to them and the decision, not the internal assessment.
+        context.update(reviews=[], review_progress=[], missing_sections=[])
     if is_owner:
         context["can_edit"] = status == S.DRAFT
         if status in (S.DRAFT, S.VALIDATION_FAILED):
@@ -158,15 +184,14 @@ def _detail_context(request, application, tab, **forms):
             context["response_form"] = forms.get("response_form") or ResponseUploadForm()
     if user.is_hod:
         if status in (S.VALIDATED, S.UNDER_REVIEW, S.INFO_REQUESTED):
-            context["assign_form"] = forms.get("assign_form") or AssignReviewerForm(
-                initial={"reviewer": application.assigned_reviewer}
-            )
+            context["assign_form"] = forms.get("assign_form") or ReviewTeamForm(application)
         if status == S.REVIEW_COMPLETE:
             context["decision_form"] = forms.get("decision_form") or DecisionForm()
             context["return_form"] = forms.get("return_form") or ReturnForm()
-    if is_assigned and status == S.UNDER_REVIEW:
-        context["review_form"] = forms.get("review_form") or ReviewForm()
-        context["info_form"] = forms.get("info_form") or InfoRequestForm()
+    if status == S.UNDER_REVIEW and my_sections:
+        context["review_form"] = forms.get("review_form") or ReviewForm(sections=my_sections)
+    if status == S.UNDER_REVIEW and is_lead:
+        context["info_form"] = forms.get("info_form") or InfoRequestForm(application=application)
         context["complete_form"] = forms.get("complete_form") or CompleteReviewForm()
     return context
 
@@ -242,15 +267,16 @@ def submit_application(request, pk):
 @require_POST
 def assign_reviewer(request, pk):
     application = _get_application(request, pk)
-    form = AssignReviewerForm(request.POST)
+    form = ReviewTeamForm(application, request.POST)
     if not form.is_valid():
         return _render_detail(request, application, "overview", status=400, assign_form=form)
     try:
-        services.assign_reviewer(application, request.user, form.cleaned_data["reviewer"])
+        services.assign_review_team(application, request.user, form.cleaned_data["lead"], form.sections())
     except ValidationError as exc:
-        messages.error(request, " ".join(exc.messages))
-    else:
-        messages.success(request, _("Reviewer assigned."))
+        for error in exc.messages:
+            form.add_error(None, error)
+        return _render_detail(request, application, "overview", status=400, assign_form=form)
+    messages.success(request, _("Review team assigned."))
     return redirect(application)
 
 
@@ -285,6 +311,7 @@ def return_to_reviewer(request, pk):
 # --- reviewer actions ----------------------------------------------------------------
 
 def _reviewer_application(request, pk):
+    """Lead-reviewer actions: questions to the applicant and the recommendation."""
     application = _get_application(request, pk)
     if application.status != S.UNDER_REVIEW or application.assigned_reviewer_id != request.user.pk:
         raise PermissionDenied
@@ -294,14 +321,15 @@ def _reviewer_application(request, pk):
 @reviewer_required
 @require_POST
 def add_review(request, pk):
-    application = _reviewer_application(request, pk)
-    form = ReviewForm(request.POST)
+    """A module assessment, only for the modules the HOD assigned to this reviewer."""
+    application = _get_application(request, pk)
+    sections = application.sections_for(request.user)
+    if application.status != S.UNDER_REVIEW or not sections:
+        raise PermissionDenied
+    form = ReviewForm(request.POST, sections=sections)
     if not form.is_valid():
         return _render_detail(request, application, "review", status=400, review_form=form)
-    review = form.save(commit=False)
-    review.application = application
-    review.reviewer = request.user
-    review.save()
+    services.add_review(application, request.user, **form.cleaned_data)
     messages.success(request, _("Section review saved."))
     return redirect(_detail_url(application, "review"))
 
@@ -310,11 +338,12 @@ def add_review(request, pk):
 @require_POST
 def request_info(request, pk):
     application = _reviewer_application(request, pk)
-    form = InfoRequestForm(request.POST)
+    form = InfoRequestForm(request.POST, application=application)
     if not form.is_valid():
         return _render_detail(request, application, "review", status=400, info_form=form)
     services.request_information(
-        application, request.user, form.cleaned_data["questions"], form.cleaned_data["due_date"]
+        application, request.user, form.cleaned_data["questions"], form.cleaned_data["due_date"],
+        sections=form.cleaned_data["sections"],
     )
     messages.success(request, _("Questions sent to the applicant. The review clock is stopped."))
     return redirect(_detail_url(application, "review"))
@@ -425,21 +454,56 @@ def sequence_package(request, pk, seq_pk):
     )
 
 
-@any_role_required
-def sequence_file(request, pk, seq_pk, path):
-    """Stream one document from an accepted sequence after access checks."""
-    application, sequence = _get_sequence(request, pk, seq_pk)
+def _sequence_document(sequence, path):
+    """Absolute path of one document inside an accepted sequence, or 404."""
     if not sequence.is_accepted or not sequence.extracted_dir:
         raise Http404
     seq_dir = locate_sequence_dir(sequence.extracted_dir)[0].resolve()
     target = (seq_dir / path).resolve()
     if not target.is_relative_to(seq_dir) or not target.is_file():
         raise Http404
-    inline = target.suffix.lower() in INLINE_TYPES
-    content_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-    if not inline:
+    return target, target.relative_to(seq_dir).as_posix()
+
+
+@any_role_required
+def sequence_document(request, pk, seq_pk, path):
+    """In-app viewer for a dossier PDF (rendered with PDF.js, so no browser plugin is needed)."""
+    application, sequence = _get_sequence(request, pk, seq_pk)
+    target, rel_path = _sequence_document(sequence, path)
+    if target.suffix.lower() != ".pdf":
+        return redirect("applications:sequence_file", application.pk, sequence.pk, rel_path)
+    remember_document(request, sequence, rel_path)
+    return render(
+        request,
+        "applications/document_viewer.html",
+        {
+            "application": application,
+            "sequence": sequence,
+            "path": rel_path,
+            "filename": target.name,
+            "file_url": reverse("applications:sequence_file", args=[application.pk, sequence.pk, rel_path]),
+        },
+    )
+
+
+@any_role_required
+def sequence_file(request, pk, seq_pk, path):
+    """Stream one document from an accepted sequence after access checks."""
+    application, sequence = _get_sequence(request, pk, seq_pk)
+    target, rel_path = _sequence_document(sequence, path)
+    remember_document(request, sequence, rel_path)
+    suffix = target.suffix.lower()
+    if suffix in INLINE_TYPES:
+        content_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+    elif suffix in TEXT_TYPES:
+        content_type = "text/plain; charset=utf-8"
+    else:
         content_type = "application/octet-stream"
+    inline = content_type != "application/octet-stream"
     response = FileResponse(open(target, "rb"), as_attachment=not inline, filename=target.name, content_type=content_type)
     response["X-Content-Type-Options"] = "nosniff"
-    response["Content-Security-Policy"] = "sandbox"
+    if suffix != ".pdf":
+        # Chromium's built-in PDF viewer refuses to load in a sandboxed document and
+        # falls back to downloading, so PDFs are the one type served without it.
+        response["Content-Security-Policy"] = "sandbox"
     return response

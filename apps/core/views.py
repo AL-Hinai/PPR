@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, F
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from apps.applications.models import Application, Decision
+from apps.applications.models import Application, Decision, ReviewAssignment
 
 S = Application.Status
 
@@ -51,12 +52,23 @@ def _company_dashboard(request):
 
 
 def _reviewer_dashboard(request):
-    applications = Application.objects.visible_to(request.user).select_related("company")
+    user = request.user
+    applications = Application.objects.visible_to(user).select_related("company")
+    to_review = applications.filter(status=S.UNDER_REVIEW)
+    # Modules assigned to this reviewer that still need an assessment (new, or re-assessment after an answer).
+    my_modules = []
+    for application in to_review:
+        pending = [row["assignment"].section for row in application.review_progress()
+                   if row["pending"] and row["assignment"].reviewer_id == user.pk]
+        if pending:
+            my_modules.append({"application": application, "sections": pending})
     return render(
         request,
         "core/dashboard_reviewer.html",
         {
-            "to_review": applications.filter(status=S.UNDER_REVIEW),
+            "my_modules": my_modules,
+            "specialties": user.get_specialties_display(),
+            "to_review": to_review,
             "waiting": applications.filter(status=S.INFO_REQUESTED),
             "done": applications.filter(status__in=[S.REVIEW_COMPLETE, S.APPROVED, S.REJECTED])[:10],
         },
@@ -73,11 +85,11 @@ def _hod_dashboard(request):
     ]
     counts = _status_counts(applications)
     peak = max((c for _, _, c in counts), default=0) or 1
+    # Active module assignments per reviewer, with their specialties.
     workload = (
-        applications.filter(status__in=[S.UNDER_REVIEW, S.INFO_REQUESTED])
-        .exclude(assigned_reviewer=None)
-        .values(name=F("assigned_reviewer__username"))
-        .annotate(n=Count("pk"))
+        ReviewAssignment.objects.filter(application__status__in=[S.UNDER_REVIEW, S.INFO_REQUESTED])
+        .values(name=F("reviewer__username"))
+        .annotate(n=Count("pk"), applications=Count("application", distinct=True))
         .order_by("-n")
     )
     return render(
@@ -85,6 +97,7 @@ def _hod_dashboard(request):
         "core/dashboard_hod.html",
         {
             "awaiting_assignment": applications.filter(status=S.VALIDATED).select_related("company"),
+            "auto_assign": settings.AUTO_ASSIGN_REVIEW_TEAMS,
             "awaiting_decision": applications.filter(status=S.REVIEW_COMPLETE).select_related("company", "assigned_reviewer"),
             "counts": [(v, label, c, round(c * 100 / peak)) for v, label, c in counts if v != S.DRAFT],
             "approved_this_year": decisions.filter(outcome=Decision.Outcome.APPROVED).count(),

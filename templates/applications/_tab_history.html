@@ -12,9 +12,9 @@
               <span class="text-xs text-slate-500">{{ entry.created_at|date:"d M Y, H:i" }}</span>
             </div>
             <p class="mt-1 text-sm text-slate-600">
-              {% if entry.actor %}{{ entry.actor.display_name }} <span class="text-slate-400">({{ entry.actor.get_role_display }})</span>{% else %}{% trans "System (automatic validation)" %}{% endif %}
+              {% if entry.hide_actor %}{% trans "Reviewer" %}{% elif entry.actor %}{{ entry.actor.display_name }} <span class="text-slate-400">({{ entry.actor.get_role_display }})</span>{% elif entry.to_status == "UNDER_REVIEW" %}{% trans "System (automatic assignment)" %}{% else %}{% trans "System (automatic validation)" %}{% endif %}
             </p>
-            {% if entry.note %}<p class="mt-1 whitespace-pre-line rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">{{ entry.note }}</p>{% endif %}
+            {% if entry.shown_note %}<p class="mt-1 whitespace-pre-line rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">{{ entry.shown_note }}</p>{% endif %}
           </li>
         {% endfor %}
       </ol>

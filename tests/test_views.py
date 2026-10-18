@@ -17,7 +17,8 @@ def approved_application(make_application, applicant, reviewer, hod):
     upload(application, applicant, samples.build_package("0000"))
     services.submit(application, applicant)
     services.assign_reviewer(application, hod, reviewer)
-    application.reviews.create(reviewer=reviewer, section="M3", assessment="ACCEPTABLE", comments="OK")
+    for section in application.required_sections():
+        services.add_review(application, reviewer, section, "ACCEPTABLE", "OK")
     services.complete_review(application, reviewer, "APPROVE", "Recommend approval")
     services.decide(application, hod, "APPROVED", "OK")
     return application
@@ -76,7 +77,9 @@ def test_protected_document_download(client, approved_application, applicant, ot
     client.force_login(applicant)
     response = client.get(url)
     assert response.status_code == 200
-    assert response["Content-Security-Policy"] == "sandbox"
+    assert response["Content-Type"] == "application/pdf"
+    assert response["Content-Disposition"].startswith("inline")
+    assert "Content-Security-Policy" not in response  # sandbox breaks the browser PDF viewer
     assert b"".join(response.streaming_content).startswith(b"%PDF-")
 
     traversal = reverse("applications:sequence_file", args=[approved_application.pk, sequence.pk, "../../../config/settings/base.py"])
@@ -87,13 +90,38 @@ def test_protected_document_download(client, approved_application, applicant, ot
 
 
 @pytest.mark.django_db
-def test_xml_documents_are_downloaded_not_rendered(client, approved_application, applicant):
+def test_pdf_opens_in_the_in_app_viewer(client, approved_application, applicant, other_applicant):
+    sequence = approved_application.sequences.get()
+    path = "m2/22-intro/introduction.pdf"
+    viewer = reverse("applications:sequence_document", args=[approved_application.pk, sequence.pk, path])
+
+    client.force_login(applicant)
+    response = client.get(viewer)
+    assert response.status_code == 200
+    assert reverse("applications:sequence_file", args=[approved_application.pk, sequence.pk, path]) in response.content.decode()
+
+    detail = client.get(reverse("applications:sequence", args=[approved_application.pk, sequence.pk])).content.decode()
+    assert viewer in detail
+
+    xml = reverse("applications:sequence_document", args=[approved_application.pk, sequence.pk, "index.xml"])
+    assert client.get(xml).url == reverse("applications:sequence_file", args=[approved_application.pk, sequence.pk, "index.xml"])
+
+    traversal = reverse("applications:sequence_document", args=[approved_application.pk, sequence.pk, "../../../config/settings/base.py"])
+    assert client.get(traversal).status_code == 404
+
+    client.force_login(other_applicant)
+    assert client.get(viewer).status_code == 404
+
+
+@pytest.mark.django_db
+def test_xml_documents_open_in_browser_as_plain_text(client, approved_application, applicant):
     sequence = approved_application.sequences.get()
     client.force_login(applicant)
     response = client.get(reverse("applications:sequence_file", args=[approved_application.pk, sequence.pk, "index.xml"]))
     assert response.status_code == 200
-    assert response["Content-Type"] == "application/octet-stream"
-    assert "attachment" in response["Content-Disposition"]
+    assert response["Content-Type"] == "text/plain; charset=utf-8"
+    assert response["Content-Disposition"].startswith("inline")
+    assert response["Content-Security-Policy"] == "sandbox"
 
 
 @pytest.mark.django_db

@@ -22,4 +22,5 @@ urlpatterns = [
     path("<int:pk>/sequences/<int:seq_pk>/report.csv", views.sequence_report_csv, name="sequence_csv"),
     path("<int:pk>/sequences/<int:seq_pk>/package/", views.sequence_package, name="sequence_package"),
     path("<int:pk>/sequences/<int:seq_pk>/files/<path:path>", views.sequence_file, name="sequence_file"),
+    path("<int:pk>/sequences/<int:seq_pk>/view/<path:path>", views.sequence_document, name="sequence_document"),
 ]

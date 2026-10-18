@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{{ filename }} · {{ application.reference_no }}{% endblock %}
+{% block main_class %}mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/web/pdf_viewer.css">
+<style>
+  .pdf-pages { background: #e2e8f0; overflow-x: auto; border-radius: 0 0 1rem 1rem; }
+  .pdf-page { position: relative; margin: 0 auto 16px; background: #fff; box-shadow: 0 1px 3px rgb(15 23 42 / .15), 0 4px 12px rgb(15 23 42 / .08); }
+  .pdf-page canvas { display: block; }
+  .pdf-page .textLayer { position: absolute; inset: 0; }
+  .pdf-page[data-state="pending"]::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, #f8fafc 0 12px, #f1f5f9 12px 24px); }
+</style>
+{% endblock %}
+{% block content %}
+<a href="{% url 'applications:sequence' application.pk sequence.pk %}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700">{% icon "arrow-left" "size-4 rtl:rotate-180" %}{{ application.reference_no }} · {% trans "Sequence" %} {{ sequence.number }}</a>
+
+<div class="mt-3 flex flex-wrap items-start justify-between gap-4">
+  <div class="min-w-0">
+    <h1 class="flex items-center gap-2 text-xl font-bold text-slate-900">{% icon "document" "size-5 shrink-0 text-brand-600" %}<span class="truncate">{{ filename }}</span></h1>
+    <p class="mt-0.5 font-mono text-[11px] break-all text-slate-400" dir="ltr">{{ path }}</p>
+  </div>
+  <div class="flex flex-wrap gap-2 print:hidden">
+    <button type="button" class="btn btn-secondary btn-sm" @click="$dispatch('assistant-pin', { sequence_id: {{ sequence.pk }}, path: '{{ path|escapejs }}' })">{% trans "Ask the assistant" %}</button>
+    <a href="{{ file_url }}" download="{{ filename }}" class="btn btn-secondary btn-sm">{% icon "download" "size-4" %}{% trans "Download" %}</a>
+  </div>
+</div>
+
+<section class="card mt-4" id="pdf-viewer" data-url="{{ file_url }}">
+  <div class="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-t-2xl border-b border-slate-200 bg-white/95 px-4 py-2 backdrop-blur print:hidden" dir="ltr">
+    <div class="flex items-center gap-2 text-sm text-slate-600">
+      <button type="button" class="btn btn-secondary btn-sm" data-action="prev" title="{% trans 'Previous page' %}" aria-label="{% trans 'Previous page' %}">&lsaquo;</button>
+      <input type="number" min="1" value="1" data-role="page" class="w-16 rounded-md border border-slate-300 px-2 py-1 text-center text-sm" aria-label="{% trans 'Page' %}">
+      <span>/ <span data-role="count">–</span></span>
+      <button type="button" class="btn btn-secondary btn-sm" data-action="next" title="{% trans 'Next page' %}" aria-label="{% trans 'Next page' %}">&rsaquo;</button>
+    </div>
+    <div class="flex items-center gap-2 text-sm text-slate-600">
+      <button type="button" class="btn btn-secondary btn-sm" data-action="zoom-out" title="{% trans 'Zoom out' %}" aria-label="{% trans 'Zoom out' %}">&minus;</button>
+      <span data-role="zoom" class="w-14 text-center tabular-nums">100%</span>
+      <button type="button" class="btn btn-secondary btn-sm" data-action="zoom-in" title="{% trans 'Zoom in' %}" aria-label="{% trans 'Zoom in' %}">+</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-action="fit">{% trans "Fit width" %}</button>
+    </div>
+  </div>
+  <div data-role="status" class="px-4 py-10 text-center text-sm text-slate-500">{% trans "Loading document…" %}</div>
+  <div data-role="error" class="hidden px-4 py-10 text-center text-sm text-red-700">
+    {% trans "This document could not be displayed." %}
+    <a href="{{ file_url }}" download="{{ filename }}" class="font-medium underline">{% trans "Download it instead" %}</a>
+  </div>
+  <div data-role="pages" class="pdf-pages hidden px-4 py-4" dir="ltr"></div>
+</section>
+
+<script type="module">
+  import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+
+  const root = document.getElementById("pdf-viewer");
+  const $ = (role) => root.querySelector(`[data-role="${role}"]`);
+  const pagesEl = $("pages"), pageInput = $("page");
+  const MIN_SCALE = 0.25, MAX_SCALE = 4;
+  let pdf, baseWidth = 612, scale = 1, current = 1, fitWidth = true;
+  const pages = [];  // {el, state: "pending" | "rendering" | "done", task}
+
+  const fitScale = () => Math.min(2, Math.max(MIN_SCALE, (pagesEl.clientWidth - 32) / baseWidth));
+
+  function layout() {
+    for (const p of pages) {
+      p.task?.cancel();
+      p.el.replaceChildren();
+      p.el.dataset.state = "pending";
+      p.el.style.width = `${p.width * scale}px`;
+      p.el.style.height = `${p.height * scale}px`;
+    }
+    $("zoom").textContent = `${Math.round(scale * 100)}%`;
+    // Re-observing fires a fresh callback for the pages already on screen.
+    for (const p of pages) { observer.unobserve(p.el); observer.observe(p.el); }
+  }
+
+  async function render(index) {
+    const p = pages[index];
+    if (p.el.dataset.state !== "pending") return;
+    p.el.dataset.state = "rendering";
+    const page = await pdf.getPage(index + 1);
+    const viewport = page.getViewport({ scale });
+    const ratio = window.devicePixelRatio || 1;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.floor(viewport.width * ratio);
+    canvas.height = Math.floor(viewport.height * ratio);
+    canvas.style.width = `${viewport.width}px`;
+    canvas.style.height = `${viewport.height}px`;
+    const text = document.createElement("div");
+    text.className = "textLayer";
+    p.el.style.setProperty("--scale-factor", scale);
+    p.el.style.setProperty("--user-unit", 1);
+    p.el.style.setProperty("--total-scale-factor", scale);
+    p.el.replaceChildren(canvas, text);
+    p.task = page.render({
+      canvasContext: canvas.getContext("2d"),
+      viewport,
+      transform: ratio === 1 ? null : [ratio, 0, 0, ratio, 0, 0],
+    });
+    try {
+      await p.task.promise;
+      await new pdfjsLib.TextLayer({ textContentSource: page.streamTextContent(), container: text, viewport }).render();
+      p.el.dataset.state = "done";
+    } catch (err) {
+      if (err?.name !== "RenderingCancelledException") console.error(err);
+    }
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) if (entry.isIntersecting) render(Number(entry.target.dataset.index));
+  }, { rootMargin: "800px 0px" });
+
+  // The page whose top is closest to (but above) the middle of the screen is the current one.
+  function trackCurrent() {
+    const middle = window.innerHeight / 2;
+    let best = 1;
+    pages.forEach((p, i) => { if (p.el.getBoundingClientRect().top < middle) best = i + 1; });
+    if (best !== current) { current = best; pageInput.value = current; }
+  }
+
+  function goTo(n) {
+    current = Math.min(Math.max(1, n), pages.length);
+    pageInput.value = current;
+    pages[current - 1].el.scrollIntoView({ block: "start" });
+  }
+
+  function zoom(next) {
+    const keep = current;
+    scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, next));
+    layout();
+    goTo(keep);
+  }
+
+  root.addEventListener("click", (event) => {
+    const action = event.target.closest("[data-action]")?.dataset.action;
+    if (!action || !pdf) return;
+    if (action === "prev") goTo(current - 1);
+    if (action === "next") goTo(current + 1);
+    if (action === "zoom-in") { fitWidth = false; zoom(scale * 1.25); }
+    if (action === "zoom-out") { fitWidth = false; zoom(scale / 1.25); }
+    if (action === "fit") { fitWidth = true; zoom(fitScale()); }
+  });
+  pageInput.addEventListener("change", () => goTo(Number(pageInput.value) || 1));
+  window.addEventListener("scroll", () => requestAnimationFrame(trackCurrent), { passive: true });
+  window.addEventListener("resize", () => { if (fitWidth && pdf) zoom(fitScale()); });
+  window.addEventListener("hashchange", () => {
+    const n = Number((location.hash.match(/page=(\d+)/) || [])[1]);
+    if (n && pdf) goTo(n);
+  });
+
+  try {
+    pdf = await pdfjsLib.getDocument({ url: root.dataset.url, isEvalSupported: false, enableXfa: false }).promise;
+    $("count").textContent = pdf.numPages;
+    pageInput.max = pdf.numPages;
+    // Size every placeholder from page 1 and correct each page once it has been read.
+    const first = (await pdf.getPage(1)).getViewport({ scale: 1 });
+    baseWidth = first.width;
+    for (let i = 0; i < pdf.numPages; i++) {
+      const el = document.createElement("div");
+      el.className = "pdf-page";
+      el.dataset.index = i;
+      pagesEl.append(el);
+      pages.push({ el, width: first.width, height: first.height });
+    }
+    $("status").classList.add("hidden");
+    pagesEl.classList.remove("hidden");
+    scale = fitScale();
+    layout();
+    const start = Number((location.hash.match(/page=(\d+)/) || [])[1]);
+    if (start > 1) goTo(start);
+    for (let i = 1; i < pdf.numPages; i++) {
+      const vp = (await pdf.getPage(i + 1)).getViewport({ scale: 1 });
+      if (vp.width !== first.width || vp.height !== first.height) {
+        Object.assign(pages[i], { width: vp.width, height: vp.height });
+        if (pages[i].el.dataset.state === "pending") {
+          pages[i].el.style.width = `${vp.width * scale}px`;
+          pages[i].el.style.height = `${vp.height * scale}px`;
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    $("status").classList.add("hidden");
+    $("error").classList.remove("hidden");
+  }
+</script>
+{% endblock %}

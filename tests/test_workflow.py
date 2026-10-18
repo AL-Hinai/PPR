@@ -44,7 +44,8 @@ def test_full_lifecycle(make_application, applicant, reviewer, hod, django_captu
 
     with pytest.raises(ValidationError):
         services.complete_review(application, reviewer, "APPROVE", "No section reviews yet")
-    application.reviews.create(reviewer=reviewer, section="M3", assessment="ACCEPTABLE", comments="OK")
+    for section in application.required_sections():
+        services.add_review(application, reviewer, section, "ACCEPTABLE", "OK")
     services.complete_review(application, reviewer, "APPROVE", "Recommend approval")
     assert application.status == S.REVIEW_COMPLETE
 

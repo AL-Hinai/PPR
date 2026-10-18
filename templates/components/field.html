@@ -1,5 +1,5 @@
 {% load i18n %}<div class="space-y-1.5 {{ class }}">
-  {% if field.widget_type == "radioselect" %}
+  {% if field.widget_type == "radioselect" or field.widget_type == "checkboxselectmultiple" %}
     <span class="label">{{ field.label }}{% if field.field.required %}<span class="text-red-600"> *</span>{% endif %}</span>
     <div class="flex flex-wrap gap-2">
       {% for radio in field %}<label class="choice">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}

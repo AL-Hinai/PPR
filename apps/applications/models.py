@@ -3,8 +3,11 @@ from pathlib import Path
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from apps.accounts.models import CtdSection
 
 
 class ApplicationQuerySet(models.QuerySet):
@@ -16,7 +19,9 @@ class ApplicationQuerySet(models.QuerySet):
         if role == user.Role.COMPANY and user.company_id:
             return self.filter(company_id=user.company_id)
         if role == user.Role.REVIEWER:
-            return self.filter(assigned_reviewer=user)
+            # The lead reviewer and every specialist assigned to one of its modules.
+            assigned = ReviewAssignment.objects.filter(reviewer=user).values("application")
+            return self.filter(Q(assigned_reviewer=user) | Q(pk__in=assigned))
         if role == user.Role.HOD:
             return self.exclude(status=Application.Status.DRAFT)
         return self.none()
@@ -59,9 +64,10 @@ class Application(models.Model):
     route = models.CharField(_("route of administration"), max_length=100)
     atc_code = models.CharField(_("ATC code"), max_length=10, blank=True)
     status = models.CharField(_("status"), max_length=20, choices=Status.choices, default=Status.DRAFT)
+    # The lead reviewer: coordinates the module reviewers, sends questions and the recommendation.
     assigned_reviewer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("assigned reviewer"),
+        verbose_name=_("lead reviewer"),
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -112,6 +118,42 @@ class Application(models.Model):
 
     def open_info_request(self):
         return self.info_requests.filter(status=InfoRequest.Status.OPEN).first()
+
+    # --- review team ---------------------------------------------------------
+    def required_sections(self) -> list[str]:
+        """CTD modules that must be assessed: those required in the dossier for this application type."""
+        from apps.validation.rules.business import REQUIRED_MODULES
+
+        return [m.upper() for m in REQUIRED_MODULES.get(self.application_type, ["m1"])]
+
+    def sections_for(self, user) -> list[str]:
+        if not user.is_authenticated:
+            return []
+        return list(self.assignments.filter(reviewer=user).order_by("section").values_list("section", flat=True))
+
+    def review_progress(self) -> list[dict]:
+        """One row per assigned module: who assesses it, the latest assessment, and whether one is still owed.
+
+        A module the applicant was questioned about needs a fresh assessment once the answer is in:
+        an assessment older than that answer is shown but no longer counts (``reassess``).
+        """
+        reviews = {}
+        for review in self.reviews.order_by("created_at"):
+            reviews[(review.section, review.reviewer_id)] = review
+        answered = {}  # module -> when the applicant last answered questions about it
+        for request in self.info_requests.filter(status=InfoRequest.Status.ANSWERED, answered_at__isnull=False):
+            for section in request.sections or []:
+                answered[section] = max(answered.get(section, request.answered_at), request.answered_at)
+        rows = []
+        for a in self.assignments.select_related("reviewer").order_by("section"):
+            review = reviews.get((a.section, a.reviewer_id))
+            reassess = review is not None and a.section in answered and review.created_at < answered[a.section]
+            rows.append({"assignment": a, "review": review, "reassess": reassess, "pending": review is None or reassess})
+        return rows
+
+    def missing_sections(self) -> list[str]:
+        """Modules still owed an assessment: never assessed, or questioned and answered since."""
+        return [row["assignment"].section for row in self.review_progress() if row["pending"]]
 
     @property
     def is_closed(self):
@@ -181,21 +223,56 @@ class StatusHistory(models.Model):
     note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Notes an applicant may read besides their own: validation results, the questions sent to
+    # them and the decision. Assignment notes, the lead's summary and HOD returns stay internal.
+    APPLICANT_NOTE_STATUSES = {
+        Application.Status.VALIDATED, Application.Status.VALIDATION_FAILED,
+        Application.Status.INFO_REQUESTED, Application.Status.APPROVED, Application.Status.REJECTED,
+    }
+
     class Meta:
         ordering = ["created_at", "pk"]
         verbose_name = _("status change")
         verbose_name_plural = _("status history")
 
+    @property
+    def is_team_change(self) -> bool:
+        """A change to the review team: recorded without a status change, never shown to the applicant."""
+        return self.from_status == self.to_status
+
+    def note_for(self, user) -> str:
+        if not user.is_company:
+            return self.note
+        own = self.actor is not None and self.actor.is_company
+        return self.note if own or self.to_status in self.APPLICANT_NOTE_STATUSES else ""
+
+
+class ReviewAssignment(models.Model):
+    """One CTD module of one application, given to a reviewer specialised in it (automatically or by the HOD)."""
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="assignments")
+    section = models.CharField(_("section"), max_length=5, choices=CtdSection.choices)
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("reviewer"), on_delete=models.PROTECT, related_name="review_assignments"
+    )
+    # Empty when the team was assembled automatically from reviewer specialties.
+    assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="+")
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["section"]
+        constraints = [models.UniqueConstraint(fields=["application", "section"], name="one_reviewer_per_section")]
+        verbose_name = _("module assignment")
+        verbose_name_plural = _("module assignments")
+
+    def __str__(self):
+        return f"{self.application.reference_no} {self.section} → {self.reviewer}"
+
 
 class Review(models.Model):
     """A reviewer's assessment of one CTD module."""
 
-    class Section(models.TextChoices):
-        M1 = "M1", _("Module 1 – Administrative & labelling")
-        M2 = "M2", _("Module 2 – Summaries")
-        M3 = "M3", _("Module 3 – Quality")
-        M4 = "M4", _("Module 4 – Non-clinical")
-        M5 = "M5", _("Module 5 – Clinical")
+    Section = CtdSection
 
     class Assessment(models.TextChoices):
         ACCEPTABLE = "ACCEPTABLE", _("Acceptable")
@@ -225,6 +302,8 @@ class InfoRequest(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="info_requests")
     raised_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     questions = models.TextField(_("questions"))
+    # The CTD modules the questions concern; their reviewers re-assess them once the answer is in.
+    sections = models.JSONField(_("modules concerned"), default=list, blank=True)
     due_date = models.DateField(_("response due"), null=True, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN)
     response_note = models.TextField(_("response note"), blank=True)

@@ -31,6 +31,9 @@
       <nav class="ms-6 hidden items-center gap-1 md:flex" aria-label="{% trans 'Main' %}">
         <a href="{% url 'core:dashboard' %}" class="nav-link {% if ns == 'core' %}nav-link-active{% endif %}">{% icon "home" "size-4" %}{% trans "Dashboard" %}</a>
         <a href="{% url 'applications:list' %}" class="nav-link {% if ns == 'applications' %}nav-link-active{% endif %}">{% icon "folder" "size-4" %}{% trans "Applications" %}</a>
+        {% if user.is_hod %}
+          <a href="{% url 'accounts:reviewers' %}" class="nav-link {% if url_name == 'reviewers' %}nav-link-active{% endif %}">{% icon "users" "size-4" %}{% trans "Reviewers" %}</a>
+        {% endif %}
         {% if user.is_company %}
           <a href="{% url 'companies:profile' %}" class="nav-link {% if ns == 'companies' %}nav-link-active{% endif %}">{% icon "building" "size-4" %}{% trans "Company" %}</a>
         {% endif %}
@@ -39,7 +42,7 @@
 
       <div class="ms-auto flex items-center gap-2">
         {% if user.is_company %}
-          <a href="{% url 'applications:create' %}" class="btn btn-sm hidden bg-white text-brand-800 hover:bg-brand-50 sm:inline-flex">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
+          <a href="{% url 'applications:create' %}" class="btn btn-sm hidden bg-white text-brand-800 hover:bg-brand-50 lg:inline-flex">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
         {% endif %}
 
         {% include "partials/language_switch.html" with dark=True %}
@@ -83,6 +86,9 @@
     <nav x-show="open" x-cloak class="space-y-1 border-t border-white/10 px-4 py-3 md:hidden">
       <a href="{% url 'core:dashboard' %}" class="nav-link w-full">{% icon "home" "size-4" %}{% trans "Dashboard" %}</a>
       <a href="{% url 'applications:list' %}" class="nav-link w-full">{% icon "folder" "size-4" %}{% trans "Applications" %}</a>
+      {% if user.is_hod %}
+        <a href="{% url 'accounts:reviewers' %}" class="nav-link w-full">{% icon "users" "size-4" %}{% trans "Reviewers" %}</a>
+      {% endif %}
       {% if user.is_company %}
         <a href="{% url 'companies:profile' %}" class="nav-link w-full">{% icon "building" "size-4" %}{% trans "Company" %}</a>
         <a href="{% url 'applications:create' %}" class="nav-link w-full">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
@@ -109,6 +115,8 @@
   {% endif %}
   {% block content %}{% endblock %}
 </main>
+
+{% if user.is_authenticated and assistant_config %}{% include "assistant/_drawer.html" %}{% endif %}
 
 {% block footer %}
 <footer class="mx-auto max-w-7xl px-4 pb-8 text-xs text-slate-400 sm:px-6 lg:px-8 print:hidden">

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "apps.applications",
     "apps.validation",
     "apps.notifications",
+    "apps.assistant",
 ]
 
 MIDDLEWARE = [
@@ -59,6 +60,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.notifications.context_processors.notifications",
+                "apps.assistant.context_processors.assistant",
             ],
         },
     },
@@ -112,8 +114,25 @@ ECTD_MAX_FILE_MB = env.int("ECTD_MAX_FILE_MB", default=400)
 # Findings reported per rule before the rest are summarised in one line.
 ECTD_MAX_FINDINGS_PER_RULE = 50
 
+# Dossier assistant (ported from Roaa). Any OpenAI-compatible chat API; DeepSeek by default.
+# With no API key the assistant runs in offline mode (search results, no written answer).
+ASSISTANT = {
+    "PROVIDER": env("ASSISTANT_PROVIDER", default="openai"),  # openai | offline
+    "API_KEY": env("ASSISTANT_API_KEY", default=""),
+    "BASE_URL": env("ASSISTANT_BASE_URL", default="https://api.deepseek.com/v1"),
+    "MODEL": env("ASSISTANT_MODEL", default="deepseek-v4-pro"),
+    "TIMEOUT": env.float("ASSISTANT_TIMEOUT", default=60),
+    "TEMPERATURE": env.float("ASSISTANT_TEMPERATURE", default=0.2),
+    "MAX_STEPS": env.int("ASSISTANT_MAX_STEPS", default=8),
+    "DEADLINE_SECONDS": env.int("ASSISTANT_DEADLINE_SECONDS", default=150),
+}
+
 # Approval validity in years (printed on the certificate)
 APPROVAL_VALIDITY_YEARS = env.int("APPROVAL_VALIDITY_YEARS", default=5)
+
+# Assign the review team from reviewer specialties as soon as an application passes validation.
+# Off: the HOD assigns every team by hand from the dashboard.
+AUTO_ASSIGN_REVIEW_TEAMS = env.bool("AUTO_ASSIGN_REVIEW_TEAMS", default=True)
 
 LOGGING = {
     "version": 1,

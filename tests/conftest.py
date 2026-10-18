@@ -18,9 +18,14 @@ def other_company(db):
     return Company.objects.create(name_en="Other Pharma", registration_no="CR-2")
 
 
-def _user(username, role, company=None):
+ALL_SECTIONS = ["M1", "M2", "M3", "M4", "M5"]
+
+
+def _user(username, role, company=None, specialties=None):
+    if specialties is None:
+        specialties = ALL_SECTIONS if role == User.Role.REVIEWER else []
     return User.objects.create_user(username=username, password="pw-Secret-123", role=role, company=company,
-                                    email=f"{username}@example.com")
+                                    email=f"{username}@example.com", specialties=specialties)
 
 
 @pytest.fixture

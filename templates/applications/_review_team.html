@@ -1,0 +1,42 @@
+{% load i18n %}
+{# The review team: one specialist per CTD module, the lead, and where each module's assessment stands. #}
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">{% trans "Review team" %}</h2>
+    {% if review_progress %}
+      {% with total=review_progress|length missing=missing_sections|length %}
+        <span class="badge {% if missing %}bg-amber-50 text-amber-800 ring-amber-600/20{% else %}bg-emerald-50 text-emerald-700 ring-emerald-600/20{% endif %}">
+          {% blocktrans count counter=total %}{{ counter }} module{% plural %}{{ counter }} modules{% endblocktrans %}{% if missing %} · {% blocktrans count counter=missing %}{{ counter }} pending{% plural %}{{ counter }} pending{% endblocktrans %}{% endif %}
+        </span>
+      {% endwith %}
+    {% endif %}
+  </div>
+  {% if review_progress %}
+    <ul class="divide-y divide-slate-100">
+      {% for row in review_progress %}
+        {% with a=row.assignment r=row.review %}
+          <li class="flex items-center gap-3 px-5 py-3 text-sm {% if a.reviewer_id == user.pk %}bg-brand-50/50{% endif %}">
+            <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-slate-100 font-mono text-xs font-bold text-slate-700">{{ a.section }}</span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-medium text-slate-900">
+                {{ a.reviewer.display_name }}
+                {% if a.reviewer_id == application.assigned_reviewer_id %}<span class="badge ms-1 bg-brand-50 text-brand-800 ring-brand-600/20">{% trans "Lead" %}</span>{% endif %}
+                {% if a.reviewer_id == user.pk %}<span class="badge ms-1 bg-white text-slate-600 ring-slate-300">{% trans "You" %}</span>{% endif %}
+              </p>
+              <p class="truncate text-xs text-slate-500">{{ a.get_section_display }}</p>
+            </div>
+            {% if row.reassess %}
+              <span class="badge shrink-0 bg-amber-50 text-amber-800 ring-amber-600/20" title="{% trans 'The applicant answered questions about this module after its last assessment.' %}">{% trans "Re-assessment needed" %}</span>
+            {% elif r %}
+              <span class="badge shrink-0 {% if r.assessment == 'ACCEPTABLE' %}bg-emerald-50 text-emerald-700 ring-emerald-600/20{% elif r.assessment == 'MINOR' %}bg-amber-50 text-amber-800 ring-amber-600/20{% else %}bg-red-50 text-red-700 ring-red-600/20{% endif %}">{{ r.get_assessment_display }}</span>
+            {% else %}
+              <span class="badge shrink-0 bg-slate-50 text-slate-500 ring-slate-300">{% trans "Pending" %}</span>
+            {% endif %}
+          </li>
+        {% endwith %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="px-5 py-4 text-sm text-slate-500">{% trans "The Head of Department assigns a specialist reviewer to each CTD module after technical validation." %}</p>
+  {% endif %}
+</section>

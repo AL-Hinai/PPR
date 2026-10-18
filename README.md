@@ -12,9 +12,9 @@ Bilingual **English / Arabic (RTL)**. Runs on SQLite locally and MySQL on Python
 ```
 Company: Draft ──upload 0000──► Submitted ──► Technical validation ─┬─► Validation failed ──fix & resubmit──┐
                                                                      └─► Validated ◄──────────────────────────┘
-HOD:     Validated ──assign reviewer──► Under review
-Reviewer: Under review ──request info──► Information requested ──company uploads 0001 (validated)──► Under review
-Reviewer: Under review ──section reviews + recommendation──► Review complete
+HOD:     Validated ──assign review team (one specialist per CTD module + lead)──► Under review
+Lead reviewer: Under review ──request info──► Information requested ──company uploads 0001 (validated)──► Under review
+Module reviewers: assess their own modules · Lead reviewer: all modules assessed ──recommendation──► Review complete
 HOD:     Review complete ──► Approved (certificate) | Rejected | back to Under review
 ```
 
@@ -24,8 +24,9 @@ audit trail (`StatusHistory`) and sends in-app and email notifications.
 | Role | Can |
 |---|---|
 | **Company applicant** | Create applications, upload eCTD sequences, submit, answer information requests, print the certificate |
-| **Reviewer** | Assess assigned applications per CTD module, browse the dossier, request information, recommend |
-| **Head of Department (HOD)** | Assign reviewers, see KPIs, approve/reject, return to the reviewer |
+| **Reviewer** | Specialised in CTD modules (M1–M5), set by the HOD on the Reviewers page and read-only for everyone else. Assesses only the modules the HOD assigned them; reads the whole dossier of those applications |
+| **Lead reviewer** | One reviewer of the team, named by the HOD: sends questions to the applicant and the recommendation once every module is assessed |
+| **Head of Department (HOD)** | Set each reviewer's specialties (a module cannot be removed while the reviewer holds it on an active review), assign the review team (only qualified specialists are offered per module), see KPIs, approve/reject, return to the lead |
 | Superuser | Django admin (`/admin/`): users, companies, roles |
 
 ## eCTD technical validation (3 layers, 20 rules)
@@ -64,6 +65,26 @@ in the dossier viewer (CTD tree → documents).
 > ICH eCTD v3.2.2 specification package, or point `ECTD_DTD_PATH` at it. The Module 1 region folder is set with
 > `ECTD_REGION` (default `gcc`).
 
+## Dossier assistant
+
+A chat drawer on every page (ported from Roaa's assistant): the "Ask the assistant" button opens it.
+It knows which medicine the reader is working on and answers from that dossier's documents, citing
+`sequence/path p.N` as links to the page.
+
+- **Context detection** (`apps/assistant/context.py`): the drawer sends the page URL, which the server
+  resolves to the application, sequence and document. Dossier PDFs open in a new tab, so opening one is
+  remembered in the session and becomes the context when the reader returns ("Recently opened"). The
+  **Ask** button next to each document in the dossier viewer pins that document.
+- **Agent** (`agent.py`, `tools.py`): a tool-calling loop over read-only tools: application overview,
+  list / search / read documents, validation report, find applications. Every tool is limited by
+  `Application.objects.visible_to(user)`, so readers only see the dossiers they can already open.
+  Without Celery on PythonAnywhere the loop runs inside the request and streams NDJSON to the drawer.
+- **Documents** (`documents.py`): PDF/DOCX text is extracted with pypdf when first needed and cached per page
+  in `DocumentText`. For large dossiers, pre-build the cache with `manage.py index_dossier_text`.
+- **Model**: any OpenAI-compatible chat API (DeepSeek by default). Set `ASSISTANT_API_KEY` (and optionally
+  `ASSISTANT_BASE_URL`, `ASSISTANT_MODEL`) in `.env`. Without a key the drawer runs in **offline mode**:
+  it shows the best-matching passages instead of a written answer.
+
 ## Quick start (Windows / PowerShell)
 
 ```powershell
@@ -75,7 +96,8 @@ copy .env.example .env
 .venv\Scripts\python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000. Demo users: `acme`, `gulfpharma` (companies), `reviewer1`, `reviewer2`, `hod`.
+Open http://127.0.0.1:8000. Demo users: `acme`, `gulfpharma` (companies), `hod`, and one reviewer per discipline:
+`rev_regulatory` (M1, M2), `rev_quality` (M3), `rev_nonclinical` (M4), `rev_clinical` (M5).
 All use the password printed by `seed_demo` (default `Demo@2026`, or set `DEMO_PASSWORD`).
 Create an admin with `manage.py createsuperuser`.
 
@@ -123,6 +145,7 @@ variant per rule. They also cover the full workflow, permissions, protected file
 | `manage.py validate_sequence <id> [...]` | Re-run validation (e.g. after updating the DTD) |
 | `manage.py seed_demo --reset` | Recreate demo data |
 | `manage.py build_sample_packages` | Write demo eCTD zips |
+| `manage.py index_dossier_text [--application <id>]` | Extract dossier text for the assistant |
 
 ## Project layout
 
@@ -133,6 +156,7 @@ apps/companies      Company profile
 apps/applications   Application, Sequence, Review, InfoRequest, Decision, StatusHistory, workflow, services, views
 apps/validation     eCTD engine: extract.py, context.py, pdf.py, rules/, engine.py, samples.py, dtd/
 apps/notifications  in-app + email notifications
+apps/assistant      dossier assistant: context, tools, agent loop, LLM client, document text cache
 apps/core           dashboards, UI template tags, seed_demo
 templates/          Tailwind templates (RTL aware)
 theme/              django-tailwind app

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% trans "Reviewers" %}{% endblock %}
+{% block content %}
+<div>
+  <p class="text-sm text-slate-500">{% trans "Head of Department" %}</p>
+  <h1 class="text-2xl font-bold text-slate-900">{% trans "Reviewer specialties" %}</h1>
+  <p class="mt-1 max-w-3xl text-sm text-slate-500">{% trans "You decide which CTD modules each reviewer may assess. Reviewers work only within these specialties and cannot change them. When an application passes validation, its review team is assigned automatically from these specialties: each required module goes to the qualified reviewer with the fewest active modules, led by the default lead." %}</p>
+</div>
+
+{# Coverage: how many reviewers can take each module. #}
+<div class="mt-6 grid gap-3 sm:grid-cols-5">
+  {% for c in coverage %}
+    <div class="card card-body flex items-center gap-3 {% if not c.count %}border-red-200 bg-red-50/40{% endif %}">
+      <span class="grid size-10 shrink-0 place-items-center rounded-lg font-mono text-sm font-bold {% if c.count %}bg-brand-50 text-brand-800{% else %}bg-red-100 text-red-700{% endif %}">{{ c.section }}</span>
+      <span class="min-w-0">
+        <span class="block text-xs leading-tight text-slate-500" title="{{ c.label }}">{{ c.short }}</span>
+        <span class="block text-sm font-semibold {% if c.count %}text-slate-900{% else %}text-red-700{% endif %}">{% if c.count %}{% blocktrans count counter=c.count %}{{ counter }} reviewer{% plural %}{{ counter }} reviewers{% endblocktrans %}{% else %}{% trans "No reviewer" %}{% endif %}</span>
+      </span>
+    </div>
+  {% endfor %}
+</div>
+
+<section class="card mt-6 overflow-hidden">
+  <div class="card-header"><h2 class="card-title">{% trans "Reviewers" %}</h2></div>
+  {% if reviewers %}
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{% trans "Reviewer" %}</th>
+            <th>{% trans "Specialties" %}</th>
+            <th>{% trans "Active modules" %}</th>
+            <th>{% trans "Lead" %}</th>
+            <th>{% trans "Last set" %}</th>
+            <th class="sr-only">{% trans "Save" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reviewers %}
+            <tr class="{% if not r.is_active %}opacity-60{% endif %}">
+              <td class="min-w-44">
+                <p class="font-medium text-slate-900">{{ r.display_name }}</p>
+                <p class="font-mono text-xs text-slate-500">{{ r.username }}{% if not r.is_active %} · {% trans "inactive" %}{% endif %}</p>
+              </td>
+              <td>
+                <form id="spec-{{ r.pk }}" method="post" class="flex flex-wrap gap-1.5">
+                  {% csrf_token %}
+                  <input type="hidden" name="reviewer" value="{{ r.pk }}">
+                  {% for value, label in sections %}
+                    <label class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium ring-1 has-[:checked]:bg-brand-50 has-[:checked]:text-brand-800 has-[:checked]:ring-brand-300 ring-slate-200 text-slate-500" title="{{ label }}">
+                      <input type="checkbox" name="specialties" value="{{ value }}" class="checkbox" {% if value in r.specialties %}checked{% endif %}>
+                      <span class="font-mono">{{ value }}</span>
+                    </label>
+                  {% endfor %}
+                </form>
+              </td>
+              <td class="tabular-nums">{{ r.active_modules }}</td>
+              <td class="whitespace-nowrap">
+                <form method="post">
+                  {% csrf_token %}
+                  {% if r.default_lead %}
+                    <span class="badge bg-brand-50 text-brand-800 ring-brand-600/20">{% trans "Default lead" %}</span>
+                    <button name="default_lead" value="" class="ms-1 text-xs text-slate-500 hover:text-slate-700 hover:underline">{% trans "Clear" %}</button>
+                  {% elif r.is_active %}
+                    <button name="default_lead" value="{{ r.pk }}" class="text-xs font-medium text-brand-700 hover:underline">{% trans "Make default lead" %}</button>
+                  {% endif %}
+                </form>
+              </td>
+              <td class="text-xs whitespace-nowrap text-slate-500">
+                {% if r.specialties_updated_at %}{{ r.specialties_updated_by.display_name|default:"—" }}<br>{{ r.specialties_updated_at|date:"d M Y, H:i" }}{% else %}—{% endif %}
+              </td>
+              <td class="text-end"><button form="spec-{{ r.pk }}" class="btn btn-secondary btn-sm">{% trans "Save" %}</button></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {% trans "No reviewer accounts" as t %}{% trans "The system administrator creates reviewer accounts; you then set their specialties here." as x %}
+    {% include "components/empty.html" with title=t text=x icon="users" %}
+  {% endif %}
+</section>
+{% endblock %}

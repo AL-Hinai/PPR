@@ -27,8 +27,11 @@ def recipients_for(application, status):
         users += list(User.objects.filter(company_id=application.company_id, is_active=True))
     if status in HOD_STATUSES:
         users += list(User.objects.filter(role=User.Role.HOD, is_active=True))
-    if status in REVIEWER_STATUSES and application.assigned_reviewer_id:
-        users.append(application.assigned_reviewer)
+    if status in REVIEWER_STATUSES:
+        # The lead and every module reviewer.
+        if application.assigned_reviewer_id:
+            users.append(application.assigned_reviewer)
+        users += [a.reviewer for a in application.assignments.select_related("reviewer")]
     unique = {u.pk: u for u in users}
     return list(unique.values())
 
@@ -36,12 +39,14 @@ def recipients_for(application, status):
 def notify_status_change(application, history_entry):
     status = history_entry.to_status
     users = [u for u in recipients_for(application, status) if u.pk != history_entry.actor_id]
+    if history_entry.is_team_change:  # internal: the applicant's status did not change
+        users = [u for u in users if not u.is_company]
     Notification.objects.bulk_create(
-        Notification(user=u, application=application, status=status, note=history_entry.note) for u in users
+        Notification(user=u, application=application, status=status, note=history_entry.note_for(u)) for u in users
     )
     for user in users:
         if user.email:
-            _send_email(user, application, status, history_entry.note)
+            _send_email(user, application, status, history_entry.note_for(user))
 
 
 def _send_email(user, application, status, note):

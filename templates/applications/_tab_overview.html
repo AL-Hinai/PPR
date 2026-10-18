@@ -12,7 +12,7 @@
       <div class="dl-row"><dt>{% trans "Application type" %}</dt><dd>{{ application.get_application_type_display }}</dd></div>
       <div class="dl-row"><dt>{% trans "Applicant" %}</dt><dd>{{ application.company.name }}{% if application.company.license_no %} <span class="text-slate-500">({% trans "License" %} {{ application.company.license_no }})</span>{% endif %}</dd></div>
       <div class="dl-row"><dt>{% trans "Submitted" %}</dt><dd>{{ application.submitted_at|date:"d M Y, H:i"|default:"—" }}</dd></div>
-      <div class="dl-row"><dt>{% trans "Assigned reviewer" %}</dt><dd>{{ application.assigned_reviewer.display_name|default:"—" }}</dd></div>
+      {% if not user.is_company %}<div class="dl-row"><dt>{% trans "Lead reviewer" %}</dt><dd>{{ application.assigned_reviewer.display_name|default:"—" }}</dd></div>{% endif %}
     </dl>
   </section>
 
@@ -21,11 +21,13 @@
       <div class="card-header"><h2 class="card-title">{% trans "Next step" %}</h2></div>
       <div class="card-body space-y-4 text-sm">
         {% if assign_form %}
-          <p class="text-slate-600">{% if application.status == "VALIDATED" %}{% trans "The dossier passed technical validation. Assign a reviewer to start the scientific assessment." %}{% else %}{% trans "You can reassign this application to another reviewer." %}{% endif %}</p>
+          <p class="text-slate-600">{% if application.status == "VALIDATED" %}{% trans "The dossier passed technical validation. Assign a specialist to each CTD module and name the lead reviewer." %}{% else %}{% trans "You can change the review team. A module given to another reviewer needs a new assessment from them." %}{% endif %}</p>
           <form method="post" action="{% url 'applications:assign' application.pk %}" class="space-y-3">
             {% csrf_token %}
-            {% include "components/field.html" with field=assign_form.reviewer %}
-            <button class="btn btn-primary w-full">{% icon "users" "size-4" %}{% if application.status == "VALIDATED" %}{% trans "Assign reviewer" %}{% else %}{% trans "Reassign" %}{% endif %}</button>
+            {% include "components/form_errors.html" with form=assign_form %}
+            {% for field in assign_form.section_fields %}{% include "components/field.html" with field=field %}{% endfor %}
+            <div class="border-t border-slate-100 pt-3">{% include "components/field.html" with field=assign_form.lead %}</div>
+            <button class="btn btn-primary w-full">{% icon "users" "size-4" %}{% if application.status == "VALIDATED" %}{% trans "Assign review team" %}{% else %}{% trans "Update review team" %}{% endif %}</button>
           </form>
         {% elif is_owner and application.status == "DRAFT" %}
           <p class="text-slate-600">{% trans "Upload your eCTD sequence 0000 and submit it for technical validation." %}</p>
@@ -36,8 +38,11 @@
         {% elif is_owner and application.status == "INFO_REQUESTED" %}
           <p class="text-slate-600">{% trans "The reviewer has asked for more information. Respond with a new eCTD sequence." %}</p>
           <a href="?tab=sequences" class="btn btn-primary w-full">{% icon "upload" "size-4" %}{% trans "Upload response" %}</a>
+        {% elif is_lead and application.status == "UNDER_REVIEW" %}
+          <p class="text-slate-600">{% trans "You are the lead reviewer. When every module has its assessment, send questions or your recommendation to the Head of Department." %}</p>
+          <a href="?tab=review" class="btn btn-primary w-full">{% icon "clipboard" "size-4" %}{% trans "Open assessment" %}</a>
         {% elif is_assigned and application.status == "UNDER_REVIEW" %}
-          <p class="text-slate-600">{% trans "Assess each CTD module, request information if needed, then submit your recommendation." %}</p>
+          <p class="text-slate-600">{% blocktrans with modules=my_sections|join:", " %}Assess your assigned modules: {{ modules }}. The whole dossier is open to you read-only.{% endblocktrans %}</p>
           <a href="?tab=review" class="btn btn-primary w-full">{% icon "clipboard" "size-4" %}{% trans "Open assessment" %}</a>
         {% elif user.is_hod and application.status == "REVIEW_COMPLETE" %}
           <p class="text-slate-600">{% trans "The review is complete. Read the recommendation and record your decision." %}</p>
@@ -52,6 +57,8 @@
         {% endif %}
       </div>
     </section>
+
+    {% if review_progress or user.is_hod %}{% include "applications/_review_team.html" %}{% endif %}
 
     {% with latest=sequences.0 %}
       {% if latest %}

@@ -86,7 +86,7 @@
     <div class="card-header">
       <div>
         <h2 class="card-title">{% trans "Dossier viewer" %}</h2>
-        <p class="mt-0.5 text-sm text-slate-500">{% trans "CTD structure from index.xml. Documents open in a new tab." %}</p>
+        <p class="mt-0.5 text-sm text-slate-500">{% trans "CTD structure from index.xml. PDF documents open in the built-in viewer." %}</p>
       </div>
       <div class="flex gap-2 print:hidden">
         <button type="button" class="btn btn-secondary btn-sm" @click="$root.querySelectorAll('details').forEach(d => d.open = true)">{% trans "Expand all" %}</button>

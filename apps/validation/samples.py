@@ -5,6 +5,7 @@ Used by the test-suite (valid package + one broken variant per rule) and by
 """
 import hashlib
 import io
+import textwrap
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -54,7 +55,9 @@ def _pdf_escape(text: str) -> str:
 
 def make_pdf(text: str, version: str = "1.7", javascript: bool = False, font: str = "Helvetica") -> bytes:
     """A one-page PDF. The default font is one of the 14 standard PDF fonts (no embedding needed)."""
-    lines = [text[i : i + 80] for i in range(0, len(text), 80)] or [""]
+    # The first line is the heading; later paragraphs (one per "\n") are wrapped at word boundaries.
+    paragraphs = text.split("\n")
+    lines = [paragraphs[0][:120]] + [wrapped for p in paragraphs[1:] for wrapped in (textwrap.wrap(p, 90) or [""])]
     ops = ["BT", "/F1 16 Tf", "72 770 Td", f"({_pdf_escape(lines[0])}) Tj", "/F1 11 Tf"]
     for line in lines[1:]:
         ops += ["0 -18 Td", f"({_pdf_escape(line)}) Tj"]
@@ -89,6 +92,48 @@ def make_pdf(text: str, version: str = "1.7", javascript: bool = False, font: st
 
 
 # --- document sets -------------------------------------------------------------
+
+# Body text for the demo documents, so the dossier assistant has something real to search and quote.
+SAMPLE_BODY = {
+    "10-cover/cover-letter.pdf": "Initial marketing authorisation application for Paracetamol 500 mg film-coated "
+    "tablets submitted by Demo Pharma LLC in eCTD format (sequence 0000).",
+    "13-pi/smpc.pdf": "4.1 Therapeutic indications: symptomatic treatment of mild to moderate pain and fever.\n"
+    "4.2 Posology: adults and adolescents over 12 years: 1 to 2 tablets every 4 to 6 hours, maximum 8 tablets "
+    "(4 g) in 24 hours.\n4.3 Contraindications: hypersensitivity to paracetamol; severe hepatic impairment.\n"
+    "6.3 Shelf life: 36 months. 6.4 Special precautions for storage: store below 30 C in the original package.",
+    "13-pi/patient-leaflet.pdf": "Do not take more than 8 tablets in 24 hours. Talk to your doctor if you have "
+    "liver or kidney problems. Store below 30 C.",
+    "m2/23-qos/quality-overall-summary.pdf": "Drug substance paracetamol complies with Ph. Eur. Drug product: "
+    "immediate-release film-coated tablet. Dissolution: not less than 80 percent (Q) in 30 minutes, "
+    "phosphate buffer pH 5.8, paddle 50 rpm. Proposed shelf life 36 months below 30 C.",
+    "m2/25-clin-over/clinical-overview.pdf": "Bioequivalence to the reference product was shown in study BE-001. "
+    "The safety profile of paracetamol at therapeutic doses is well established; hepatotoxicity occurs in overdose.",
+    "32s1-gen-info/nomenclature.pdf": "INN: paracetamol. Chemical name: N-(4-hydroxyphenyl)acetamide. "
+    "CAS number 103-90-2. Molecular formula C8H9NO2, relative molecular mass 151.16.",
+    "32p1-desc-comp/description-composition.pdf": "Each film-coated tablet contains paracetamol 500 mg. "
+    "Excipients: pregelatinised maize starch, povidone K30, microcrystalline cellulose, stearic acid, "
+    "hypromellose, macrogol 400, titanium dioxide (E171). White, capsule-shaped tablets, 17.5 x 7.3 mm.",
+    "32p8-stab/stability-summary.pdf": "Three primary batches (B001, B002, B003) in PVC/Alu blisters were stored at "
+    "long-term 30 C / 75 percent RH (zone IVb) for 12 months and accelerated 40 C / 75 percent RH for 6 months.\n"
+    "All results remained within specification: assay 98.1 - 101.2 percent, 4-aminophenol below 0.05 percent, "
+    "dissolution above 85 percent in 30 minutes.\nProposed shelf life: 24 months. Storage: store below 30 C.",
+    "4232-repeat-dose-tox/study-tox-001.pdf": "28-day oral repeat-dose toxicity study in rats. NOAEL 300 mg/kg/day. "
+    "Hepatocellular hypertrophy at 1000 mg/kg/day, reversible after recovery.",
+    "5312-compar-ba-be-stud-rep/be-study-001.pdf": "Single-dose, two-way crossover study in 24 healthy volunteers "
+    "under fasting conditions. 90 percent confidence intervals of the test/reference ratio: Cmax 94.2 - 108.7 "
+    "percent, AUC0-t 96.5 - 103.1 percent, within the 80.00 - 125.00 percent acceptance range.",
+    "responses/response-to-questions.pdf": "Question 1: justify the proposed shelf life. Response: 18-month long-term "
+    "data at 30 C / 75 percent RH are now provided (updated 3.2.P.8.1); all results are within specification and "
+    "a shelf life of 36 months is proposed.",
+}
+
+
+def sample_body(path: str, title: str) -> str:
+    if "(updated)" in title:
+        return ("Updated with 18-month long-term data at 30 C / 75 percent RH for batches B001 - B003. All results "
+                "within specification. Proposed shelf life: 36 months. Storage: store below 30 C.")
+    return next((body for suffix, body in SAMPLE_BODY.items() if path.endswith(suffix)), "")
+
 
 def module1_documents(region: str) -> list[Doc]:
     base = f"m1/{region}"
@@ -240,7 +285,9 @@ def build_files(
     files: dict[str, bytes] = {}
     for doc in docs:
         if doc.operation != "delete":
-            files[doc.path] = doc.content if doc.content is not None else make_pdf(f"{doc.title} - {product_title}")
+            files[doc.path] = doc.content if doc.content is not None else make_pdf(
+                f"{doc.title} - {product_title}\n" + sample_body(doc.path, doc.title)
+            )
 
     regional_rel = f"m1/{region}/{region}-regional.xml"
     files[regional_rel] = regional_xml(number, [d for d in docs if d.regional_section], files, region, product_title)

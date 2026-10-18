@@ -28,7 +28,7 @@
             <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
               <div>
                 <a href="{{ app.get_absolute_url }}?tab=review" class="font-medium text-slate-900 hover:text-brand-700">{{ app.product_name }}</a>
-                <p class="text-xs text-slate-500">{{ app.reference_no }} · {{ app.company.name }} · {% trans "Reviewer" %}: {{ app.assigned_reviewer.display_name }}</p>
+                <p class="text-xs text-slate-500">{{ app.reference_no }} · {{ app.company.name }} · {% trans "Lead reviewer" %}: {{ app.assigned_reviewer.display_name }}</p>
               </div>
               <div class="flex items-center gap-3">
                 {% if app.recommendation == "APPROVE" %}<span class="badge bg-emerald-50 text-emerald-700 ring-emerald-600/20">{% trans "Recommends approval" %}</span>{% else %}<span class="badge bg-red-50 text-red-700 ring-red-600/20">{% trans "Recommends rejection" %}</span>{% endif %}
@@ -43,7 +43,12 @@
     </section>
 
     <section class="card">
-      <div class="card-header"><h2 class="card-title">{% trans "Validated – assign a reviewer" %}</h2></div>
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">{% trans "Validated – assign a review team" %}</h2>
+          {% if auto_assign %}<p class="mt-0.5 text-sm text-slate-500">{% url 'accounts:reviewers' as reviewers_url %}{% blocktrans %}Teams are assigned automatically from <a href="{{ reviewers_url }}" class="text-brand-700 hover:underline">reviewer specialties</a>. Applications only wait here when a required module has no qualified reviewer.{% endblocktrans %}</p>{% endif %}
+        </div>
+      </div>
       {% if awaiting_assignment %}
         <ul class="divide-y divide-slate-100">
           {% for app in awaiting_assignment %}
@@ -79,7 +84,7 @@
       <div class="card-header"><h2 class="card-title">{% trans "Reviewer workload" %}</h2></div>
       <ul class="divide-y divide-slate-100">
         {% for row in workload %}
-          <li class="flex justify-between px-5 py-2.5 text-sm"><span>{{ row.name }}</span><span class="font-semibold tabular-nums">{{ row.n }}</span></li>
+          <li class="flex justify-between gap-3 px-5 py-2.5 text-sm"><span>{{ row.name }}</span><span class="text-xs text-slate-500">{% blocktrans count counter=row.n %}{{ counter }} module{% plural %}{{ counter }} modules{% endblocktrans %} · <span class="font-semibold tabular-nums text-slate-800">{% blocktrans count counter=row.applications %}{{ counter }} application{% plural %}{{ counter }} applications{% endblocktrans %}</span></span></li>
         {% empty %}
           <li class="px-5 py-4 text-sm text-slate-500">{% trans "No active reviews." %}</li>
         {% endfor %}

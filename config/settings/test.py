@@ -10,3 +10,5 @@ DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memor
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 MEDIA_ROOT = Path(tempfile.mkdtemp(prefix="ppr-test-media-"))
+# Workflow tests drive assignment explicitly; tests of automatic assignment switch it on.
+AUTO_ASSIGN_REVIEW_TEAMS = False

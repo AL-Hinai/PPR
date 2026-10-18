@@ -1,0 +1,150 @@
+{% load i18n static ui %}
+{{ assistant_config|json_script:"assistant-config" }}
+<div x-data="assistant()" x-init="init()" class="print:hidden" @assistant-pin.window="pin($event.detail)" @keydown.escape.window="open && close()">
+  {# The button: on every page, hidden while the drawer is open. #}
+  <button type="button" x-show="!open" x-cloak @click="show()"
+          class="fixed bottom-6 end-6 z-40 inline-flex items-center gap-2 rounded-full bg-brand-700 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-900/20 ring-1 ring-white/10 transition hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+          aria-label="{% trans 'Open the dossier assistant' %}">
+    <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/></svg>
+    <span class="hidden sm:inline">{% trans "Ask the assistant" %}</span>
+  </button>
+
+  {# The drawer, at the reading end; no backdrop, so the page stays usable beside it. #}
+  <aside x-show="open" x-cloak role="dialog" aria-modal="false" aria-labelledby="assistant-title"
+         x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="translate-x-full rtl:-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
+         x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="translate-x-0 opacity-100" x-transition:leave-end="translate-x-full rtl:-translate-x-full opacity-0"
+         class="fixed top-0 bottom-0 end-0 z-50 flex w-full flex-col bg-white shadow-2xl ring-1 ring-slate-200 sm:top-16 sm:w-[28rem] sm:rounded-ss-2xl sm:overflow-hidden">
+    <header class="flex items-center gap-3 bg-brand-900 px-4 py-3 text-white">
+      <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 ring-1 ring-white/20">
+        <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+      </span>
+      <div class="min-w-0 flex-1 leading-tight">
+        <h2 id="assistant-title" class="text-sm font-bold">{% trans "Dossier assistant" %}</h2>
+        <p class="truncate text-[11px] text-brand-200">{% trans "Answers from the eCTD documents of the medicine you are viewing" %}</p>
+      </div>
+      <button type="button" @click="newChat()" :disabled="thinking" class="grid size-8 place-items-center rounded-lg text-brand-100 hover:bg-white/10 hover:text-white disabled:opacity-40" title="{% trans 'New chat' %}" aria-label="{% trans 'New chat' %}">
+        {% icon "plus" "size-5" %}
+      </button>
+      <button type="button" @click="close()" class="grid size-8 place-items-center rounded-lg text-brand-100 hover:bg-white/10 hover:text-white" aria-label="{% trans 'Close' %}">
+        <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </header>
+
+    {# What the drawer is about: detected from the page, a pinned document or the last document opened. #}
+    <div class="border-b border-slate-100 bg-slate-50 px-4 py-2.5 text-xs">
+      <template x-if="context && context.application">
+        <div class="space-y-1.5">
+          <p class="flex items-center gap-1.5 text-slate-600">
+            {% icon "beaker" "size-4 shrink-0 text-brand-600" %}
+            <span class="truncate"><span class="font-semibold text-slate-900" x-text="context.product"></span> <span class="font-mono text-slate-500" x-text="context.reference"></span><template x-if="context.sequence"><span> · {% trans "sequence" %} <span class="font-mono" x-text="context.sequence"></span></span></template></span>
+          </p>
+          <template x-if="context.document">
+            <p class="flex items-center gap-1.5">
+              {% icon "document" "size-4 shrink-0 text-slate-400" %}
+              <span class="badge shrink-0 bg-white text-slate-600 ring-slate-300" x-text="t.source[context.document_source] || ''"></span>
+              <span class="truncate font-mono text-[11px] text-slate-700" dir="ltr" :title="context.document" x-text="context.document_title"></span>
+              <button type="button" x-show="pinned" @click="unpin()" class="ms-auto text-slate-400 hover:text-slate-700" aria-label="{% trans 'Unpin document' %}">&times;</button>
+            </p>
+          </template>
+        </div>
+      </template>
+      <template x-if="!context || !context.application">
+        <p class="text-slate-500">{% trans "No medicine open. Open an application, or ask about any application you can access." %}</p>
+      </template>
+    </div>
+
+    <template x-if="provider === 'offline'">
+      <p class="flex items-start gap-2 border-b border-amber-100 bg-amber-50 px-4 py-2 text-[11px] text-amber-900">
+        {% icon "info" "size-4 shrink-0" %}
+        <span>{% trans "Offline mode: no language model is configured (ASSISTANT_API_KEY), so answers are matching passages from the dossier." %}</span>
+      </p>
+    </template>
+
+    <div x-ref="log" @scroll="onScroll()" class="flex-1 space-y-4 overflow-y-auto px-4 py-4" aria-live="polite">
+      <template x-if="status === 'loading'">
+        <div class="space-y-3"><div class="h-16 animate-pulse rounded-xl bg-slate-100"></div><div class="ms-12 h-10 animate-pulse rounded-xl bg-slate-100"></div></div>
+      </template>
+      <template x-if="status === 'failed'">
+        <div class="rounded-xl bg-red-50 p-3 text-sm text-red-800 ring-1 ring-red-200">
+          <p>{% trans "The assistant could not be loaded." %}</p>
+          <button type="button" class="btn btn-secondary btn-sm mt-2" @click="load()">{% trans "Try again" %}</button>
+        </div>
+      </template>
+
+      <template x-if="status === 'ready' && !messages.length && !thinking">
+        <div class="space-y-3">
+          <p class="text-sm text-slate-600">{% trans "Ask about the dossier: composition, specifications, stability, clinical data, validation findings… Answers cite the document and page." %}</p>
+          <div class="flex flex-wrap gap-2">
+            <template x-for="s in suggestions()" :key="s">
+              <button type="button" @click="ask(s)" class="rounded-full bg-brand-50 px-3 py-1.5 text-start text-xs font-medium text-brand-800 ring-1 ring-brand-200 hover:bg-brand-100" x-text="s"></button>
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <template x-for="m in messages" :key="m.id">
+        <article :class="m.role === 'user' ? 'ms-10' : 'me-2'">
+          <p class="mb-1 text-[11px] font-semibold tracking-wide text-slate-400 uppercase" :class="m.role === 'user' && 'text-end'" x-text="m.role === 'user' ? t.you : t.name"></p>
+          <template x-if="m.role === 'user'">
+            <div class="rounded-2xl rounded-se-sm bg-brand-700 px-3.5 py-2.5 text-sm whitespace-pre-wrap text-white" dir="auto" x-text="m.content"></div>
+          </template>
+          <template x-if="m.role !== 'user'">
+            <div>
+              <template x-if="m.steps && m.steps.length">
+                <details class="mb-1.5 text-[11px] text-slate-500">
+                  <summary class="cursor-pointer select-none hover:text-slate-700" x-text="t.steps.replace('%s', m.steps.length)"></summary>
+                  <ul class="mt-1 space-y-0.5 border-s border-slate-200 ps-3">
+                    <template x-for="(s, i) in m.steps" :key="i"><li dir="auto"><span class="font-mono" x-text="s.tool"></span> — <span x-text="s.summary"></span></li></template>
+                  </ul>
+                </details>
+              </template>
+              <div class="assistant-prose rounded-2xl rounded-ss-sm bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 ring-1 ring-slate-200" dir="auto" x-html="render(m.content, m.application)"></div>
+            </div>
+          </template>
+        </article>
+      </template>
+
+      <template x-if="thinking">
+        <article class="me-2">
+          <p class="mb-1 text-[11px] font-semibold tracking-wide text-slate-400 uppercase" x-text="t.name"></p>
+          <ul class="mb-1.5 space-y-0.5 text-[11px] text-slate-500" x-show="liveSteps.length">
+            <template x-for="(s, i) in liveSteps" :key="i">
+              <li class="flex items-center gap-1.5" dir="auto">
+                <span :class="s.ok ? 'text-emerald-600' : 'text-red-500'" x-text="s.ok ? '✓' : '✗'"></span>
+                <span class="font-mono" x-text="s.tool"></span> — <span x-text="s.summary"></span>
+              </li>
+            </template>
+          </ul>
+          <template x-if="answer">
+            <div class="assistant-prose rounded-2xl rounded-ss-sm bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 ring-1 ring-slate-200" dir="auto" x-html="render(answer, context && context.application)"></div>
+          </template>
+          <template x-if="!answer">
+            <p class="flex items-center gap-2 text-sm text-slate-500">
+              <svg class="size-4 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".25" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+              <span x-text="t.working"></span>
+            </p>
+          </template>
+        </article>
+      </template>
+
+      <template x-if="failure">
+        <p class="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900 ring-1 ring-amber-200" role="status" x-text="failure"></p>
+      </template>
+    </div>
+
+    <form class="border-t border-slate-200 bg-white p-3" @submit.prevent="send()">
+      <label for="assistant-question" class="sr-only">{% trans "Your question" %}</label>
+      <div class="flex items-end gap-2">
+        <textarea id="assistant-question" x-ref="composer" x-model="draft" @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); send(); }"
+                  rows="2" dir="auto" :disabled="thinking || status !== 'ready'" class="input max-h-40 min-h-11 flex-1 resize-none"
+                  placeholder="{% trans 'Ask about this medicine’s dossier…' %}"></textarea>
+        <button type="submit" class="btn btn-primary h-11" :disabled="thinking || !draft.trim() || status !== 'ready'">
+          <svg viewBox="0 0 24 24" class="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
+          <span class="sr-only">{% trans "Send" %}</span>
+        </button>
+      </div>
+      <p class="mt-1.5 text-[10px] text-slate-400">{% trans "The assistant can be wrong. Check the cited pages before relying on an answer." %}</p>
+    </form>
+  </aside>
+</div>
+<script src="{% static 'assistant/assistant.js' %}"></script>

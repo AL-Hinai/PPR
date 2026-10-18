@@ -1,4 +1,4 @@
-{% load ui %}<details class="group" {% if node.depth < 1 %}open{% endif %}>
+{% load i18n ui %}<details class="group" {% if node.depth < 1 %}open{% endif %}>
   <summary class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
     {% icon "chevron-right" "size-3.5 shrink-0 text-slate-400 transition group-open:rotate-90" %}
     {% icon "folder" "size-4 shrink-0 text-brand-600" %}
@@ -9,7 +9,14 @@
       <div class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
         {% icon "document" "size-4 shrink-0 text-slate-400" %}
         {% if leaf.exists %}
-          <a href="{% url 'applications:sequence_file' application.pk sequence.pk leaf.path %}" target="_blank" rel="noopener" class="text-brand-700 hover:underline">{{ leaf.title }}</a>
+          {% if leaf.path|lower|slice:"-4:" == ".pdf" %}
+            <a href="{% url 'applications:sequence_document' application.pk sequence.pk leaf.path %}" class="text-brand-700 hover:underline">{{ leaf.title }}</a>
+          {% else %}
+            <a href="{% url 'applications:sequence_file' application.pk sequence.pk leaf.path %}" target="_blank" rel="noopener" class="text-brand-700 hover:underline">{{ leaf.title }}</a>
+          {% endif %}
+          <button type="button" class="rounded-md px-1.5 py-0.5 text-[11px] font-medium text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50 print:hidden"
+                  @click="$dispatch('assistant-pin', { sequence_id: {{ sequence.pk }}, path: '{{ leaf.path|escapejs }}' })"
+                  title="{% trans 'Ask the assistant about this document' %}">{% trans "Ask" %}</button>
         {% else %}
           <span class="text-slate-500">{{ leaf.title }}</span>
         {% endif %}

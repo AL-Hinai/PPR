@@ -10,12 +10,22 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from apps.accounts.models import User
+from apps.accounts.services import set_default_lead, set_specialties
 from apps.applications import services
 from apps.applications.models import Application
 from apps.companies.models import Company
 from apps.validation import samples
 
 DEFAULT_PASSWORD = "Demo@2026"
+# One reviewer account per review discipline (CTD module specialties).
+REVIEWERS = {
+    "rev_regulatory": ("Salim", "Al-Busaidi", ["M1", "M2"]),
+    "rev_quality": ("Maryam", "Al-Rawahi", ["M3"]),
+    "rev_nonclinical": ("Khalid", "Al-Hinai", ["M4"]),
+    "rev_clinical": ("Aisha", "Al-Balushi", ["M5"]),
+}
+# reviewer1/reviewer2 were the generalist accounts before reviews were split by module.
+DEMO_USERNAMES = ["hod", *REVIEWERS, "reviewer1", "reviewer2", "acme", "gulfpharma"]
 
 
 class Command(BaseCommand):
@@ -33,7 +43,7 @@ class Command(BaseCommand):
         self._applications(users)
         self.stdout.write(self.style.SUCCESS("Demo data ready. Users (all share the same password):"))
         for user in users.values():
-            self.stdout.write(f"  {user.username:<12} {user.get_role_display()}")
+            self.stdout.write(f"  {user.username:<16} {user.get_role_display():<20} {user.get_specialties_display()}")
 
     def _reset(self):
         demo_companies = Company.objects.filter(registration_no__startswith="DEMO-")
@@ -41,14 +51,14 @@ class Command(BaseCommand):
             for sequence in application.sequences.all():
                 sequence.package.delete(save=False)
             application.delete()
-        User.objects.filter(username__in=["hod", "reviewer1", "reviewer2", "acme", "gulfpharma"]).delete()
+        User.objects.filter(username__in=DEMO_USERNAMES).delete()
         demo_companies.delete()
 
-    def _user(self, username, password, role, first, last, company=None):
+    def _user(self, username, password, role, first, last, company=None, specialties=()):
         user, created = User.objects.get_or_create(
             username=username,
             defaults={"role": role, "first_name": first, "last_name": last, "company": company,
-                      "email": f"{username}@example.com"},
+                      "email": f"{username}@example.com", "specialties": list(specialties)},
         )
         if created:
             user.set_password(password)
@@ -68,18 +78,42 @@ class Command(BaseCommand):
                       "license_no": "PH-3307", "country": "United Arab Emirates", "is_verified": True},
         )
         R = User.Role
-        return {
+        users = {
             "hod": self._user("hod", password, R.HOD, "Jokha", "Al-Harthy"),
-            "reviewer1": self._user("reviewer1", password, R.REVIEWER, "Salim", "Al-Busaidi"),
-            "reviewer2": self._user("reviewer2", password, R.REVIEWER, "Maryam", "Al-Rawahi"),
+            **{
+                username: self._user(username, password, R.REVIEWER, first, last, specialties=modules)
+                for username, (first, last, modules) in REVIEWERS.items()
+            },
             "acme": self._user("acme", password, R.COMPANY, "Ahmed", "Al-Kindi", acme),
             "gulfpharma": self._user("gulfpharma", password, R.COMPANY, "Fatma", "Al-Lawati", gulf),
         }
+        # Specialties are the HOD's decision; record it as such.
+        for username, (_first, _last, modules) in REVIEWERS.items():
+            if users[username].specialties_updated_by is None:
+                set_specialties(users[username], users["hod"], modules)
+        if not User.objects.filter(default_lead=True).exists():
+            set_default_lead(users["rev_regulatory"], users["hod"])
+        return users
 
     def _upload(self, application, user, data):
         return services.store_sequence(
             application, user, SimpleUploadedFile("package.zip", data, content_type="application/zip")
         )
+
+    def _team(self, application, hod, users):
+        """The review team: assigned automatically on validation, or here when that is switched off."""
+        if application.status == Application.Status.VALIDATED:
+            reviewers = [users[name] for name in REVIEWERS]
+            sections = {
+                section: next(r for r in reviewers if section in r.specialties)
+                for section in application.required_sections()
+            }
+            services.assign_review_team(application, hod, users["rev_regulatory"], sections)
+        return {a.section: a.reviewer for a in application.assignments.select_related("reviewer")}
+
+    def _assess_all(self, application, sections, comments):
+        for section, reviewer in sections.items():
+            services.add_review(application, reviewer, section, "ACCEPTABLE", comments.get(section, "Acceptable."))
 
     def _new(self, user, **fields):
         return Application.objects.create(company=user.company, created_by=user, **fields)
@@ -89,7 +123,7 @@ class Command(BaseCommand):
             self.stdout.write("Demo applications already exist (use --reset to recreate).")
             return
         acme, gulf, hod = users["acme"], users["gulfpharma"], users["hod"]
-        rev1, rev2 = users["reviewer1"], users["reviewer2"]
+        regulatory, clinical = users["rev_regulatory"], users["rev_clinical"]
         paracetamol = {"active_ingredients": "Paracetamol", "dosage_form": "Film-coated tablet",
                        "strength": "500 mg", "route": "Oral", "atc_code": "N02BE01"}
 
@@ -107,7 +141,7 @@ class Command(BaseCommand):
         self._upload(app, gulf, samples.to_zip(broken))
         services.submit(app, gulf)
 
-        # 3. Validated, waiting for the HOD to assign a reviewer
+        # 3. Validated; the review team is assigned automatically from reviewer specialties
         app = self._new(acme, application_type="NEW_DRUG", product_name="Cardiolex 10 mg",
                         active_ingredients="Rosuvastatin calcium", dosage_form="Film-coated tablet",
                         strength="10 mg", route="Oral", atc_code="C10AA07")
@@ -120,9 +154,10 @@ class Command(BaseCommand):
                         strength="10 mg/ml", route="Intravenous", atc_code="N02BE01")
         self._upload(app, acme, samples.build_package("0000", "NEW_DRUG"))
         services.submit(app, acme)
-        services.assign_reviewer(app, hod, rev1)
-        services.request_information(app, rev1, "1. Provide 12-month long-term stability data for batch B-003.\n"
-                                                  "2. Clarify the specification limit for impurity C.")
+        team = self._team(app, hod, users)
+        services.add_review(app, team["M1"], "M1", "ACCEPTABLE", "Labelling and SmPC are consistent with the application form.")
+        services.request_information(app, regulatory, "1. Provide 12-month long-term stability data for batch B-003.\n"
+                                                  "2. Clarify the specification limit for impurity C.", sections=["M3"])
         response = SimpleUploadedFile("response.zip", samples.build_package("0001", documents=samples.response_documents()))
         services.respond_to_info_request(app, acme, response, "Updated stability summary provided in 3.2.P.8.1.")
 
@@ -132,12 +167,11 @@ class Command(BaseCommand):
                         strength="850 mg", route="Oral", atc_code="A10BA02")
         self._upload(app, gulf, samples.build_package("0000", "GENERIC"))
         services.submit(app, gulf)
-        services.assign_reviewer(app, hod, rev2)
-        app.reviews.create(reviewer=rev2, section="M3", assessment="ACCEPTABLE",
-                           comments="Specifications and stability data are adequate.")
-        app.reviews.create(reviewer=rev2, section="M5", assessment="MINOR",
-                           comments="Bioequivalence demonstrated; minor reporting gaps noted.")
-        services.complete_review(app, rev2, Application.Recommendation.APPROVE,
+        team = self._team(app, hod, users)
+        self._assess_all(app, {s: r for s, r in team.items() if s != "M5"},
+                         {"M3": "Specifications and stability data are adequate."})
+        services.add_review(app, clinical, "M5", "MINOR", "Bioequivalence demonstrated; minor reporting gaps noted.")
+        services.complete_review(app, regulatory, Application.Recommendation.APPROVE,
                                  "Quality and bioequivalence are acceptable. Recommend approval.")
 
         # 6. Approved
@@ -146,7 +180,7 @@ class Command(BaseCommand):
                         strength="500 mg", route="Oral", atc_code="J01CA04")
         self._upload(app, acme, samples.build_package("0000", "GENERIC"))
         services.submit(app, acme)
-        services.assign_reviewer(app, hod, rev1)
-        app.reviews.create(reviewer=rev1, section="M3", assessment="ACCEPTABLE", comments="Acceptable.")
-        services.complete_review(app, rev1, Application.Recommendation.APPROVE, "Recommend approval.")
+        team = self._team(app, hod, users)
+        self._assess_all(app, team, {})
+        services.complete_review(app, regulatory, Application.Recommendation.APPROVE, "Recommend approval.")
         services.decide(app, hod, "APPROVED", "Meets quality, safety and efficacy requirements.")

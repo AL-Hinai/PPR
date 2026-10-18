@@ -21,10 +21,12 @@
       </section>
     {% endif %}
 
-    {% if application.recommendation %}
+    {% if not user.is_company %}{% include "applications/_review_team.html" %}{% endif %}
+
+    {% if application.recommendation and not user.is_company %}
       <section class="card">
         <div class="card-header">
-          <h2 class="card-title">{% trans "Reviewer recommendation" %}</h2>
+          <h2 class="card-title">{% trans "Lead reviewer recommendation" %}</h2>
           {% if application.recommendation == "APPROVE" %}<span class="badge bg-emerald-50 text-emerald-700 ring-emerald-600/20">{{ application.get_recommendation_display }}</span>{% else %}<span class="badge bg-red-50 text-red-700 ring-red-600/20">{{ application.get_recommendation_display }}</span>{% endif %}
         </div>
         <div class="card-body text-sm"><p class="whitespace-pre-line text-slate-700">{{ application.recommendation_note }}</p></div>
@@ -52,6 +54,7 @@
       </section>
     {% endif %}
 
+    {% if not user.is_company %}
     <section class="card">
       <div class="card-header"><h2 class="card-title">{% trans "Section reviews" %}</h2></div>
       {% if reviews %}
@@ -71,6 +74,7 @@
         {% trans "No section reviews yet" as t %}{% include "components/empty.html" with title=t icon="clipboard" %}
       {% endif %}
     </section>
+    {% endif %}
 
     <section class="card">
       <div class="card-header"><h2 class="card-title">{% trans "Information requests" %}</h2></div>
@@ -79,9 +83,10 @@
           {% for ir in info_requests %}
             <li class="space-y-2 px-5 py-4 text-sm">
               <div class="flex flex-wrap items-center justify-between gap-2">
-                <p class="text-xs text-slate-500">{{ ir.raised_by.display_name }} · {{ ir.created_at|date:"d M Y" }}{% if ir.due_date %} · {% blocktrans with d=ir.due_date|date:"d M Y" %}due {{ d }}{% endblocktrans %}{% endif %}</p>
+                <p class="text-xs text-slate-500">{% if not user.is_company %}{{ ir.raised_by.display_name }} · {% endif %}{{ ir.created_at|date:"d M Y" }}{% if ir.due_date %} · {% blocktrans with d=ir.due_date|date:"d M Y" %}due {{ d }}{% endblocktrans %}{% endif %}</p>
                 {% if ir.status == "OPEN" %}<span class="badge bg-orange-50 text-orange-700 ring-orange-600/20">{{ ir.get_status_display }}</span>{% else %}<span class="badge bg-emerald-50 text-emerald-700 ring-emerald-600/20">{{ ir.get_status_display }}</span>{% endif %}
               </div>
+              {% if ir.sections %}<p class="font-mono text-xs text-slate-500">{% trans "Modules" %}: {{ ir.sections|join:", " }}</p>{% endif %}
               <p class="whitespace-pre-line text-slate-800">{{ ir.questions }}</p>
               {% if ir.response_sequence %}
                 <div class="rounded-lg bg-slate-50 p-3">
@@ -101,20 +106,29 @@
   <aside class="space-y-6">
     {% if review_form %}
       <section class="card">
-        <div class="card-header"><h2 class="card-title">{% trans "Add section review" %}</h2></div>
+        <div class="card-header">
+          <h2 class="card-title">{% trans "Add section review" %}</h2>
+          <span class="font-mono text-xs text-slate-500">{{ my_sections|join:" · " }}</span>
+        </div>
         <form method="post" action="{% url 'applications:add_review' application.pk %}" class="card-body space-y-4">
           {% csrf_token %}
           {% include "components/field.html" with field=review_form.section %}
           {% include "components/field.html" with field=review_form.assessment %}
           {% include "components/field.html" with field=review_form.comments %}
           <button class="btn btn-primary w-full">{% trans "Save review" %}</button>
+          {% if not is_lead and application.assigned_reviewer %}
+            <p class="help">{% blocktrans with name=application.assigned_reviewer.display_name %}Questions for the applicant go through the lead reviewer, {{ name }}: put them in your comments.{% endblocktrans %}</p>
+          {% endif %}
         </form>
       </section>
+    {% endif %}
 
+    {% if complete_form %}
       <section class="card">
         <div class="card-header"><h2 class="card-title">{% trans "Request information" %}</h2></div>
         <form method="post" action="{% url 'applications:request_info' application.pk %}" class="card-body space-y-4">
           {% csrf_token %}
+          {% include "components/field.html" with field=info_form.sections %}
           {% include "components/field.html" with field=info_form.questions %}
           {% include "components/field.html" with field=info_form.due_date %}
           <button class="btn btn-secondary w-full">{% icon "chat" "size-4" %}{% trans "Send questions (clock stop)" %}</button>
@@ -126,17 +140,23 @@
         <form method="post" action="{% url 'applications:complete_review' application.pk %}" class="card-body space-y-4">
           {% csrf_token %}
           {% include "components/form_errors.html" with form=complete_form %}
+          {% if missing_sections %}
+            <p class="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900 ring-1 ring-amber-200">{% blocktrans with modules=missing_sections|join:", " %}Waiting for module assessments: {{ modules }}.{% endblocktrans %}</p>
+          {% endif %}
           {% include "components/field.html" with field=complete_form.recommendation %}
           {% include "components/field.html" with field=complete_form.summary %}
           <button class="btn btn-primary w-full">{% trans "Send to Head of Department" %}</button>
         </form>
       </section>
-    {% elif not decision and not decision_form %}
+    {% endif %}
+    {% if not review_form and not complete_form and not decision and not decision_form %}
       <section class="card card-body text-sm text-slate-500">
         {% if application.status == "INFO_REQUESTED" %}
           {% trans "The review clock is stopped until the applicant responds." %}
+        {% elif application.assigned_reviewer and user.is_company %}
+          {% trans "The scientific assessment is in progress." %}
         {% elif application.assigned_reviewer %}
-          {% blocktrans with name=application.assigned_reviewer.display_name %}Assessment by {{ name }}.{% endblocktrans %}
+          {% blocktrans with name=application.assigned_reviewer.display_name %}Assessment led by {{ name }}.{% endblocktrans %}
         {% else %}
           {% trans "The scientific assessment starts once a reviewer is assigned." %}
         {% endif %}

@@ -5,7 +5,22 @@
 <div>
   <p class="text-sm text-slate-500">{% trans "Reviewer workspace" %}</p>
   <h1 class="text-2xl font-bold text-slate-900">{% blocktrans with name=user.first_name|default:user.username %}Welcome, {{ name }}{% endblocktrans %}</h1>
+  <p class="mt-1 text-sm text-slate-500">{% if specialties %}{% blocktrans %}Your review specialties: {{ specialties }} (set by the Head of Department){% endblocktrans %}{% else %}{% trans "No review specialties yet. The Head of Department sets the CTD modules you assess." %}{% endif %}</p>
 </div>
+
+{% if my_modules %}
+<section class="card mt-6 border-brand-200">
+  <div class="card-header bg-brand-50/60"><h2 class="card-title">{% trans "Modules awaiting your assessment" %}</h2></div>
+  <ul class="divide-y divide-slate-100">
+    {% for item in my_modules %}
+      <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm">
+        <a href="{{ item.application.get_absolute_url }}?tab=review" class="font-medium text-brand-700 hover:underline">{{ item.application.reference_no }} · {{ item.application.product_name }}</a>
+        <span class="flex gap-1.5">{% for section in item.sections %}<span class="badge bg-amber-50 font-mono text-amber-800 ring-amber-600/20">{{ section }}</span>{% endfor %}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
 
 <div class="mt-6 grid gap-4 sm:grid-cols-3">
   <div class="card card-body"><p class="text-sm text-slate-500">{% trans "To review" %}</p><p class="mt-1 text-3xl font-bold text-amber-600">{{ to_review|length }}</p></div>

@@ -133,3 +133,9 @@
     @apply col-span-2 text-sm font-medium break-words text-slate-900;
   }
 }
+
+/* Assistant answers: spacing between the paragraphs, lists and quotes the drawer renders. */
+.assistant-prose > * + * {
+  margin-top: 0.5rem;
+}
+
