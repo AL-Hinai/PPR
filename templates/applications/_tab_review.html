@@ -56,7 +56,10 @@
 
     {% if not user.is_company %}
     <section class="card">
-      <div class="card-header"><h2 class="card-title">{% trans "Section reviews" %}</h2></div>
+      <div class="card-header">
+        <h2 class="card-title">{% trans "Section reviews" %}</h2>
+        <a href="{% url 'applications:notes_print' application.pk %}" class="text-sm font-medium text-brand-700 hover:underline">{% trans "Assessment notes" %}</a>
+      </div>
       {% if reviews %}
         <ul class="divide-y divide-slate-100">
           {% for review in reviews %}
@@ -115,6 +118,10 @@
           {% include "components/field.html" with field=review_form.section %}
           {% include "components/field.html" with field=review_form.assessment %}
           {% include "components/field.html" with field=review_form.comments %}
+          <button type="button" class="btn btn-secondary btn-sm w-full" x-data
+                  @click="const f = $el.form; const r = await fetch('{% url 'applications:my_notes' application.pk %}?section=' + f.section.value); const t = (await r.text()).trim(); if (t) f.comments.value = (f.comments.value ? f.comments.value + '\n' : '') + t">
+            {% icon "document" "size-4" %}{% trans "Insert my notes on this module" %}
+          </button>
           <button class="btn btn-primary w-full">{% trans "Save review" %}</button>
           {% if not is_lead and application.assigned_reviewer %}
             <p class="help">{% blocktrans with name=application.assigned_reviewer.display_name %}Questions for the applicant go through the lead reviewer, {{ name }}: put them in your comments.{% endblocktrans %}</p>

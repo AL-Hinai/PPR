@@ -68,8 +68,18 @@ Module 1 follows the **GCC Module 1 Specifications v1.5** (`apps/validation/regi
 | | FC-06 / FC-07 | File size limit, no empty files |
 
 Any **error** fails the sequence. Warnings let it pass ("Passed with warnings"). Each run is stored as a
-`ValidationRun` with its `Finding`s, shown as a report (with CSV export). Accepted sequences can be browsed
-in the dossier viewer (CTD tree → documents).
+`ValidationRun` with its `Finding`s, shown as a report with CSV export and a printable short/long report
+(print to PDF), linked from the validation email when `SITE_URL` is set. The GCC envelope of each sequence is
+shown next to the application data, with names that differ flagged. Accepted sequences can be browsed in the
+dossier viewer (CTD tree → documents). An eCTD 4.0 package is recognised and refused with a clear message.
+
+**Background validation.** In production (`VALIDATION_MODE=queue`) submitting queues a `ValidationJob`;
+`manage.py run_validation_worker` (a PythonAnywhere always-on task) validates it, moves the workflow and indexes
+the text. The page shows "Validation in progress" and refreshes when done. Locally and in tests
+`VALIDATION_MODE=sync` validates during the request.
+
+**Benchmark.** The same broken packages that prove each rule are exported for comparison with a reference
+validator such as EURSvalidator: see [docs/validation_benchmark.md](docs/validation_benchmark.md).
 
 > **Note on the DTD:** `apps/validation/dtd/ich-ectd-3-2.dtd` is the official ICH eCTD v3.2 DTD, unchanged
 > (source and checksum in [apps/validation/dtd/README.md](apps/validation/dtd/README.md)). `ECTD_DTD_PATH`
@@ -77,6 +87,24 @@ in the dossier viewer (CTD tree → documents).
 > specification, because SFDA does not publish the files; replace it with the distributed files when available.
 > The GCC-07 list of required Module 1 documents follows the Oman MOH draft eCTD guideline and should be
 > confirmed with the Drug Safety Center.
+
+## Reviewer tools
+
+- **Current dossier** tab: every accepted sequence applied in order (new, replace, append, delete), with each
+  document's history; replaced and deleted documents can be shown.
+- **Review notes** in the PDF viewer: notes on a page, optionally quoting selected text, never changing the
+  file. Internal to the department. Collected on the *Assessment notes* page (print to PDF) and inserted into a
+  module assessment with *Insert my notes on this module*.
+- **Search** (header box, `/applications/search/`): application details and the text of every accepted document
+  the reader may open, with page links. MySQL uses a FULLTEXT index.
+
+## Accounts and security
+
+Login lockout after 5 failures (django-axes), passwords of at least 12 characters, password change and reset by
+email, HSTS, 8-hour sessions that end when the browser closes, and a nonce-based Content-Security-Policy with
+htmx, Alpine.js and PDF.js served from this site (`apps/core/static/vendor/`). Optional **single sign-on** for
+staff through OpenID Connect and a key-protected **read-only API** for other systems: [docs/sso.md](docs/sso.md).
+System validation documents (URS, risk assessment, IQ/OQ/PQ, traceability): [docs/validation/](docs/validation/).
 
 ## Dossier assistant
 
@@ -97,6 +125,9 @@ It knows which medicine the reader is working on and answers from that dossier's
 - **Model**: any OpenAI-compatible chat API (DeepSeek by default). Set `ASSISTANT_API_KEY` (and optionally
   `ASSISTANT_BASE_URL`, `ASSISTANT_MODEL`) in `.env`. Without a key the drawer runs in **offline mode**:
   it shows the best-matching passages instead of a written answer.
+  When a model is configured the drawer tells readers which host receives the text. Decide where the model runs
+  first: [docs/assistant_data_protection.md](docs/assistant_data_protection.md). Check a configured model with
+  `manage.py assistant_smoke_test`.
 
 ## Quick start (Windows / PowerShell)
 
@@ -158,7 +189,14 @@ variant per rule. They also cover the full workflow, permissions, protected file
 | `manage.py validate_sequence <id> [...]` | Re-run validation (e.g. after updating the DTD) |
 | `manage.py seed_demo --reset` | Recreate demo data |
 | `manage.py build_sample_packages` | Write demo eCTD zips |
-| `manage.py index_dossier_text [--application <id>]` | Extract dossier text for the assistant |
+| `manage.py build_sample_packages --benchmark --out <dir>` | Write the benchmark set (valid, one broken package per rule, `manifest.csv`) |
+| `manage.py benchmark_validation <dir>` | Validate a folder of packages without the database and write comparison CSVs ([docs/validation_benchmark.md](docs/validation_benchmark.md)) |
+| `manage.py index_dossier_text [--application <id>]` | Extract dossier text for search and the assistant (the worker does this on acceptance) |
+| `manage.py run_validation_worker [--once]` | Run queued validations (always-on task in production) |
+| `manage.py assistant_smoke_test [--application <id>]` | Ask the assistant one question and check its citations |
+| `manage.py create_api_key "<system>"` | Issue a read-only API key (printed once) |
+| `manage.py axes_reset` | Clear login lockouts |
+| `python scripts/traceability.py --run` | Run the tests and write `docs/validation/traceability.md` |
 
 ## Project layout
 
@@ -166,15 +204,18 @@ variant per rule. They also cover the full workflow, permissions, protected file
 config/settings/{base,local,test,production}.py
 apps/accounts       custom User (role, company), role decorators
 apps/companies      Company profile
-apps/applications   Application, Sequence, Review, InfoRequest, Decision, StatusHistory, workflow, services, views
-apps/validation     eCTD engine: extract.py, context.py, pdf.py, rules/, engine.py, samples.py, dtd/
+apps/applications   Application, Sequence, Review, InfoRequest, Decision, StatusHistory, DocumentNote, workflow,
+                    services, views, lifecycle (current dossier), notes, search
+apps/validation     eCTD engine: extract.py, context.py, pdf.py, rules/, regions/ (GCC M1), engine.py, worker.py,
+                    benchmark.py, samples.py, dtd/
 apps/notifications  in-app + email notifications
+apps/api            read-only JSON API with keys
 apps/assistant      dossier assistant: context, tools, agent loop, LLM client, document text cache
 apps/core           dashboards, UI template tags, seed_demo
 templates/          Tailwind templates (RTL aware)
 theme/              django-tailwind app
 locale/ar/          Arabic translations
-docs/               deployment guide
+docs/               deployment, benchmark, SSO/API, assistant data protection, validation pack
 ```
 
 Deployment: see [docs/deploy_pythonanywhere.md](docs/deploy_pythonanywhere.md).

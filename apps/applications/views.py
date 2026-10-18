@@ -19,6 +19,7 @@ from apps.validation.ectd import build_dossier_tree, locate_sequence_dir
 from apps.validation.models import Finding
 
 from . import services
+from .lifecycle import build_current_view
 from .forms import (
     ApplicationForm,
     CompleteReviewForm,
@@ -33,7 +34,7 @@ from .forms import (
 from .models import Application, Sequence
 
 S = Application.Status
-TABS = ("overview", "sequences", "review", "history")
+TABS = ("overview", "sequences", "dossier", "review", "history")
 INLINE_TYPES = {".pdf", ".png", ".jpg", ".jpeg", ".gif"}
 # Markup/text shown as plain source so applicant files can never run script in a reviewer's browser.
 TEXT_TYPES = {".txt", ".xml", ".xsd", ".xsl", ".dtd", ".mod", ".ent", ".csv", ".json", ".md5", ".sgm", ".htm", ".html"}
@@ -155,6 +156,7 @@ def _detail_context(request, application, tab, **forms):
         "tabs": [
             ("overview", _("Overview")),
             ("sequences", _("eCTD sequences")),
+            ("dossier", _("Current dossier")),
             ("review", _("Assessment")),
             ("history", _("History")),
         ],
@@ -172,10 +174,12 @@ def _detail_context(request, application, tab, **forms):
         "review_progress": application.review_progress(),
         "missing_sections": application.missing_sections(),
     }
+    if context["tab"] == "dossier":
+        context["current_view"] = build_current_view(application)
     if user.is_company:
         # Applicants see the questions sent to them and the decision, not the internal assessment.
         context.update(reviews=[], review_progress=[], missing_sections=[])
-    if is_owner:
+    if is_owner and not application.validation_in_progress():
         context["can_edit"] = status == S.DRAFT
         if status in (S.DRAFT, S.VALIDATION_FAILED):
             context["upload_form"] = forms.get("upload_form") or SequenceUploadForm()
@@ -220,10 +224,16 @@ def upload_sequence(request, pk):
         form = ResponseUploadForm(request.POST, request.FILES)
         if not form.is_valid():
             return _render_detail(request, application, "sequences", status=400, response_form=form)
-        sequence, run = services.respond_to_info_request(
-            application, request.user, form.cleaned_data["package"], form.cleaned_data["note"]
-        )
-        if sequence.is_accepted:
+        try:
+            sequence, run = services.respond_to_info_request(
+                application, request.user, form.cleaned_data["package"], form.cleaned_data["note"]
+            )
+        except ValidationError as exc:
+            messages.error(request, " ".join(exc.messages))
+            return redirect(_detail_url(application, "sequences"))
+        if run is None:
+            messages.info(request, _("Response sequence %(no)s is being validated. You will be notified of the result.") % {"no": sequence.number})
+        elif sequence.is_accepted:
             messages.success(request, _("Response sequence %(no)s passed validation and was sent to the reviewer.") % {"no": sequence.number})
         else:
             messages.error(request, _("Response sequence %(no)s failed technical validation. Fix the errors and upload again.") % {"no": sequence.number})
@@ -232,7 +242,11 @@ def upload_sequence(request, pk):
     form = SequenceUploadForm(request.POST, request.FILES)
     if not form.is_valid():
         return _render_detail(request, application, "sequences", status=400, upload_form=form)
-    sequence = services.store_sequence(application, request.user, form.cleaned_data["package"])
+    try:
+        sequence = services.store_sequence(application, request.user, form.cleaned_data["package"])
+    except ValidationError as exc:
+        messages.error(request, " ".join(exc.messages))
+        return redirect(_detail_url(application, "sequences"))
     messages.success(
         request, _("Package uploaded as sequence %(no)s. Submit it to start technical validation.") % {"no": sequence.number}
     )
@@ -250,7 +264,9 @@ def submit_application(request, pk):
     except ValidationError as exc:
         messages.error(request, " ".join(exc.messages))
         return redirect(_detail_url(application, "sequences"))
-    if sequence.is_accepted:
+    if run is None:
+        messages.info(request, _("Your submission is being validated. This page updates when the result is ready."))
+    elif sequence.is_accepted:
         messages.success(request, _("Your submission passed technical validation and is waiting for review."))
     else:
         messages.error(
@@ -259,6 +275,17 @@ def submit_application(request, pk):
             % {"count": run.error_count},
         )
     return redirect("applications:sequence", pk=application.pk, seq_pk=sequence.pk)
+
+
+@any_role_required
+def validation_status(request, pk):
+    """Polled by htmx while a sequence is queued: 204 while it runs, then HX-Refresh to show the result."""
+    application = _get_application(request, pk)
+    if application.validation_in_progress():
+        return HttpResponse(status=204)
+    response = HttpResponse(status=200)
+    response["HX-Refresh"] = "true"
+    return response
 
 
 # --- HOD actions ---------------------------------------------------------------------
@@ -418,6 +445,30 @@ def sequence_detail(request, pk, seq_pk):
     )
 
 
+@any_role_required
+def sequence_report_print(request, pk, seq_pk):
+    """Printable validation report (A4): ?mode=short lists errors only, ?mode=long (default) every finding."""
+    application, sequence = _get_sequence(request, pk, seq_pk)
+    run = sequence.latest_run()
+    if run is None:
+        raise Http404
+    mode = "short" if request.GET.get("mode") == "short" else "long"
+    findings = run.findings.all()
+    if mode == "short":
+        findings = findings.filter(severity=Finding.Severity.ERROR)
+    layers = OrderedDict((value, {"label": label, "findings": []}) for value, label in Finding.Layer.choices)
+    for finding in findings:
+        layers[finding.layer]["findings"].append(finding)
+    return render(request, "applications/validation_report.html", {
+        "application": application,
+        "sequence": sequence,
+        "run": run,
+        "mode": mode,
+        "layers": layers,
+        "envelope_rows": _envelope_rows(application, sequence.envelope),
+    })
+
+
 def _same_name(a: str, b: str) -> bool:
     return " ".join(a.split()).casefold() == " ".join(b.split()).casefold()
 
@@ -508,6 +559,10 @@ def sequence_document(request, pk, seq_pk, path):
             "path": rel_path,
             "filename": target.name,
             "file_url": reverse("applications:sequence_file", args=[application.pk, sequence.pk, rel_path]),
+            # Review notes: the department only, never the applicant.
+            "can_annotate": request.user.is_reviewer or request.user.is_hod,
+            "notes": application.notes.filter(sequence=sequence, path=rel_path).select_related("author")
+            .order_by("page", "created_at"),
         },
     )
 

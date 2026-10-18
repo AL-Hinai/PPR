@@ -35,6 +35,11 @@
         <input type="hidden" name="next" value="{{ next }}">
         <button class="btn btn-primary w-full py-2.5">{% trans "Sign in" %}</button>
       </form>
+      {% if sso_enabled %}
+        <div class="mt-6 flex items-center gap-3 text-xs text-slate-400"><span class="h-px flex-1 bg-slate-200"></span>{% trans "Pharmacy Department staff" %}<span class="h-px flex-1 bg-slate-200"></span></div>
+        <a href="{% url 'oidc_authentication_init' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="btn btn-secondary mt-3 w-full py-2.5">{% icon "shield" "size-4" %}{{ sso_label|default:_("Sign in with your Ministry account") }}</a>
+      {% endif %}
+      <p class="mt-4 text-center text-sm"><a href="{% url 'accounts:password_reset' %}" class="text-brand-700 hover:underline">{% trans "Forgot your password?" %}</a></p>
     </div>
   </div>
 </div>

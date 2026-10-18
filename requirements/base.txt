@@ -4,3 +4,5 @@ django-tailwind>=4.6
 django-htmx>=1.19
 lxml>=5.3
 pypdf>=5.0
+django-axes>=8.0,<9
+mozilla-django-oidc>=4.0,<5

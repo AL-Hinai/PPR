@@ -34,6 +34,8 @@
   {% endfor %}
 </ol>
 
+{% include "applications/_validation_progress.html" %}
+
 <nav class="mt-8 flex gap-6 overflow-x-auto border-b border-slate-200" aria-label="{% trans 'Sections' %}">
   {% for key, label in tabs %}
     <a href="?tab={{ key }}" class="tab {% if tab == key %}tab-active{% endif %}">
@@ -46,6 +48,7 @@
 
 <div class="mt-6">
   {% if tab == "sequences" %}{% include "applications/_tab_sequences.html" %}
+  {% elif tab == "dossier" %}{% include "applications/_tab_dossier.html" %}
   {% elif tab == "review" %}{% include "applications/_tab_review.html" %}
   {% elif tab == "history" %}{% include "applications/_tab_history.html" %}
   {% else %}{% include "applications/_tab_overview.html" %}{% endif %}

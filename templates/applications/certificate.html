@@ -9,11 +9,12 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   {% tailwind_css %}
   <style>@page { size: A4; margin: 14mm; }</style>
+  <script src="{% static 'core/ui.js' %}" defer></script>
 </head>
 <body class="bg-slate-100 text-slate-900 print:bg-white">
   <div class="mx-auto flex max-w-[210mm] justify-between gap-2 px-4 py-4 print:hidden">
     <a href="{{ application.get_absolute_url }}" class="btn btn-secondary btn-sm">{% icon "arrow-left" "size-4" %}{% trans "Back" %}</a>
-    <button type="button" onclick="window.print()" class="btn btn-primary btn-sm">{% icon "printer" "size-4" %}{% trans "Print" %}</button>
+    <button type="button" data-print class="btn btn-primary btn-sm">{% icon "printer" "size-4" %}{% trans "Print" %}</button>
   </div>
 
   <article class="mx-auto max-w-[210mm] bg-white p-10 shadow-lg ring-1 ring-slate-200 print:p-0 print:shadow-none print:ring-0">

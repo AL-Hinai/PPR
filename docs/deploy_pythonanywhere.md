@@ -89,11 +89,31 @@ application = get_wsgi_application()
 * **Do not** add a mapping for media. Dossiers are private and are served only through permission-checked views.
 * Turn on **Force HTTPS**, then click **Reload**.
 
-## 7. Limits and validation on PythonAnywhere
+## 7. Validation worker (always-on task)
 
-* Validation runs synchronously during the upload/submit request. Keep `ECTD_MAX_UPLOAD_MB` within your plan's
-  request limits. For large dossiers, upgrade the plan or run `python manage.py validate_sequence <id>`
-  from a scheduled task.
+In production (`VALIDATION_MODE=queue`, the default in `config/settings/production.py`) a submit only queues
+the validation; a background worker validates the sequence, moves the workflow and extracts the dossier text.
+Without the worker, submissions stay "Validation in progress".
+
+On the **Tasks** tab, create an **always-on task** with this command:
+
+```bash
+cd ~/ppr && DJANGO_SETTINGS_MODULE=config.settings.production ~/.virtualenvs/ppr/bin/python manage.py run_validation_worker
+```
+
+* The task log shows `Validation worker started`, then one line whenever jobs run.
+* A job that crashes is retried up to 3 times; after that it is marked failed and the HOD and administrators are
+  notified. A job whose worker stopped mid-run is retried after 30 minutes. Jobs are in Django admin
+  (*Validation jobs*).
+* Restart the task after every update (it keeps running the old code otherwise).
+* If always-on tasks are not available, a scheduled task running `manage.py run_validation_worker --once`
+  every hour works, with slower results. `VALIDATION_MODE=sync` validates during the request instead, which
+  only suits small dossiers.
+
+## 8. Limits on PythonAnywhere
+
+* Upload size: the upload itself still goes through a web request. Test the largest expected dossier on your
+  plan and keep `ECTD_MAX_UPLOAD_MB` below what succeeds; the default is 500.
 * Uploaded zips and extracted accepted sequences live under `MEDIA_ROOT`. Watch your disk quota.
 
 ## Updating
@@ -107,4 +127,4 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 ```
 
-Then click **Reload** in the Web tab.
+Then click **Reload** in the Web tab and restart the validation worker task.

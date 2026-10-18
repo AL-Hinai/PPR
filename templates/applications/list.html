@@ -12,7 +12,7 @@
     <span class="pointer-events-none absolute inset-y-0 start-3 grid place-items-center text-slate-400">{% icon "search" "size-4" %}</span>
     <input type="search" name="q" value="{{ query }}" class="input ps-9" placeholder="{% trans 'Search reference, product, ingredient or company' %}">
   </div>
-  <select name="status" class="input sm:w-64" onchange="this.form.submit()">
+  <select name="status" class="input sm:w-64" data-autosubmit>
     <option value="">{% trans "All statuses" %}</option>
     {% for value, label in statuses %}<option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>{% endfor %}
   </select>

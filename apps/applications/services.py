@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from apps.validation.engine import validate_sequence
+from apps.validation.models import ValidationJob
 
 from .models import Application, Decision, InfoRequest, Review, ReviewAssignment, Sequence, StatusHistory
 from .workflow import transition
@@ -19,6 +20,8 @@ S = Application.Status
 
 def store_sequence(application, user, uploaded_file, description="") -> Sequence:
     """Save an uploaded zip as the application's next sequence (replacing an unsubmitted one)."""
+    if application.validation_in_progress():
+        raise ValidationError(_("A sequence is still being validated. Wait for the result before uploading another."))
     for old in application.sequences.filter(validation_status=Sequence.ValidationStatus.PENDING):
         old.package.delete(save=False)
         old.delete()
@@ -43,7 +46,10 @@ def store_sequence(application, user, uploaded_file, description="") -> Sequence
 
 
 def submit(application, user):
-    """Company submits (or resubmits after a failed validation); validation runs immediately."""
+    """Company submits (or resubmits after a failed validation); the sequence is then validated.
+
+    Returns (sequence, run); ``run`` is None when validation was queued for the background worker.
+    """
     sequence = application.pending_sequence()
     if sequence is None:
         raise ValidationError(_("Upload an eCTD package before submitting."))
@@ -52,29 +58,53 @@ def submit(application, user):
         transition(application, S.VALIDATING)
     else:
         transition(application, S.VALIDATING, user)
-    run = validate_sequence(sequence)
-    transition(application, S.VALIDATED if sequence.is_accepted else S.VALIDATION_FAILED)
-    if sequence.is_accepted and settings.AUTO_ASSIGN_REVIEW_TEAMS:
-        auto_assign_review_team(application)
-    return sequence, run
+    return _validate(sequence, ValidationJob.Kind.SUBMIT, user)
 
 
 def respond_to_info_request(application, user, uploaded_file, note):
     """The company answers questions with a new sequence. It must pass validation to count."""
-    info_request = application.open_info_request()
-    if application.status != S.INFO_REQUESTED or info_request is None:
+    if application.status != S.INFO_REQUESTED or application.open_info_request() is None:
         raise ValidationError(_("There is no open information request."))
     sequence = store_sequence(application, user, uploaded_file, description=_("Response to questions"))
-    run = validate_sequence(sequence)
-    if sequence.is_accepted:
+    return _validate(sequence, ValidationJob.Kind.INFO_RESPONSE, user, note)
+
+
+def _validate(sequence, kind, user, note=""):
+    """Validate now (VALIDATION_MODE "sync") or queue it for ``run_validation_worker`` ("queue")."""
+    if settings.VALIDATION_MODE == "queue":
         with transaction.atomic():
-            info_request.status = InfoRequest.Status.ANSWERED
-            info_request.response_sequence = sequence
-            info_request.response_note = note
-            info_request.answered_at = timezone.now()
-            info_request.save()
-            transition(application, S.UNDER_REVIEW, user, note=note)
+            sequence.validation_status = Sequence.ValidationStatus.QUEUED
+            sequence.save(update_fields=["validation_status"])
+            ValidationJob.objects.create(sequence=sequence, kind=kind, requested_by=user, note=note)
+        return sequence, None
+    run = validate_sequence(sequence)
+    finish_validation(sequence, kind, user, note)
     return sequence, run
+
+
+def finish_validation(sequence, kind, user, note=""):
+    """Move the workflow once a sequence has been validated (inline or by the worker)."""
+    application = sequence.application  # the caller's instance, so it sees the new status
+    if kind == ValidationJob.Kind.SUBMIT:
+        transition(application, S.VALIDATED if sequence.is_accepted else S.VALIDATION_FAILED)
+        if sequence.is_accepted and settings.AUTO_ASSIGN_REVIEW_TEAMS:
+            auto_assign_review_team(application)
+        return
+    info_request = application.open_info_request()
+    if not sequence.is_accepted or info_request is None:
+        if settings.VALIDATION_MODE == "queue":  # inline, the uploader sees the result straight away
+            from apps.notifications.services import notify_company
+
+            notify_company(application, _("Response sequence %(no)s failed technical validation. Fix the errors "
+                                          "and upload again.") % {"no": sequence.number})
+        return
+    with transaction.atomic():
+        info_request.status = InfoRequest.Status.ANSWERED
+        info_request.response_sequence = sequence
+        info_request.response_note = note
+        info_request.answered_at = timezone.now()
+        info_request.save()
+        transition(application, S.UNDER_REVIEW, user, note=note)
 
 
 def assign_review_team(application, hod, lead, sections, note_prefix=""):

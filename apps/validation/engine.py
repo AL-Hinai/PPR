@@ -60,36 +60,45 @@ def run_rules(ctx) -> list:
     return issues
 
 
+def validate_package(zip_path, dest: Path, *, expected_number: str, application_type: str,
+                     previous: dict[str, Path] | None = None) -> tuple[list, dict]:
+    """Extract one package into ``dest`` and run every rule, without touching the database.
+
+    Returns (issues, envelope). Used by ``validate_sequence`` and the ``benchmark_validation`` command.
+    """
+    try:
+        safe_extract(
+            zip_path,
+            dest,
+            max_total_bytes=settings.ECTD_MAX_UNCOMPRESSED_MB * MB,
+            max_files=settings.ECTD_MAX_FILES,
+        )
+    except ArchiveError as exc:
+        return [PACKAGE_RULE.issue(str(exc))], {}
+    ctx = ValidationContext(
+        root=dest,
+        expected_number=expected_number,
+        application_type=application_type,
+        region=settings.ECTD_REGION,
+        dtd_path=Path(settings.ECTD_DTD_PATH),
+        limits=Limits(max_file_bytes=settings.ECTD_MAX_FILE_MB * MB),
+        previous=previous or {},
+        country=settings.ECTD_COUNTRY,
+    )
+    return run_rules(ctx), ctx.envelope or {}
+
+
 def validate_sequence(sequence) -> ValidationRun:
     application = sequence.application
     run = ValidationRun.objects.create(sequence=sequence, validator_version=VALIDATOR_VERSION)
     rel_dir, dest = _extraction_dir(sequence)
     shutil.rmtree(dest, ignore_errors=True)
 
-    try:
-        safe_extract(
-            sequence.package.path,
-            dest,
-            max_total_bytes=settings.ECTD_MAX_UNCOMPRESSED_MB * MB,
-            max_files=settings.ECTD_MAX_FILES,
-        )
-    except ArchiveError as exc:
-        issues = [PACKAGE_RULE.issue(str(exc))]
-        envelope = {}
-    else:
-        expected, previous = _previous_sequences(sequence)
-        ctx = ValidationContext(
-            root=dest,
-            expected_number=expected,
-            application_type=application.application_type,
-            region=settings.ECTD_REGION,
-            dtd_path=Path(settings.ECTD_DTD_PATH),
-            limits=Limits(max_file_bytes=settings.ECTD_MAX_FILE_MB * MB),
-            previous=previous,
-            country=settings.ECTD_COUNTRY,
-        )
-        issues = run_rules(ctx)
-        envelope = ctx.envelope or {}
+    expected, previous = _previous_sequences(sequence)
+    issues, envelope = validate_package(
+        sequence.package.path, dest,
+        expected_number=expected, application_type=application.application_type, previous=previous,
+    )
 
     Finding.objects.bulk_create(
         Finding(

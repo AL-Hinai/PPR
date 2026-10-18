@@ -1,5 +1,42 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+
+class ValidationJob(models.Model):
+    """A queued validation, run by ``manage.py run_validation_worker`` (VALIDATION_MODE = "queue")."""
+
+    class Kind(models.TextChoices):
+        SUBMIT = "SUBMIT", _("Submission")
+        INFO_RESPONSE = "INFO_RESPONSE", _("Response to questions")
+
+    class Status(models.TextChoices):
+        QUEUED = "QUEUED", _("Queued")
+        RUNNING = "RUNNING", _("Running")
+        DONE = "DONE", _("Done")
+        FAILED = "FAILED", _("Failed")
+
+    ACTIVE = (Status.QUEUED, Status.RUNNING)
+
+    sequence = models.ForeignKey("applications.Sequence", on_delete=models.CASCADE, related_name="jobs")
+    kind = models.CharField(max_length=15, choices=Kind.choices)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.QUEUED)
+    # The company user who submitted; the worker acts for them where the workflow needs a person.
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
+    note = models.TextField(blank=True)  # the applicant's note on a response to questions
+    attempts = models.PositiveSmallIntegerField(default=0)
+    error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    claimed_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = _("validation job")
+        verbose_name_plural = _("validation jobs")
+
+    def __str__(self):
+        return f"{self.get_kind_display()} job {self.pk} for {self.sequence} ({self.status})"
 
 
 class ValidationRun(models.Model):

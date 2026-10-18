@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Application, Decision, InfoRequest, Review, ReviewAssignment, Sequence, StatusHistory
+from .models import (
+    Application, Decision, DocumentNote, InfoRequest, Review, ReviewAssignment, Sequence, StatusHistory,
+)
 
 
 class SequenceInline(admin.TabularInline):
@@ -39,3 +41,18 @@ class ApplicationAdmin(admin.ModelAdmin):
 admin.site.register(Review)
 admin.site.register(InfoRequest)
 admin.site.register(Decision)
+
+
+@admin.register(DocumentNote)
+class DocumentNoteAdmin(admin.ModelAdmin):
+    """Read-only: notes belong to their authors and are changed in the document viewer."""
+
+    list_display = ["application", "path", "page", "section", "author", "created_at"]
+    list_filter = ["section"]
+    search_fields = ["application__reference_no", "body", "path"]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

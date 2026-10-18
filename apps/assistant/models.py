@@ -52,6 +52,9 @@ class DocumentText(models.Model):
     path = models.CharField(max_length=500)
     page = models.PositiveIntegerField()
     text = models.TextField(blank=True)
+    # Stored with the text so search results need not rebuild every sequence's CTD tree.
+    title = models.CharField(max_length=300, blank=True)
+    section = models.CharField(max_length=500, blank=True)  # CTD heading trail, e.g. "3 Quality › 3.2 Body of data"
 
     class Meta:
         ordering = ["sequence", "path", "page"]

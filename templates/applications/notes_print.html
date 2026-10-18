@@ -1,0 +1,51 @@
+{% load static i18n tailwind_tags ui %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ application.reference_no }} {% trans "Assessment notes" %} · PPR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  {% tailwind_css %}
+  <style>@page { size: A4; margin: 14mm; } li { break-inside: avoid; }</style>
+  <script src="{% static 'core/ui.js' %}" defer></script>
+</head>
+<body class="bg-slate-100 text-slate-900 print:bg-white">
+  <div class="mx-auto flex max-w-[210mm] flex-wrap justify-between gap-2 px-4 py-4 print:hidden">
+    <a href="{{ application.get_absolute_url }}?tab=review" class="btn btn-secondary btn-sm">{% icon "arrow-left" "size-4 rtl:rotate-180" %}{% trans "Back" %}</a>
+    <div class="flex gap-2">
+      <a href="?" class="btn btn-sm {% if not mine %}btn-primary{% else %}btn-secondary{% endif %}">{% trans "All reviewers" %}</a>
+      <a href="?mine=1" class="btn btn-sm {% if mine %}btn-primary{% else %}btn-secondary{% endif %}">{% trans "My notes" %}</a>
+      <button type="button" data-print class="btn btn-primary btn-sm">{% icon "printer" "size-4" %}{% trans "Print / save as PDF" %}</button>
+    </div>
+  </div>
+
+  <article class="mx-auto max-w-[210mm] bg-white p-10 shadow-lg ring-1 ring-slate-200 print:p-0 print:shadow-none print:ring-0">
+    <header class="border-b-4 border-brand-700 pb-4">
+      <p class="text-xs font-semibold tracking-widest text-brand-700 uppercase">{% trans "Pharmacy Department · Internal" %}</p>
+      <h1 class="mt-1 text-xl font-bold">{% trans "Assessment notes" %}</h1>
+      <p class="mt-1 text-sm text-slate-600"><span class="font-mono">{{ application.reference_no }}</span> · {{ application.product_name }} · {{ application.company.name }}</p>
+      <p class="mt-1 text-xs text-slate-500">{% blocktrans count counter=count %}{{ counter }} note{% plural %}{{ counter }} notes{% endblocktrans %}{% if mine %} · {% trans "my notes only" %}{% endif %}</p>
+    </header>
+
+    {% for module, documents in groups %}
+      <h2 class="mt-8 text-base font-bold text-brand-900">{{ module }}</h2>
+      {% for path, number, notes in documents %}
+        <h3 class="mt-4 font-mono text-xs font-semibold text-slate-700" dir="ltr">{{ number }}/{{ path }}</h3>
+        <ul class="mt-2 space-y-2">
+          {% for note in notes %}
+            <li class="rounded-md border border-slate-200 px-3 py-2 text-sm">
+              <p class="text-xs text-slate-500">{% blocktrans with p=note.page %}Page {{ p }}{% endblocktrans %} · {{ note.author.display_name }} · {{ note.created_at|date:"d M Y" }}</p>
+              {% if note.quote %}<blockquote class="mt-1 border-s-2 border-amber-300 ps-2 text-xs text-slate-500 italic" dir="auto">{{ note.quote }}</blockquote>{% endif %}
+              <p class="mt-1 whitespace-pre-line" dir="auto">{{ note.body }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    {% empty %}
+      <p class="mt-8 text-sm text-slate-500">{% trans "No notes yet. Add them from the document viewer while reading the dossier." %}</p>
+    {% endfor %}
+  </article>
+</body>
+</html>

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% load i18n ui %}
+{% load i18n static ui %}
 {% block title %}{{ filename }} · {{ application.reference_no }}{% endblock %}
 {% block main_class %}mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/web/pdf_viewer.css">
+<link rel="stylesheet" href="{% static 'vendor/pdfjs/pdf_viewer.css' %}">{# PDF.js 4.10.38 #}
 <style>
   .pdf-pages { background: #e2e8f0; overflow-x: auto; border-radius: 0 0 1rem 1rem; }
   .pdf-page { position: relative; margin: 0 auto 16px; background: #fff; box-shadow: 0 1px 3px rgb(15 23 42 / .15), 0 4px 12px rgb(15 23 42 / .08); }
@@ -26,7 +26,8 @@
   </div>
 </div>
 
-<section class="card mt-4" id="pdf-viewer" data-url="{{ file_url }}">
+<div class="mt-4 {% if can_annotate %}grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start{% endif %}">
+<section class="card min-w-0" id="pdf-viewer" data-url="{{ file_url }}">
   <div class="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-t-2xl border-b border-slate-200 bg-white/95 px-4 py-2 backdrop-blur print:hidden" dir="ltr">
     <div class="flex items-center gap-2 text-sm text-slate-600">
       <button type="button" class="btn btn-secondary btn-sm" data-action="prev" title="{% trans 'Previous page' %}" aria-label="{% trans 'Previous page' %}">&lsaquo;</button>
@@ -48,10 +49,34 @@
   </div>
   <div data-role="pages" class="pdf-pages hidden px-4 py-4" dir="ltr"></div>
 </section>
+{% if can_annotate %}
+  <aside class="card lg:sticky lg:top-4 print:hidden" aria-label="{% trans 'Review notes' %}">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">{% trans "Review notes" %}</h2>
+        <p class="mt-0.5 text-xs text-slate-500">{% trans "Internal to the department. Select text in the document to quote it." %}</p>
+      </div>
+      <a href="{% url 'applications:notes_print' application.pk %}" class="text-xs font-medium text-brand-700 hover:underline">{% trans "All notes" %}</a>
+    </div>
+    <form class="card-body space-y-2 border-b border-slate-100" data-note-form
+          hx-post="{% url 'applications:notes' application.pk sequence.pk %}" hx-target="#notes-list" hx-swap="outerHTML">
+      <input type="hidden" name="path" value="{{ path }}">
+      <p data-role="note-quote" hidden class="flex items-start gap-2 rounded-md bg-amber-50 px-2 py-1.5 text-xs text-amber-900">
+        <span class="line-clamp-3 italic" dir="auto"></span>
+        <button type="button" class="ms-auto shrink-0 text-amber-700 hover:text-amber-900" aria-label="{% trans 'Remove quote' %}">&times;</button>
+      </p>
+      <textarea name="body" rows="3" required class="input text-sm" placeholder="{% trans 'Your note' %}"></textarea>
+      <button class="btn btn-primary btn-sm w-full">{% trans "Add note on page" %} <span data-role="note-page">1</span></button>
+    </form>
+    {% include "applications/_notes_list.html" %}
+  </aside>
+  <script src="{% static 'applications/notes.js' %}" defer></script>
+{% endif %}
+</div>
 
-<script type="module">
-  import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+<script type="module" nonce="{{ request.csp_nonce }}">
+  import * as pdfjsLib from "{% static 'vendor/pdfjs/pdf.min.js' %}";
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "{% static 'vendor/pdfjs/pdf.worker.min.js' %}";
 
   const root = document.getElementById("pdf-viewer");
   const $ = (role) => root.querySelector(`[data-role="${role}"]`);

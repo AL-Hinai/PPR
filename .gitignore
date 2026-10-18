@@ -25,3 +25,7 @@ Thumbs.db
 
 # Generated demo packages (manage.py build_sample_packages)
 /sample_packages/
+
+# Validation benchmark: dossiers (may be confidential) and result sheets (docs/validation_benchmark.md)
+/benchmark/
+benchmark-*.csv

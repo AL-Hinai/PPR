@@ -25,10 +25,11 @@ class IndexExists(Rule):
 
     def check(self, ctx):
         if not ctx.index_path.is_file():
-            yield self.issue(
-                "index.xml was not found in the sequence folder.",
-                file_path=f"{ctx.display_folder}/index.xml",
-            )
+            detail = "index.xml was not found in the sequence folder."
+            if ctx.backbone == "4.0":
+                detail = ("This is an eCTD 4.0 sequence (submissionunit.xml). Only eCTD v3.2.2 sequences with an "
+                          "index.xml backbone are accepted.")
+            yield self.issue(detail, file_path=f"{ctx.display_folder}/index.xml")
 
 
 class IndexWellFormed(Rule):

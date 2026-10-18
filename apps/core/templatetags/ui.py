@@ -86,6 +86,7 @@ SEVERITY_STYLES = {
 V = Sequence.ValidationStatus
 VALIDATION_STYLES = {
     V.PENDING: ("bg-slate-100 text-slate-700 ring-slate-500/20", "clock"),
+    V.QUEUED: ("bg-sky-50 text-sky-700 ring-sky-600/20", "clock"),
     V.PASSED: ("bg-emerald-50 text-emerald-700 ring-emerald-600/20", "check-circle"),
     V.PASSED_WITH_WARNINGS: ("bg-amber-50 text-amber-800 ring-amber-600/20", "warning"),
     V.FAILED: ("bg-red-50 text-red-700 ring-red-600/20", "x-circle"),

@@ -1,5 +1,6 @@
 """eCTD constants and XML helpers shared by the validator, the dossier viewer and the sample builder."""
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 from lxml import etree
@@ -9,6 +10,14 @@ ECTD_NS = "http://www.ich.org/ectd"
 XLINK_NS = "http://www.w3c.org/1999/xlink"
 SEQUENCE_RE = re.compile(r"^\d{4}$")
 OPERATIONS = ("new", "append", "replace", "delete")
+# ICH lifecycle reference to a leaf of an earlier sequence: ../0000/index.xml#leaf-id
+MODIFIED_FILE_RE = re.compile(r"^(?:\.\./)+(\d{4})/([^#]+)#(.+)$")
+
+
+def parse_modified_file(value: str) -> tuple[str, str, str] | None:
+    """'../0000/index.xml#leaf-1' -> ('0000', 'index.xml', 'leaf-1'); None when it is not such a reference."""
+    match = MODIFIED_FILE_RE.match((value or "").replace("\\", "/"))
+    return match.groups() if match else None
 
 MODULES = {
     "m1": "m1-administrative-information-and-prescribing-information",
@@ -101,6 +110,7 @@ def _leaf_info(leaf, base_dir: Path, seq_dir: Path) -> dict:
         "id": leaf.get("ID", ""),
         "title": child_text(leaf, "title") or href or leaf.get("ID", ""),
         "operation": leaf.get("operation", ""),
+        "modified_file": leaf.get("modified-file", ""),
         "path": rel,
         "exists": bool(rel) and (seq_dir / rel).is_file(),
         "is_pdf": rel.lower().endswith(".pdf"),
@@ -180,3 +190,83 @@ def build_dossier_tree(seq_dir: Path) -> list[dict]:
         if node:
             modules.append(node)
     return modules
+
+
+# --- Backbone formats ------------------------------------------------------------
+
+@dataclass
+class Leaf:
+    id: str
+    title: str
+    operation: str
+    href: str
+    checksum: str
+    checksum_type: str
+    modified_file: str
+    source: str  # XML file declaring the leaf, relative to the sequence folder
+    base_dir: Path  # folder that href / modified-file are relative to
+    line: int | None = None
+
+    @property
+    def location(self):
+        return f"{self.source}, line {self.line}" if self.line else self.source
+
+
+class BackboneReader:
+    """One eCTD backbone format: how a sequence declares its documents and their lifecycle.
+
+    PPR implements eCTD v3.2.2 (index.xml plus the regional Module 1 XML). eCTD 4.0 (HL7 RPS,
+    submissionunit.xml with controlled-vocabulary keywords and document re-use) would be a second reader
+    with the same methods, plus its own rules; the GCC has not announced a timeline for it.
+    """
+
+    version = ""
+    backbone_file = ""
+
+    def matches(self, seq_dir: Path) -> bool:
+        return (seq_dir / self.backbone_file).is_file()
+
+    def leaves(self, tree, source: str, base_dir: Path) -> list[Leaf]:
+        raise NotImplementedError
+
+    def tree(self, seq_dir: Path) -> list[dict]:
+        raise NotImplementedError
+
+
+class Ectd32Reader(BackboneReader):
+    version = "3.2.2"
+    backbone_file = "index.xml"
+
+    def leaves(self, tree, source: str, base_dir: Path) -> list[Leaf]:
+        return [
+            Leaf(
+                id=element.get("ID", ""),
+                title=child_text(element, "title"),
+                operation=element.get("operation", ""),
+                href=attr(element, "href"),
+                checksum=element.get("checksum", ""),
+                checksum_type=element.get("checksum-type", ""),
+                modified_file=element.get("modified-file", ""),
+                source=source,
+                base_dir=base_dir,
+                line=element.sourceline,
+            )
+            for element in tree.iter()
+            if local_name(element) == "leaf"
+        ]
+
+    def tree(self, seq_dir: Path) -> list[dict]:
+        return build_dossier_tree(seq_dir)
+
+
+ECTD_32 = Ectd32Reader()
+ECTD_4_BACKBONE = "submissionunit.xml"
+
+
+def detect_backbone(seq_dir: Path) -> str:
+    """Which eCTD version a sequence folder uses: "3.2.2", "4.0" or "" (neither backbone found)."""
+    if ECTD_32.matches(seq_dir):
+        return ECTD_32.version
+    if (seq_dir / ECTD_4_BACKBONE).is_file():
+        return "4.0"
+    return ""

@@ -1,4 +1,5 @@
 """The dossier assistant: context detection, access scoping, document tools and the agent loop."""
+import io
 import json
 
 import pytest
@@ -14,6 +15,8 @@ from apps.assistant.tools import ToolBox
 from apps.validation import samples
 
 from .conftest import upload
+
+pytestmark = [pytest.mark.req("URS-17")]
 
 STABILITY = samples.STABILITY_PATH
 
@@ -185,3 +188,32 @@ def test_drawer_renders_on_pages(client, dossier, reviewer):
     page = client.get(reverse("applications:sequence", args=[dossier.pk, dossier.sequences.get().pk]))
     assert b'id="assistant-config"' in page.content
     assert b"assistant-pin" in page.content  # "Ask" buttons on the dossier tree
+
+
+@pytest.mark.django_db
+def test_smoke_test_command_checks_citations_offline(settings, hod, make_application, applicant):
+    from django.core.management import call_command
+
+    from apps.applications import services
+    from apps.validation import samples
+
+    from .conftest import upload
+
+    settings.ASSISTANT = {**settings.ASSISTANT, "API_KEY": ""}
+    application = make_application()
+    upload(application, applicant, samples.build_package("0000"))
+    services.submit(application, applicant)
+    out = io.StringIO()
+    call_command("assistant_smoke_test", application=application.pk, user="hod", stdout=out)
+    assert "Provider: offline" in out.getvalue() and "Smoke test passed." in out.getvalue()
+
+
+def test_drawer_warns_when_text_goes_to_an_external_model(settings, rf, hod):
+    from apps.assistant.context_processors import assistant
+
+    request = rf.get("/")
+    request.user = hod
+    settings.ASSISTANT = {**settings.ASSISTANT, "PROVIDER": "openai", "API_KEY": "k", "BASE_URL": "https://api.deepseek.com/v1"}
+    assert assistant(request)["assistant_external_host"] == "api.deepseek.com"
+    settings.ASSISTANT = {**settings.ASSISTANT, "API_KEY": ""}
+    assert assistant(request)["assistant_external_host"] == ""

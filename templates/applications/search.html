@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n ui %}
+{% block title %}{% if query %}{{ query }} · {% endif %}{% trans "Search" %}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-900">{% trans "Search dossiers" %}</h1>
+<p class="mt-1 text-sm text-slate-500">{% trans "Searches every application you can open: its details and the text of its accepted documents." %}</p>
+
+<form method="get" class="mt-4 flex max-w-2xl gap-2" role="search">
+  <input type="search" name="q" value="{{ query }}" class="input" placeholder="{% trans 'e.g. shelf life, impurity C, MA-2026-00012' %}" autofocus>
+  <button class="btn btn-primary">{% icon "search" "size-4" %}{% trans "Search" %}</button>
+</form>
+
+{% if query %}
+  {% if applications %}
+    <section class="card mt-6">
+      <div class="card-header"><h2 class="card-title">{% trans "Applications" %}</h2></div>
+      <ul class="divide-y divide-slate-100">
+        {% for application in applications %}
+          <li class="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
+            <a href="{{ application.get_absolute_url }}" class="font-medium text-brand-700 hover:underline">{{ application.product_name }}</a>
+            <span class="font-mono text-xs text-slate-500">{{ application.reference_no|default:"—" }}</span>
+            <span class="text-slate-500">{{ application.company.name }}</span>
+            {% status_badge application.status %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <section class="card mt-6">
+    <div class="card-header">
+      <h2 class="card-title">{% trans "Documents" %}</h2>
+      <span class="text-sm text-slate-500">{% blocktrans count counter=document_count %}{{ counter }} document{% plural %}{{ counter }} documents{% endblocktrans %}</span>
+    </div>
+    {% if documents %}
+      <ul class="divide-y divide-slate-100">
+        {% for doc in documents %}
+          <li class="px-5 py-4">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+              <a href="{% url 'applications:sequence_document' doc.application.pk doc.sequence.pk doc.path %}" class="font-semibold text-brand-700 hover:underline">{{ doc.title }}</a>
+              <a href="{{ doc.application.get_absolute_url }}" class="text-slate-600 hover:underline">{{ doc.application.product_name }}</a>
+              <span class="font-mono text-xs text-slate-400">{{ doc.application.reference_no }} / {{ doc.sequence.number }}</span>
+            </div>
+            {% if doc.section %}<p class="mt-0.5 text-xs text-slate-500" dir="ltr">{{ doc.section }}</p>{% endif %}
+            <ul class="mt-2 space-y-1.5">
+              {% for hit in doc.pages %}
+                <li class="flex gap-3 text-sm">
+                  <a href="{% url 'applications:sequence_document' doc.application.pk doc.sequence.pk doc.path %}#page={{ hit.page }}"
+                     class="shrink-0 font-mono text-xs font-semibold text-brand-700 hover:underline">p.{{ hit.page }}</a>
+                  <span class="text-slate-700" dir="auto">{{ hit.snippet }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% trans "No documents match" as t %}{% trans "Try other words. Only accepted sequences are searched, and their text is indexed when they pass validation." as x %}
+      {% include "components/empty.html" with title=t text=x icon="search" %}
+    {% endif %}
+  </section>
+{% endif %}
+{% endblock %}

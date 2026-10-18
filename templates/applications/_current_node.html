@@ -1,0 +1,31 @@
+{% load i18n ui %}<details class="group" {% if node.depth < 1 %}open{% endif %}>
+  <summary class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
+    {% icon "chevron-right" "size-3.5 shrink-0 text-slate-400 transition group-open:rotate-90" %}
+    {% icon "folder" "size-4 shrink-0 text-brand-600" %}
+    <span class="{% if node.depth == 0 %}font-semibold text-slate-900{% else %}text-slate-700{% endif %}">{{ node.label }}</span>
+  </summary>
+  <div class="ms-4 border-s border-slate-200 ps-3">
+    {% for leaf in node.leaves %}
+      <div class="flex flex-wrap items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50"
+           {% if leaf.status != "current" %}x-show="all" x-cloak{% endif %}>
+        {% icon "document" "size-4 shrink-0 text-slate-400" %}
+        {% if leaf.status != "current" %}
+          <span class="text-slate-400 line-through">{{ leaf.title }}</span>
+          <span class="badge bg-slate-100 text-slate-600 ring-slate-500/20">{% if leaf.status == "replaced" %}{% blocktrans with s=leaf.changed_in %}replaced in {{ s }}{% endblocktrans %}{% else %}{% blocktrans with s=leaf.changed_in %}deleted in {{ s }}{% endblocktrans %}{% endif %}</span>
+        {% elif leaf.exists %}
+          <a href="{% if leaf.is_pdf %}{% url 'applications:sequence_document' application.pk leaf.sequence_pk leaf.path %}{% else %}{% url 'applications:sequence_file' application.pk leaf.sequence_pk leaf.path %}{% endif %}"
+             {% if not leaf.is_pdf %}target="_blank" rel="noopener"{% endif %} class="text-brand-700 hover:underline">{{ leaf.title }}</a>
+        {% else %}
+          <span class="text-slate-500">{{ leaf.title }}</span>
+        {% endif %}
+        {% for step in leaf.history %}
+          <span class="badge {% if step.operation == 'new' %}bg-sky-50 text-sky-700 ring-sky-600/20{% elif step.operation == 'replace' %}bg-amber-50 text-amber-800 ring-amber-600/20{% elif step.operation == 'delete' %}bg-red-50 text-red-700 ring-red-600/20{% else %}bg-violet-50 text-violet-700 ring-violet-600/20{% endif %}"
+                title="{% trans 'Sequence' %} {{ step.sequence }}">{{ step.sequence }} · {{ step.operation }}</span>
+        {% endfor %}
+        {% if leaf.appends_to %}<span class="text-xs text-slate-500">{% blocktrans with t=leaf.appends_to %}adds to “{{ t }}”{% endblocktrans %}</span>{% endif %}
+        {% if leaf.unresolved %}<span class="badge bg-amber-50 text-amber-800 ring-amber-600/20" title="{{ leaf.modified_file }}">{% trans "target not found" %}</span>{% endif %}
+      </div>
+    {% endfor %}
+    {% for child in node.children %}{% include "applications/_current_node.html" with node=child %}{% endfor %}
+  </div>
+</details>

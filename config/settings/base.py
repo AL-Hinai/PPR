@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django_htmx",
+    "axes",
     "tailwind",
     "theme",
     "apps.core",
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     "apps.validation",
     "apps.notifications",
     "apps.assistant",
+    "apps.api",
 ]
 
 MIDDLEWARE = [
@@ -43,7 +45,55 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "apps.core.middleware.ContentSecurityPolicyMiddleware",
+    "axes.middleware.AxesMiddleware",  # last: turns lockouts into the lockout page
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",  # first: refuses locked-out logins
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Single sign-on for staff (OpenID Connect, e.g. Microsoft Entra ID / ADFS). Off unless OIDC_RP_CLIENT_ID is set.
+OIDC_RP_CLIENT_ID = env("OIDC_RP_CLIENT_ID", default="")
+SSO_ENABLED = bool(OIDC_RP_CLIENT_ID)
+if SSO_ENABLED:
+    INSTALLED_APPS.append("mozilla_django_oidc")
+    AUTHENTICATION_BACKENDS.insert(1, "apps.accounts.sso.StaffOIDCBackend")
+    OIDC_RP_CLIENT_SECRET = env("OIDC_RP_CLIENT_SECRET")
+    OIDC_OP_AUTHORIZATION_ENDPOINT = env("OIDC_OP_AUTHORIZATION_ENDPOINT")
+    OIDC_OP_TOKEN_ENDPOINT = env("OIDC_OP_TOKEN_ENDPOINT")
+    OIDC_OP_USER_ENDPOINT = env("OIDC_OP_USER_ENDPOINT")
+    OIDC_OP_JWKS_ENDPOINT = env("OIDC_OP_JWKS_ENDPOINT")
+    OIDC_RP_SIGN_ALGO = env("OIDC_RP_SIGN_ALGO", default="RS256")
+    OIDC_RP_SCOPES = env("OIDC_RP_SCOPES", default="openid email profile")
+    OIDC_CREATE_USER = False  # accounts are issued in PPR; SSO only signs existing staff in
+    OIDC_STORE_ID_TOKEN = False
+SSO_LABEL = env("SSO_LABEL", default="")  # empty: the translated "Sign in with your Ministry account"
+
+# Login lockout (django-axes): 5 failures for the same username from the same address lock it for 1 hour.
+AXES_FAILURE_LIMIT = env.int("AXES_FAILURE_LIMIT", default=5)
+AXES_COOLOFF_TIME = env.int("AXES_COOLOFF_HOURS", default=1)
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_TEMPLATE = "accounts/locked_out.html"
+
+# Content-Security-Policy (apps/core/middleware.py). Scripts come from this site only; inline scripts need
+# nonce="{{ request.csp_nonce }}". Alpine.js evaluates its attribute expressions, hence 'unsafe-eval'.
+CSP_ENABLED = env.bool("CSP_ENABLED", default=True)
+CSP_DIRECTIVES = {
+    "default-src": ["'self'"],
+    "script-src": ["'self'", "'nonce-{nonce}'", "'unsafe-eval'"],
+    "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
+    "img-src": ["'self'", "data:", "blob:"],
+    "connect-src": ["'self'"],
+    "worker-src": ["'self'", "blob:"],
+    "object-src": ["'none'"],
+    "base-uri": ["'self'"],
+    "form-action": ["'self'"],
+    "frame-ancestors": ["'none'"],
+}
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -69,7 +119,7 @@ TEMPLATES = [
 AUTH_USER_MODEL = "accounts.User"
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -96,6 +146,8 @@ FILE_UPLOAD_PERMISSIONS = 0o640
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+# Public address of the site, for links in emails (e.g. https://ppr.example.gov.om). Empty: no links.
+SITE_URL = env("SITE_URL", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="PPR <no-reply@localhost>")
 
 # Tailwind: standalone CLI binary (no Node.js required)
@@ -113,6 +165,9 @@ ECTD_MAX_UPLOAD_MB = env.int("ECTD_MAX_UPLOAD_MB", default=500)
 ECTD_MAX_UNCOMPRESSED_MB = env.int("ECTD_MAX_UNCOMPRESSED_MB", default=1024)
 ECTD_MAX_FILES = env.int("ECTD_MAX_FILES", default=5000)
 ECTD_MAX_FILE_MB = env.int("ECTD_MAX_FILE_MB", default=400)
+# "sync": validate inside the submit request. "queue": queue a job for `manage.py run_validation_worker`
+# (production: large dossiers must not hold a web worker; run the worker as an always-on task).
+VALIDATION_MODE = env("VALIDATION_MODE", default="sync")
 # Findings reported per rule before the rest are summarised in one line.
 ECTD_MAX_FINDINGS_PER_RULE = 50
 

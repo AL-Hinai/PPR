@@ -10,8 +10,12 @@ urlpatterns = [
     path("applications/", include("apps.applications.urls")),
     path("notifications/", include("apps.notifications.urls")),
     path("assistant/", include("apps.assistant.urls")),
+    path("api/", include("apps.api.urls")),
     path("", include("apps.core.urls")),
 ]
+
+if settings.SSO_ENABLED:
+    urlpatterns.insert(0, path("oidc/", include("mozilla_django_oidc.urls")))
 
 if settings.DEBUG and "django_browser_reload" in settings.INSTALLED_APPS:
     urlpatterns.append(path("__reload__/", include("django_browser_reload.urls")))

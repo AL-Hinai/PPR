@@ -4,7 +4,7 @@
 {% if note %}
 {{ note }}
 {% endif %}
-{% trans "Sign in to PPR to view the details." %}
+{% if link %}{% trans "View it in PPR:" %} {{ link }}{% else %}{% trans "Sign in to PPR to view the details." %}{% endif %}
 
 --
 {% trans "PPR — Pharmaceutical Product Registration" %}

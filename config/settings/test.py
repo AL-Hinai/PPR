@@ -12,3 +12,4 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 MEDIA_ROOT = Path(tempfile.mkdtemp(prefix="ppr-test-media-"))
 # Workflow tests drive assignment explicitly; tests of automatic assignment switch it on.
 AUTO_ASSIGN_REVIEW_TEAMS = False
+VALIDATION_MODE = "sync"  # the queue path is tested explicitly in tests/test_validation_queue.py

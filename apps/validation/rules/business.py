@@ -3,14 +3,13 @@ import re
 
 from django.utils.translation import gettext_lazy as _
 
-from ..ectd import MODULES, OPERATIONS, SEQUENCE_RE, heading_label, local_name
+from ..ectd import MODULES, OPERATIONS, SEQUENCE_RE, heading_label, local_name, parse_modified_file
 from .base import Layer, Rule, Severity
 
 FOLDER_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 FILE_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]*\.[a-z0-9]+$")
 MAX_NAME_LENGTH = 64
 MAX_PATH_LENGTH = 180
-MODIFIED_FILE_RE = re.compile(r"^(?:\.\./)+(\d{4})/([^#]+)#(.+)$")
 
 # Modules that must contain at least one document in the initial sequence (0000).
 REQUIRED_MODULES = {
@@ -184,14 +183,14 @@ class LifecycleOperations(Rule):
                 f"Leaf '{leaf.id}' uses '{leaf.operation}' but has no modified-file.", location=leaf.location
             )
             return
-        match = MODIFIED_FILE_RE.match(leaf.modified_file.replace("\\", "/"))
-        if not match:
+        reference = parse_modified_file(leaf.modified_file)
+        if reference is None:
             yield self.issue(
                 f"modified-file '{leaf.modified_file}' must look like ../0000/index.xml#leaf-id.",
                 location=leaf.location,
             )
             return
-        number, path, leaf_id = match.groups()
+        number, path, leaf_id = reference
         current = ctx.folder_name if ctx.folder_name and SEQUENCE_RE.match(ctx.folder_name) else ctx.expected_number
         if number >= current:
             yield self.issue(

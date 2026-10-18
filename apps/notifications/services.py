@@ -3,7 +3,9 @@ import logging
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import translation
 
 from apps.accounts.models import User
@@ -49,6 +51,38 @@ def notify_status_change(application, history_entry):
             _send_email(user, application, status, history_entry.note_for(user))
 
 
+def notify_users(users, application, note):
+    """A message that is not a status change (e.g. a background validation result), in-app and by email."""
+    users = list({u.pk: u for u in users}.values())
+    Notification.objects.bulk_create(
+        Notification(user=u, application=application, status=application.status, note=note) for u in users
+    )
+    for user in users:
+        if user.email:
+            _send_email(user, application, application.status, note)
+
+
+def notify_company(application, note):
+    notify_users(User.objects.filter(company_id=application.company_id, is_active=True), application, note)
+
+
+def notify_staff(application, note):
+    """The Head of Department and administrators (e.g. when a validation job keeps failing)."""
+    users = User.objects.filter(is_active=True).filter(models.Q(role=User.Role.HOD) | models.Q(is_superuser=True))
+    notify_users(users, application, note)
+
+
+def _link(application, status) -> str:
+    """Absolute link for the email: the validation report after validation, else the application."""
+    if not settings.SITE_URL:
+        return ""
+    path = application.get_absolute_url()
+    sequence = application.latest_sequence()
+    if status in (S.VALIDATED, S.VALIDATION_FAILED) and sequence and sequence.latest_run():
+        path = reverse("applications:sequence_report", args=[application.pk, sequence.pk])
+    return settings.SITE_URL.rstrip("/") + path
+
+
 def _send_email(user, application, status, note):
     with translation.override(user.preferred_language):
         context = {
@@ -56,6 +90,7 @@ def _send_email(user, application, status, note):
             "application": application,
             "status_label": Application.Status(status).label,
             "note": note,
+            "link": _link(application, status),
         }
         subject = render_to_string("notifications/email_subject.txt", context).strip()
         body = render_to_string("notifications/email_body.txt", context)

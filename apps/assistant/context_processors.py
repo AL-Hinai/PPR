@@ -1,3 +1,6 @@
+from urllib.parse import urlparse
+
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -8,7 +11,11 @@ def assistant(request):
         return {}
     # Cited documents open in the in-app viewer (it hands anything other than a PDF to the raw file view).
     file_url = reverse("applications:sequence_document", args=[999999, 888888, "PATH"])
+    config = settings.ASSISTANT
+    external = config["PROVIDER"] != "offline" and bool(config["API_KEY"])
     return {
+        # Shown in the drawer: questions and dossier passages leave the server for this host.
+        "assistant_external_host": urlparse(config["BASE_URL"]).hostname if external else "",
         "assistant_config": {
             "urls": {
                 "session": reverse("assistant:session"),

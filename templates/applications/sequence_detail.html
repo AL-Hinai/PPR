@@ -16,11 +16,16 @@
     <p class="mt-0.5 font-mono text-[11px] break-all text-slate-400" title="SHA-256" dir="ltr">SHA-256 {{ sequence.sha256 }}</p>
   </div>
   <div class="flex flex-wrap gap-2">
-    {% if run %}<a href="{% url 'applications:sequence_csv' application.pk sequence.pk %}" class="btn btn-secondary">{% icon "download" "size-4" %}{% trans "Report (CSV)" %}</a>{% endif %}
+    {% if run %}
+      <a href="{% url 'applications:sequence_report' application.pk sequence.pk %}" class="btn btn-secondary">{% icon "printer" "size-4" %}{% trans "Report (PDF)" %}</a>
+      <a href="{% url 'applications:sequence_csv' application.pk sequence.pk %}" class="btn btn-secondary">{% icon "download" "size-4" %}{% trans "Report (CSV)" %}</a>
+    {% endif %}
     <a href="{% url 'applications:sequence_package' application.pk sequence.pk %}" class="btn btn-secondary">{% icon "download" "size-4" %}{% trans "Package (zip)" %}</a>
-    <button type="button" onclick="window.print()" class="btn btn-secondary">{% icon "printer" "size-4" %}{% trans "Print" %}</button>
+    <button type="button" data-print class="btn btn-secondary">{% icon "printer" "size-4" %}{% trans "Print" %}</button>
   </div>
 </div>
+
+{% include "applications/_validation_progress.html" %}
 
 {% if envelope_rows %}
   <section class="card mt-6">

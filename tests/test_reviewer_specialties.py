@@ -11,6 +11,8 @@ from apps.validation import samples
 
 from .conftest import upload
 
+pytestmark = [pytest.mark.req("URS-08")]
+
 URL = reverse("accounts:reviewers")
 
 

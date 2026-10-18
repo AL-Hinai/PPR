@@ -1,0 +1,31 @@
+{% load i18n %}<div id="notes-list" class="divide-y divide-slate-100">
+  {% if error == "empty" %}<p class="px-4 py-2 text-xs text-red-700">{% trans "Write the note first." %}</p>{% endif %}
+  {% for note in notes %}
+    <article class="space-y-1 px-4 py-3 text-sm" x-data="{ editing: false }">
+      <div class="flex items-center justify-between gap-2 text-xs text-slate-500">
+        <a href="#page={{ note.page }}" class="font-semibold text-brand-700 hover:underline">{% blocktrans with p=note.page %}Page {{ p }}{% endblocktrans %}</a>
+        <span>{{ note.author.display_name }} · {{ note.created_at|date:"d M, H:i" }}</span>
+      </div>
+      {% if note.quote %}<blockquote class="border-s-2 border-amber-300 ps-2 text-xs text-slate-500 italic" dir="auto">{{ note.quote|truncatechars:300 }}</blockquote>{% endif %}
+      <p class="whitespace-pre-line text-slate-800" dir="auto" x-show="!editing">{{ note.body }}</p>
+      {% if note.author_id == request.user.pk %}
+        <form x-show="editing" x-cloak class="space-y-2"
+              hx-post="{% url 'applications:note_edit' application.pk note.pk %}" hx-target="#notes-list" hx-swap="outerHTML">
+          <textarea name="body" rows="3" class="input text-sm" required>{{ note.body }}</textarea>
+          <div class="flex gap-2">
+            <button class="btn btn-primary btn-sm">{% trans "Save" %}</button>
+            <button type="button" class="btn btn-secondary btn-sm" @click="editing = false">{% trans "Cancel" %}</button>
+          </div>
+        </form>
+        <div class="flex gap-3 text-xs print:hidden" x-show="!editing">
+          <button type="button" class="text-slate-500 hover:text-slate-800" @click="editing = true">{% trans "Edit" %}</button>
+          <button type="button" class="text-red-600 hover:text-red-800"
+                  hx-post="{% url 'applications:note_delete' application.pk note.pk %}" hx-target="#notes-list" hx-swap="outerHTML"
+                  hx-confirm="{% trans 'Delete this note?' %}">{% trans "Delete" %}</button>
+        </div>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p class="px-4 py-6 text-center text-sm text-slate-500">{% trans "No notes on this document yet." %}</p>
+  {% endfor %}
+</div>

@@ -8,6 +8,8 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS", default=[f"https://{host}" for host in ALLOWED_HOSTS]
 )
+# Validation runs in the always-on task `manage.py run_validation_worker`, not in web requests.
+VALIDATION_MODE = env("VALIDATION_MODE", default="queue")
 
 DATABASES = {
     "default": {
@@ -38,9 +40,19 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=0)
+# HSTS: browsers refuse plain HTTP for a year. Set SECURE_HSTS_SECONDS=0 only while testing a new domain.
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True)
+# Preloading is a lasting commitment for the whole domain, made by its owner (Ministry IT), not by this app.
+SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD", default=False)
+SILENCED_SYSTEM_CHECKS = [] if SECURE_HSTS_PRELOAD else ["security.W021"]
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
+# Sessions end after a working day, or when the browser closes.
+SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE", default=8 * 60 * 60)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_HTTPONLY = True
 
 LOGGING = {
     "version": 1,

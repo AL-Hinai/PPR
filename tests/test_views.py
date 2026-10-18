@@ -8,6 +8,8 @@ from apps.validation import samples
 
 from .conftest import upload
 
+pytestmark = [pytest.mark.req("URS-01"), pytest.mark.req("URS-13"), pytest.mark.req("URS-18")]
+
 S = Application.Status
 
 

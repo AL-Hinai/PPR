@@ -100,7 +100,7 @@ def extract_pages(file: Path) -> list[str]:
     return []
 
 
-def ensure_text(sequence: Sequence, path: str) -> bool:
+def ensure_text(sequence: Sequence, path: str, title: str = "", section: str = "") -> bool:
     """Extract and store one document's text if it has not been already. True if it is stored."""
     if DocumentText.objects.filter(sequence=sequence, path=path).exists():
         return True
@@ -109,7 +109,8 @@ def ensure_text(sequence: Sequence, path: str) -> bool:
         return False
     pages = extract_pages(file) or [""]
     DocumentText.objects.bulk_create(
-        [DocumentText(sequence=sequence, path=path, page=i, text=text) for i, text in enumerate(pages, start=1)],
+        [DocumentText(sequence=sequence, path=path, page=i, text=text, title=title[:300], section=section[:500])
+         for i, text in enumerate(pages, start=1)],
         ignore_conflicts=True,
     )
     return True
@@ -120,14 +121,18 @@ def index_sequences(sequences, budget: float = INDEX_BUDGET_SECONDS) -> tuple[in
     started = time.monotonic()
     indexed = total = 0
     for sequence in sequences:
-        done = set(DocumentText.objects.filter(sequence=sequence).values_list("path", flat=True).distinct())
+        stored = DocumentText.objects.filter(sequence=sequence)
+        done = set(stored.values_list("path", flat=True).distinct())
+        untitled = set(stored.filter(title="").values_list("path", flat=True).distinct())
         for doc in list_documents(sequence):
             if not doc["path"].lower().endswith(TEXT_SUFFIXES):
                 continue
             total += 1
             if doc["path"] in done:
                 indexed += 1
-            elif time.monotonic() - started < budget and ensure_text(sequence, doc["path"]):
+                if doc["path"] in untitled:  # extracted on demand by the assistant, before titles were known
+                    stored.filter(path=doc["path"]).update(title=doc["title"][:300], section=doc["section"][:500])
+            elif time.monotonic() - started < budget and ensure_text(sequence, doc["path"], doc["title"], doc["section"]):
                 indexed += 1
     return indexed, total
 
@@ -161,7 +166,6 @@ def search(sequences, query: str, limit: int = 8) -> list[dict]:
         return []
     sequences = list(sequences)
     by_id = {s.pk: s for s in sequences}
-    titles = {(s.pk, d["path"]): d["title"] for s in sequences for d in list_documents(s)}
     condition = Q()
     for term in terms:
         condition |= Q(text__icontains=term)
@@ -174,13 +178,20 @@ def search(sequences, query: str, limit: int = 8) -> list[dict]:
         if hits:
             scored.append((breadth, hits, row))
     scored.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    titles = _titles(by_id, [row for *_rest, row in scored[:limit] if not row.title])
     return [
         {
             "sequence": by_id[row.sequence_id].number,
             "path": row.path,
-            "title": titles.get((row.sequence_id, row.path), row.path.rsplit("/", 1)[-1]),
+            "title": row.title or titles.get((row.sequence_id, row.path), row.path.rsplit("/", 1)[-1]),
             "page": row.page,
             "snippet": _snippet(row.text, terms),
         }
         for _breadth, _hits, row in scored[:limit]
     ]
+
+
+def _titles(by_id: dict, rows) -> dict:
+    """Titles for rows stored before titles were kept, from the CTD trees of just those sequences."""
+    needed = {row.sequence_id for row in rows}
+    return {(pk, d["path"]): d["title"] for pk in needed for d in list_documents(by_id[pk])}

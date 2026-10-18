@@ -1,0 +1,28 @@
+{% load i18n ui %}
+<section class="card" x-data="{ all: false }">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">{% trans "Current dossier" %}</h2>
+      <p class="mt-0.5 text-sm text-slate-500">
+        {% blocktrans with seqs=current_view.sequences|join:", " %}Every accepted sequence applied in order ({{ seqs }}): replaced and deleted documents drop out, appended documents sit next to the one they add to.{% endblocktrans %}
+      </p>
+    </div>
+    {% with counts=current_view.counts %}
+    <div class="flex flex-wrap items-center gap-2 text-xs print:hidden">
+      <span class="badge bg-emerald-50 text-emerald-700 ring-emerald-600/20">{% blocktrans with n=counts.current %}{{ n }} current{% endblocktrans %}</span>
+      {% if counts.replaced or counts.deleted %}
+        <label class="flex cursor-pointer items-center gap-1.5 text-slate-600">
+          <input type="checkbox" class="checkbox" x-model="all">
+          {% blocktrans with r=counts.replaced d=counts.deleted %}Show {{ r }} replaced and {{ d }} deleted{% endblocktrans %}
+        </label>
+      {% endif %}
+    </div>
+    {% endwith %}
+  </div>
+  <div class="card-body space-y-1" dir="ltr">
+    {% for node in current_view.tree %}{% include "applications/_current_node.html" %}{% empty %}
+      {% trans "No accepted sequence yet" as t %}{% trans "The current dossier appears once a sequence passes technical validation." as x %}
+      {% include "components/empty.html" with title=t text=x icon="folder" %}
+    {% endfor %}
+  </div>
+</section>

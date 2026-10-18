@@ -116,6 +116,10 @@ class Application(models.Model):
     def latest_sequence(self):
         return self.sequences.order_by("-uploaded_at").first()
 
+    def validation_in_progress(self):
+        """A sequence is waiting for (or being checked by) the background validator."""
+        return self.sequences.filter(validation_status=Sequence.ValidationStatus.QUEUED).exists()
+
     def open_info_request(self):
         return self.info_requests.filter(status=InfoRequest.Status.OPEN).first()
 
@@ -169,6 +173,7 @@ class Sequence(models.Model):
 
     class ValidationStatus(models.TextChoices):
         PENDING = "PENDING", _("Not yet validated")
+        QUEUED = "QUEUED", _("Validation in progress")
         PASSED = "PASSED", _("Passed")
         PASSED_WITH_WARNINGS = "PASSED_WITH_WARNINGS", _("Passed with warnings")
         FAILED = "FAILED", _("Failed")
@@ -339,3 +344,35 @@ class Decision(models.Model):
     class Meta:
         verbose_name = _("decision")
         verbose_name_plural = _("decisions")
+
+
+class DocumentNote(models.Model):
+    """A reviewer's note on one page of a dossier document. Internal: applicants never see notes.
+
+    The original PDF is never changed; the note stores the page and, optionally, the text it is about.
+    """
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="notes")
+    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE, related_name="notes")
+    path = models.CharField(_("document"), max_length=500)
+    page = models.PositiveIntegerField(_("page"), default=1)
+    quote = models.TextField(_("quoted text"), blank=True)
+    body = models.TextField(_("note"))
+    section = models.CharField(_("module"), max_length=5, blank=True)  # M1–M5, from the document's folder
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="document_notes")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["section", "path", "page", "created_at"]
+        verbose_name = _("document note")
+        verbose_name_plural = _("document notes")
+
+    def __str__(self):
+        return f"{self.path} p.{self.page}: {self.body[:40]}"
+
+    @staticmethod
+    def section_for(path: str) -> str:
+        """'m3/32-body-data/…' -> 'M3'; '' when the path is outside the CTD modules."""
+        head = path.split("/", 1)[0].lower()
+        return head.upper() if head in ("m1", "m2", "m3", "m4", "m5") else ""

@@ -53,6 +53,12 @@
       </template>
     </div>
 
+    {% if assistant_external_host %}
+      <p class="flex items-start gap-2 border-b border-sky-100 bg-sky-50 px-4 py-2 text-[11px] text-sky-900">
+        {% icon "shield" "size-4 shrink-0" %}
+        <span>{% blocktrans with host=assistant_external_host %}Your question and the dossier passages the assistant reads are sent to the language model at {{ host }}.{% endblocktrans %}</span>
+      </p>
+    {% endif %}
     <template x-if="provider === 'offline'">
       <p class="flex items-start gap-2 border-b border-amber-100 bg-amber-50 px-4 py-2 text-[11px] text-amber-900">
         {% icon "info" "size-4 shrink-0" %}

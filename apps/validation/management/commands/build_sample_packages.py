@@ -3,6 +3,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 
 from apps.validation import samples
+from apps.validation.benchmark import write_benchmark_set
 
 
 class Command(BaseCommand):
@@ -10,10 +11,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--out", default="sample_packages")
+        parser.add_argument(
+            "--benchmark", action="store_true",
+            help="Write the benchmark set instead: valid packages, one broken package per rule, and manifest.csv.",
+        )
 
-    def handle(self, *args, out, **options):
+    def handle(self, *args, out, benchmark, **options):
         folder = Path(out)
         folder.mkdir(parents=True, exist_ok=True)
+        if benchmark:
+            cases = write_benchmark_set(folder)
+            self.stdout.write(f"wrote {len(cases)} packages and {folder / 'manifest.csv'}")
+            return
 
         packages = {
             "0000-new-drug-valid.zip": samples.build_package("0000", "NEW_DRUG"),

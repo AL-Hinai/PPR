@@ -8,28 +8,10 @@ from urllib.parse import unquote
 
 from lxml import etree
 
-from .ectd import attr, child_text, local_name, locate_sequence_dir, parse_xml
+from .ectd import ECTD_32, Leaf, detect_backbone, local_name, locate_sequence_dir, parse_xml
 from .pdf import PdfReport, inspect_pdf
 from .regions import get_profile
 from .regions.gcc import parse_envelopes, select_envelope
-
-
-@dataclass
-class Leaf:
-    id: str
-    title: str
-    operation: str
-    href: str
-    checksum: str
-    checksum_type: str
-    modified_file: str
-    source: str  # XML file declaring the leaf, relative to the sequence folder
-    base_dir: Path  # folder that href / modified-file are relative to
-    line: int | None = None
-
-    @property
-    def location(self):
-        return f"{self.source}, line {self.line}" if self.line else self.source
 
 
 @dataclass
@@ -50,7 +32,11 @@ class ValidationContext:
 
     def __post_init__(self):
         self.region_profile = get_profile(self.region)
+        # Resolved, so rel() works on resolved hrefs even when the root is a short (8.3) or symlinked path.
+        self.root = Path(self.root).resolve()
         self.seq_dir, self.folder_name = locate_sequence_dir(self.root)
+        self.backbone = detect_backbone(self.seq_dir)  # "3.2.2", "4.0" (not accepted) or ""
+        self.reader = ECTD_32
         self.index_path = self.seq_dir / "index.xml"
         self.index_error = ""
         self.index_error_line = None
@@ -127,34 +113,13 @@ class ValidationContext:
         """The submission envelope addressed to the receiving country (or to all GCC countries)."""
         return select_envelope(self.envelopes, self.country)
 
-    def _collect_leaves(self, tree, source: str, base_dir: Path) -> list[Leaf]:
-        leaves = []
-        for element in tree.iter():
-            if local_name(element) != "leaf":
-                continue
-            leaves.append(
-                Leaf(
-                    id=element.get("ID", ""),
-                    title=child_text(element, "title"),
-                    operation=element.get("operation", ""),
-                    href=attr(element, "href"),
-                    checksum=element.get("checksum", ""),
-                    checksum_type=element.get("checksum-type", ""),
-                    modified_file=element.get("modified-file", ""),
-                    source=source,
-                    base_dir=base_dir,
-                    line=element.sourceline,
-                )
-            )
-        return leaves
-
     @cached_property
     def leaves(self) -> list[Leaf]:
         leaves = []
         if self.index_tree is not None:
-            leaves += self._collect_leaves(self.index_tree, "index.xml", self.seq_dir)
+            leaves += self.reader.leaves(self.index_tree, "index.xml", self.seq_dir)
         if self.regional_tree is not None:
-            leaves += self._collect_leaves(self.regional_tree, self.regional_rel, self.regional_path.parent)
+            leaves += self.reader.leaves(self.regional_tree, self.regional_rel, self.regional_path.parent)
         return leaves
 
     def resolve_href(self, leaf: Leaf) -> Path | None:

@@ -1,0 +1,9 @@
+{% load i18n ui %}
+{% if application.validation_in_progress %}
+  <div class="card card-body mt-4 flex items-center gap-3 border-sky-200 bg-sky-50 text-sm text-sky-800"
+       hx-get="{% url 'applications:validation_status' application.pk %}" hx-trigger="every 5s" hx-swap="none"
+       role="status">
+    <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-sky-300 border-t-sky-700"></span>
+    {% trans "Technical validation is in progress. This page refreshes when the result is ready." %}
+  </div>
+{% endif %}
