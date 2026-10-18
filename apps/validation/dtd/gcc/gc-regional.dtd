@@ -1,0 +1,183 @@
+<!--
+PUBLIC "-//GC//DTD eCTD GCBackbone 1.1//EN"
+In the eCTD File Organisation: "util/dtd/gc-regional.dtd"
+
+Created : August 2009
+
+minor changes on elements (Oct 2012)
+change "m1-7-5-alcohol-free" in "m1-7-5-alcohol-content"
+change "m1-7-6-pork-free" in "m1-7-6-pork-content"
+samples from "leaf-node" in "specific"
+
+Modified: August 2015
+Modification done in the envelope
+Add submission unit concept
+Add new values in submission
+Minor changes : formatting the DTD
+
+Meaning or value of the suffixes:
+   ?  : element must appear 0 or 1 time
+   *  : element must appear 0 or more time
+   +  : element must appear 1 or more times
+   <none>: element must appear once and only once
+
+PPR note: transcribed from Appendix 6 of the GCC Module 1 Specifications v1.5
+(SFDA, Nov 2015). Not byte-identical to the file SFDA distributes; see
+apps/validation/dtd/README.md.
+-->
+
+<!-- General declarations, external modules references................... -->
+<!ENTITY % countries "(ae|common|bh|kw|om|qa|sa|ye)">
+<!ENTITY % languages "(en|ar)">
+<!ENTITY % leaf-node "(( leaf | node-extension )*)">
+<!ENTITY % envelope-module SYSTEM "gc-envelope.mod" >
+%envelope-module;
+
+<!ENTITY % leaf-module SYSTEM "gc-leaf.mod" >
+%leaf-module;
+
+<!ELEMENT specific (
+   %leaf-node;
+)>
+<!ATTLIST specific
+   country %countries; #REQUIRED
+>
+
+<!-- Root element ..................................................... -->
+<!ELEMENT gc:gc-backbone (
+   gc-envelope,
+   m1-gc
+)>
+
+<!ATTLIST gc:gc-backbone
+   xmlns:gc       CDATA #FIXED   "http://sfda.gov.sa"
+   xmlns:xlink    CDATA #FIXED   "http://www.w3c.org/1999/xlink"
+   xml:lang       CDATA #IMPLIED
+   dtd-version    CDATA #FIXED   "1.1"
+>
+<!-- ................................................................... -->
+<!ELEMENT m1-gc (
+   m1-0-cover,
+   m1-2-form?,
+   m1-3-pi?,
+   m1-4-expert?,
+   m1-5-environrisk?,
+   m1-6-pharmacovigilance?,
+   m1-7-certificates?,
+   m1-8-pricing?,
+   m1-9-responses?,
+   m1-additional-data?
+)>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-0-cover (
+   specific+
+)>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-2-form (
+   specific+
+)>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-3-pi (
+   m1-3-1-spc?,
+   m1-3-2-label?,
+   m1-3-3-pil?,
+   m1-3-4-mockup?,
+   m1-3-5-samples?
+)>
+<!ELEMENT m1-3-1-spc (
+   pi-doc+
+)>
+<!ELEMENT m1-3-2-label (
+   pi-doc+
+)>
+<!ELEMENT m1-3-3-pil (
+   pi-doc+
+)>
+<!ELEMENT m1-3-4-mockup (
+   specific+
+)>
+<!ELEMENT m1-3-5-samples (
+   specific+
+)>
+
+<!ELEMENT pi-doc (
+   %leaf-node;
+)>
+<!ATTLIST pi-doc
+   xml:lang %languages; #REQUIRED
+   type     (spc|label|pil) #REQUIRED
+   country  %countries;    #REQUIRED
+>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-4-expert (
+   m1-4-1-quality?,
+   m1-4-2-non-clinical?,
+   m1-4-3-clinical?
+)>
+
+<!ELEMENT   m1-4-1-quality         %leaf-node;>
+<!ELEMENT   m1-4-2-non-clinical    %leaf-node;>
+<!ELEMENT   m1-4-3-clinical        %leaf-node;>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-5-environrisk (
+   (m1-5-1-non-gmo | m1-5-2-gmo)?
+)>
+<!ELEMENT   m1-5-1-non-gmo     %leaf-node;>
+<!ELEMENT   m1-5-2-gmo         %leaf-node;>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-6-pharmacovigilance (
+   m1-6-1-pharmacovigilance-system?,
+   m1-6-2-risk-management-system?
+)>
+<!ELEMENT   m1-6-1-pharmacovigilance-system  %leaf-node;>
+<!ELEMENT   m1-6-2-risk-management-system    %leaf-node;>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-7-certificates (
+   m1-7-1-gmp?,
+   m1-7-2-cpp?,
+   m1-7-3-analysis-substance?,
+   m1-7-4-analysis-excipients?,
+   m1-7-5-alcohol-content?,
+   m1-7-6-pork-content?,
+   m1-7-7-certificate-tse?,
+   m1-7-8-diluent-coloring-agents?,
+   m1-7-9-patent-information?,
+   m1-7-10-letter-access-dmf?
+)>
+<!ELEMENT m1-7-1-gmp      %leaf-node;>
+<!ELEMENT m1-7-2-cpp     %leaf-node;>
+<!ELEMENT m1-7-3-analysis-substance  %leaf-node;>
+<!ELEMENT m1-7-4-analysis-excipients  %leaf-node;>
+<!ELEMENT m1-7-5-alcohol-content   %leaf-node;>
+<!ELEMENT m1-7-6-pork-content   %leaf-node;>
+<!ELEMENT m1-7-7-certificate-tse   %leaf-node;>
+<!ELEMENT m1-7-8-diluent-coloring-agents %leaf-node;>
+<!ELEMENT m1-7-9-patent-information  %leaf-node;>
+<!ELEMENT m1-7-10-letter-access-dmf  %leaf-node;>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-8-pricing (
+   m1-8-1-price-list?,
+   m1-8-2-other-document?
+)>
+<!ELEMENT m1-8-1-price-list      %leaf-node;>
+<!ELEMENT m1-8-2-other-document   %leaf-node;>
+
+
+<!-- ................................................................... -->
+<!ELEMENT m1-9-responses (
+   specific+
+)>
+
+<!-- ................................................................... -->
+<!ELEMENT m1-additional-data (
+   specific+
+)>
+<!-- +++ -->

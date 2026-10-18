@@ -186,6 +186,8 @@ class Sequence(models.Model):
         _("validation status"), max_length=25, choices=ValidationStatus.choices, default=ValidationStatus.PENDING
     )
     description = models.CharField(_("description"), max_length=255, blank=True)
+    # Submission envelope from the regional Module 1 XML, captured at validation.
+    envelope = models.JSONField(_("envelope"), default=dict, blank=True)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

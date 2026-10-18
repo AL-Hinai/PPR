@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PPR\n"
-"POT-Creation-Date: 2026-10-18 11:49+0000\n"
+"POT-Creation-Date: 2026-10-18 13:45+0000\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -129,7 +129,7 @@ msgstr ""
 "ملف مضغوط (zip) يحتوي على مجلد تسلسل واحد (مثل 0000/) وفي جذره الملف "
 "index.xml."
 
-#: apps/applications/models.py:278
+#: apps/applications/models.py:280
 msgid "Acceptable"
 msgstr "مقبول"
 
@@ -193,7 +193,7 @@ msgstr "اجتازت جميع الفحوصات"
 msgid "All statuses"
 msgstr "جميع الحالات"
 
-#: apps/applications/models.py:300
+#: apps/applications/models.py:302
 msgid "Answered"
 msgstr "تمت الإجابة"
 
@@ -201,7 +201,7 @@ msgstr "تمت الإجابة"
 msgid "Answers from the eCTD documents of the medicine you are viewing"
 msgstr "إجابات من مستندات eCTD للدواء الذي تستعرضه"
 
-#: templates/applications/_tab_overview.html
+#: apps/applications/views.py:433 templates/applications/_tab_overview.html
 msgid "Applicant"
 msgstr "مقدّم الطلب"
 
@@ -257,7 +257,7 @@ msgstr "الطلبات حسب الحالة"
 msgid "Approval certificate"
 msgstr "شهادة الموافقة"
 
-#: apps/applications/models.py:333
+#: apps/applications/models.py:335
 msgid "approval no."
 msgstr "رقم الموافقة"
 
@@ -274,7 +274,7 @@ msgstr "نظرة عامة على الموافقات"
 msgid "Approve"
 msgstr "الموافقة"
 
-#: apps/applications/models.py:42 apps/applications/models.py:326
+#: apps/applications/models.py:42 apps/applications/models.py:328
 #: templates/core/dashboard_company.html
 msgid "Approved"
 msgstr "تمت الموافقة"
@@ -335,7 +335,7 @@ msgid ""
 msgstr ""
 "قيّم الوحدات المسندة إليك: %(modules)s. الملف كاملًا متاح لك للاطلاع فقط."
 
-#: apps/applications/models.py:285
+#: apps/applications/models.py:287
 msgid "assessment"
 msgstr "التقييم"
 
@@ -450,7 +450,7 @@ msgstr "إغلاق"
 msgid "Collapse all"
 msgstr "طيّ الكل"
 
-#: apps/applications/models.py:286
+#: apps/applications/models.py:288
 msgid "comments"
 msgstr "الملاحظات"
 
@@ -566,7 +566,7 @@ msgstr "اتخاذ القرار"
 msgid "Decision"
 msgstr "القرار"
 
-#: apps/applications/models.py:338
+#: apps/applications/models.py:340
 msgid "decision"
 msgstr "قرار"
 
@@ -579,7 +579,7 @@ msgstr "صدور القرار"
 msgid "Decision recorded: %(outcome)s."
 msgstr "تم تسجيل القرار: %(outcome)s."
 
-#: apps/applications/models.py:339
+#: apps/applications/models.py:341
 msgid "decisions"
 msgstr "القرارات"
 
@@ -599,6 +599,14 @@ msgstr "المراجع القائد الافتراضي"
 #: apps/applications/models.py:188
 msgid "description"
 msgstr "الوصف"
+
+#: apps/applications/views.py:441
+msgid "Description"
+msgstr "الوصف"
+
+#: templates/applications/sequence_detail.html
+msgid "Differs from the application"
+msgstr "يختلف عن بيانات الطلب"
 
 #: templates/base.html
 msgid "Dismiss"
@@ -695,6 +703,10 @@ msgstr ""
 msgid "English"
 msgstr "الإنجليزية"
 
+#: apps/applications/models.py:190
+msgid "envelope"
+msgstr "الغلاف"
+
 #: apps/validation/models.py:40
 msgid "Error"
 msgstr "خطأ"
@@ -749,7 +761,7 @@ msgstr "فحص امتثال الملفات"
 msgid "Files in the package should be referenced by the XML backbone"
 msgstr "يُفضّل أن تكون جميع ملفات الحزمة مُشاراً إليها في ملف XML الرئيسي"
 
-#: apps/validation/rules/files.py:112
+#: apps/validation/rules/files.py:115
 msgid "Files must not be empty"
 msgstr "يجب ألا تكون الملفات فارغة"
 
@@ -777,9 +789,17 @@ msgstr "ملاءمة العرض"
 msgid "Fix the validation errors and resubmit."
 msgstr "صحّح أخطاء التحقق وأعد التقديم."
 
-#: apps/validation/rules/files.py:82
+#: apps/validation/rules/files.py:85
 msgid "Fonts used in PDF files should be embedded"
 msgstr "يُفضّل تضمين الخطوط المستخدمة في ملفات PDF"
+
+#: templates/applications/sequence_detail.html
+msgid ""
+"From the GCC regional Module 1 XML. Names that differ from the application "
+"are flagged."
+msgstr ""
+"من ملف XML الإقليمي للوحدة 1 الخليجية. يُشار إلى الأسماء التي تختلف عن "
+"بيانات الطلب."
 
 #: apps/applications/models.py:47
 msgid "Generic"
@@ -835,7 +855,11 @@ msgstr "يجب أن يكون index.xml مطابقاً لتعريف DTD الخا�
 msgid "index.xml must be well-formed XML"
 msgstr "يجب أن يكون index.xml ملف XML سليم البنية"
 
-#: apps/validation/rules/files.py:96
+#: apps/validation/rules/regional.py:171
+msgid "index.xml must reference the GCC regional XML with operation 'new'"
+msgstr "يجب أن يشير index.xml إلى ملف XML الإقليمي الخليجي بالعملية 'new'"
+
+#: apps/validation/rules/files.py:99
 msgid "Individual files must not exceed the maximum file size"
 msgstr "يجب ألا يتجاوز أي ملف الحد الأقصى للحجم"
 
@@ -843,7 +867,7 @@ msgstr "يجب ألا يتجاوز أي ملف الحد الأقصى للحجم"
 msgid "Info"
 msgstr "معلومة"
 
-#: apps/applications/models.py:318
+#: apps/applications/models.py:320
 msgid "information request"
 msgstr "طلب معلومات"
 
@@ -851,13 +875,21 @@ msgstr "طلب معلومات"
 msgid "Information requested"
 msgstr "مطلوب معلومات"
 
-#: apps/applications/models.py:319
+#: apps/applications/models.py:321
 msgid "information requests"
 msgstr "طلبات المعلومات"
 
 #: templates/applications/_tab_review.html
 msgid "Information requests"
 msgstr "طلبات المعلومات"
+
+#: apps/applications/views.py:435
+msgid "INN"
+msgstr "الاسم الدولي غير المسجل (INN)"
+
+#: apps/applications/views.py:432
+msgid "Invented name"
+msgstr "الاسم التجاري"
 
 #: templates/404.html
 msgid "It may have moved, or you may not have access to it."
@@ -867,7 +899,7 @@ msgstr "ربما نُقلت الصفحة، أو ليست لديك صلاحية �
 msgid "Justification"
 msgstr "المبررات"
 
-#: apps/applications/models.py:332
+#: apps/applications/models.py:334
 msgid "justification"
 msgstr "المبررات"
 
@@ -933,7 +965,7 @@ msgstr ""
 msgid "Main"
 msgstr "الرئيسية"
 
-#: apps/applications/models.py:280
+#: apps/applications/models.py:282
 msgid "Major issues"
 msgstr "ملاحظات جوهرية"
 
@@ -953,9 +985,13 @@ msgstr "تعليم الكل كمقروء"
 msgid "Menu"
 msgstr "القائمة"
 
-#: apps/applications/models.py:279
+#: apps/applications/models.py:281
 msgid "Minor issues"
 msgstr "ملاحظات بسيطة"
+
+#: apps/validation/rules/regional.py:145
+msgid "Module 1 must contain the documents required for this submission"
+msgstr "يجب أن تحتوي الوحدة 1 على المستندات المطلوبة لهذا التقديم"
 
 #: apps/accounts/models.py:11
 msgid "Module 1 – Administrative & labelling"
@@ -977,11 +1013,11 @@ msgstr "الوحدة 4 – الدراسات غير السريرية"
 msgid "Module 5 – Clinical"
 msgstr "الوحدة 5 – الدراسات السريرية"
 
-#: apps/applications/models.py:265
+#: apps/applications/models.py:267
 msgid "module assignment"
 msgstr "إسناد وحدة"
 
-#: apps/applications/models.py:266
+#: apps/applications/models.py:268
 msgid "module assignments"
 msgstr "إسنادات الوحدات"
 
@@ -997,7 +1033,7 @@ msgstr "وحدات بانتظار تقييمك"
 msgid "Modules concerned"
 msgstr "الوحدات المعنية"
 
-#: apps/applications/models.py:306
+#: apps/applications/models.py:308
 msgid "modules concerned"
 msgstr "الوحدات المعنية"
 
@@ -1176,7 +1212,7 @@ msgstr ""
 msgid "One sequence folder (e.g. 0000) containing index.xml and index-md5.txt"
 msgstr "مجلد تسلسل واحد (مثل 0000) يحتوي على index.xml و index-md5.txt"
 
-#: apps/validation/rules/files.py:25
+#: apps/validation/rules/files.py:26
 msgid "Only accepted file formats may be submitted"
 msgstr "لا يجوز تقديم إلا صيغ الملفات المقبولة"
 
@@ -1192,7 +1228,7 @@ msgstr "لا ينتمي إلى الشركات إلا مقدّمو الطلبات
 msgid "Only reviewers have review specialties."
 msgstr "تخصصات المراجعة للمراجعين فقط."
 
-#: apps/applications/models.py:299 templates/core/dashboard_company.html
+#: apps/applications/models.py:301 templates/core/dashboard_company.html
 msgid "Open"
 msgstr "فتح"
 
@@ -1209,7 +1245,7 @@ msgstr "افتح الصفحة المشار إليها"
 msgid "Open the dossier assistant"
 msgstr "افتح مساعد الملف"
 
-#: apps/applications/models.py:331
+#: apps/applications/models.py:333
 msgid "outcome"
 msgstr "النتيجة"
 
@@ -1253,15 +1289,15 @@ msgstr "ناجح"
 msgid "Passed with warnings"
 msgstr "ناجح مع تحذيرات"
 
-#: apps/validation/rules/files.py:57
+#: apps/validation/rules/files.py:60
 msgid "PDF files must be version 1.4 to 1.7"
 msgstr "يجب أن تكون ملفات PDF من الإصدار 1.4 إلى 1.7"
 
-#: apps/validation/rules/files.py:69
+#: apps/validation/rules/files.py:72
 msgid "PDF files must not contain JavaScript or launch actions"
 msgstr "يجب ألا تحتوي ملفات PDF على JavaScript أو أوامر تشغيل"
 
-#: apps/validation/rules/files.py:43
+#: apps/validation/rules/files.py:46
 msgid "PDF files must open without passwords or security restrictions"
 msgstr "يجب أن تُفتح ملفات PDF دون كلمات مرور أو قيود أمنية"
 
@@ -1329,6 +1365,10 @@ msgstr "الصفحة السابقة"
 msgid "Print"
 msgstr "طباعة"
 
+#: apps/applications/views.py:438
+msgid "Procedure"
+msgstr "الإجراء"
+
 #: templates/components/application_table.html
 msgid "Product"
 msgstr "المستحضر"
@@ -1345,7 +1385,7 @@ msgstr "اسم المستحضر"
 msgid "Product name"
 msgstr "اسم المستحضر"
 
-#: apps/applications/models.py:304
+#: apps/applications/models.py:306
 msgid "questions"
 msgstr "الأسئلة"
 
@@ -1380,6 +1420,10 @@ msgstr "القارئ"
 #: apps/assistant/context_processors.py:26
 msgid "Reading"
 msgstr "قيد القراءة"
+
+#: apps/applications/views.py:439
+msgid "Receiving agency"
+msgstr "الجهة المستلمة"
 
 #: templates/core/dashboard_company.html
 msgid "Recent applications"
@@ -1433,13 +1477,17 @@ msgstr "التسجيل"
 msgid "Reject"
 msgstr "الرفض"
 
-#: apps/applications/models.py:43 apps/applications/models.py:327
+#: apps/applications/models.py:43 apps/applications/models.py:329
 msgid "Rejected"
 msgstr "مرفوض"
 
 #: templates/core/dashboard_hod.html
 msgid "rejected"
 msgstr "مرفوضة"
+
+#: apps/applications/views.py:440
+msgid "Related sequences"
+msgstr "التسلسلات المرتبطة"
 
 #: apps/applications/models.py:49
 msgid "Renewal"
@@ -1469,11 +1517,11 @@ msgstr "الرد على طلب المعلومات"
 msgid "Response due"
 msgstr "موعد الرد"
 
-#: apps/applications/models.py:307
+#: apps/applications/models.py:309
 msgid "response due"
 msgstr "موعد الرد"
 
-#: apps/applications/models.py:309
+#: apps/applications/models.py:311
 msgid "response note"
 msgstr "ملاحظة الرد"
 
@@ -1510,7 +1558,7 @@ msgstr "إعادة لمزيد من المراجعة"
 msgid "Return to the reviewer instead"
 msgstr "أو أعده إلى المراجع"
 
-#: apps/applications/models.py:291
+#: apps/applications/models.py:293
 msgid "review"
 msgstr "مراجعة"
 
@@ -1543,7 +1591,7 @@ msgstr "تم تعيين فريق المراجعة."
 msgid "Reviewer"
 msgstr "المراجع"
 
-#: apps/applications/models.py:256
+#: apps/applications/models.py:258
 msgid "reviewer"
 msgstr "المراجع"
 
@@ -1568,7 +1616,7 @@ msgstr "مساحة عمل المراجع"
 msgid "Reviewers"
 msgstr "المراجعون"
 
-#: apps/applications/models.py:292
+#: apps/applications/models.py:294
 msgid "reviews"
 msgstr "المراجعات"
 
@@ -1613,7 +1661,7 @@ msgstr "ابحث بالرقم المرجعي أو المستحضر أو الما
 msgid "Searching the dossier…"
 msgstr "جارٍ البحث في الملف…"
 
-#: apps/applications/models.py:254 apps/applications/models.py:284
+#: apps/applications/models.py:256 apps/applications/models.py:286
 msgid "section"
 msgstr "القسم"
 
@@ -1645,7 +1693,7 @@ msgstr "إرسال إلى رئيس القسم"
 msgid "Separate multiple ingredients with commas."
 msgstr "افصل بين المواد المتعددة بفواصل."
 
-#: apps/applications/models.py:179 apps/applications/models.py:194
+#: apps/applications/models.py:179 apps/applications/models.py:196
 #: templates/applications/_tab_review.html templates/assistant/_drawer.html
 msgid "sequence"
 msgstr "التسلسل"
@@ -1674,7 +1722,7 @@ msgstr ""
 "أرقام التسلسل، والمجاميع الاختبارية MD5، والوحدات المطلوبة، وعمليات دورة "
 "الحياة، وقواعد التسمية."
 
-#: apps/applications/models.py:195
+#: apps/applications/models.py:197
 msgid "sequences"
 msgstr "التسلسلات"
 
@@ -1736,11 +1784,11 @@ msgstr "الحالة"
 msgid "Status"
 msgstr "الحالة"
 
-#: apps/applications/models.py:235
+#: apps/applications/models.py:237
 msgid "status change"
 msgstr "تغيير الحالة"
 
-#: apps/applications/models.py:236
+#: apps/applications/models.py:238
 msgid "status history"
 msgstr "سجل الحالات"
 
@@ -1760,6 +1808,18 @@ msgstr "التركيز"
 #: templates/applications/_tab_overview.html
 msgid "Strength"
 msgstr "التركيز"
+
+#: templates/applications/sequence_detail.html
+msgid "Submission envelope"
+msgstr "غلاف التقديم"
+
+#: apps/applications/views.py:436
+msgid "Submission type"
+msgstr "نوع التقديم"
+
+#: apps/applications/views.py:437
+msgid "Submission unit"
+msgstr "وحدة التقديم"
 
 #: templates/applications/_tab_sequences.html
 msgid "Submit for validation"
@@ -1873,9 +1933,43 @@ msgid ""
 "The dossier viewer is available once a sequence passes technical validation."
 msgstr "يتوفر عارض الملف بعد اجتياز التسلسل للتحقق الفني."
 
+#: apps/validation/rules/regional.py:60
+msgid "The envelope must be addressed to the receiving country and its agency"
+msgstr "يجب أن يكون الغلاف موجهاً إلى الدولة المستلمة وجهتها"
+
+#: apps/validation/rules/regional.py:83
+msgid ""
+"The envelope sequence and related sequences must match this application's "
+"lifecycle"
+msgstr "يجب أن يتوافق تسلسل الغلاف والتسلسلات المرتبطة مع دورة حياة هذا الطلب"
+
+#: apps/validation/rules/regional.py:105
+msgid "The envelope submission type must match the application type"
+msgstr "يجب أن يتوافق نوع التقديم في الغلاف مع نوع الطلب"
+
+#: apps/validation/rules/regional.py:123
+msgid "The envelope submission unit must fit the sequence"
+msgstr "يجب أن تتناسب وحدة التقديم في الغلاف مع التسلسل"
+
 #: templates/applications/_tab_sequences.html
 msgid "The first upload of an application is sequence 0000."
 msgstr "أول رفع للطلب هو التسلسل 0000."
+
+#: apps/validation/rules/regional.py:194
+msgid "The GCC regional DTD files must be included in util/dtd"
+msgstr "يجب تضمين ملفات DTD الإقليمية الخليجية في util/dtd"
+
+#: apps/validation/rules/regional.py:43
+msgid "The GCC regional XML must be valid against the GCC regional DTD"
+msgstr "يجب أن يكون ملف XML الإقليمي الخليجي صالحاً وفق DTD الإقليمي الخليجي"
+
+#: apps/validation/rules/regional.py:26
+msgid ""
+"The GCC regional XML must have the gc:gc-backbone root in the "
+"http://sfda.gov.sa namespace"
+msgstr ""
+"يجب أن يكون جذر ملف XML الإقليمي الخليجي العنصر gc:gc-backbone ضمن النطاق "
+"http://sfda.gov.sa"
 
 #: templates/core/home.html
 msgid "The Head of Department approves or rejects and issues the certificate."
@@ -1908,7 +2002,7 @@ msgstr "يجب أن تحتوي الوحدات المطلوبة لنوع الطل
 msgid "The package is larger than %(limit)s MB."
 msgstr "حجم الحزمة أكبر من %(limit)s ميغابايت."
 
-#: apps/validation/rules/files.py:16
+#: apps/validation/rules/files.py:17
 msgid "The package must be a valid, safe ZIP archive"
 msgstr "يجب أن تكون الحزمة ملف ZIP سليماً وآمناً"
 
@@ -2094,7 +2188,7 @@ msgstr "استخدم الحساب الصادر لك من دائرة الصيدل
 msgid "Users"
 msgstr "المستخدمون"
 
-#: apps/applications/models.py:334
+#: apps/applications/models.py:336
 msgid "valid until"
 msgstr "صالح حتى"
 

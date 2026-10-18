@@ -22,6 +22,27 @@
   </div>
 </div>
 
+{% if envelope_rows %}
+  <section class="card mt-6">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">{% trans "Submission envelope" %}</h2>
+        <p class="mt-0.5 text-sm text-slate-500">{% trans "From the GCC regional Module 1 XML. Names that differ from the application are flagged." %}</p>
+      </div>
+    </div>
+    <dl class="card-body grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+      {% for row in envelope_rows %}
+        <div>
+          <dt class="text-xs text-slate-500">{{ row.label }}</dt>
+          <dd class="mt-0.5 font-medium text-slate-900" dir="auto">{{ row.value }}
+            {% if row.differs %}<span class="badge ms-1 bg-amber-50 text-amber-700 ring-amber-200">{% trans "Differs from the application" %}</span>{% endif %}
+          </dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </section>
+{% endif %}
+
 {% if not run %}
   <div class="card card-body mt-6 text-sm text-slate-600">{% trans "This sequence has not been validated yet. Submit it from the application page." %}</div>
 {% else %}

@@ -413,8 +413,34 @@ def sequence_detail(request, pk, seq_pk):
             "severity": severity,
             "severities": Finding.Severity.choices,
             "tree": tree,
+            "envelope_rows": _envelope_rows(application, sequence.envelope),
         },
     )
+
+
+def _same_name(a: str, b: str) -> bool:
+    return " ".join(a.split()).casefold() == " ".join(b.split()).casefold()
+
+
+def _envelope_rows(application, envelope: dict) -> list[dict]:
+    """The GCC envelope next to the application record; names that differ are flagged for the reviewer."""
+    if not envelope:
+        return []
+    company = application.company
+    names = envelope.get("invented_names", [])
+    rows = [
+        (_("Invented name"), ", ".join(names), not any(_same_name(n, application.product_name) for n in names)),
+        (_("Applicant"), envelope.get("applicant", ""),
+         not any(_same_name(envelope.get("applicant", ""), n) for n in (company.name_en, company.name_ar) if n)),
+        (_("INN"), ", ".join(envelope.get("inns", [])), False),
+        (_("Submission type"), envelope.get("submission_type", ""), False),
+        (_("Submission unit"), envelope.get("submission_unit", ""), False),
+        (_("Procedure"), envelope.get("procedure", ""), False),
+        (_("Receiving agency"), f"{envelope.get('agency', '')} ({envelope.get('country', '')})", False),
+        (_("Related sequences"), ", ".join(envelope.get("related_sequences", [])), False),
+        (_("Description"), envelope.get("description", ""), False),
+    ]
+    return [{"label": label, "value": value or "—", "differs": differs} for label, value, differs in rows]
 
 
 @any_role_required

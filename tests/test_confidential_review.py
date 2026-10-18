@@ -47,7 +47,10 @@ def assessed(make_application, applicant, hod, team, django_capture_on_commit_ca
 
 
 def _answer(application, applicant):
-    response = SimpleUploadedFile("response.zip", samples.build_package("0001", documents=samples.response_documents()))
+    response = SimpleUploadedFile(
+        "response.zip",
+        samples.build_package("0001", application.application_type, documents=samples.response_documents()),
+    )
     services.respond_to_info_request(application, applicant, response, "Impurity C limit added.")
     application.refresh_from_db()
 

@@ -104,6 +104,8 @@ TAILWIND_USE_STANDALONE_BINARY = True
 
 # eCTD technical validation
 ECTD_REGION = env("ECTD_REGION", default="gcc")
+# Receiving country in the GCC envelope (om = Oman, agency OM-MOH).
+ECTD_COUNTRY = env("ECTD_COUNTRY", default="om")
 ECTD_DTD_PATH = env(
     "ECTD_DTD_PATH", default=str(BASE_DIR / "apps" / "validation" / "dtd" / "ich-ectd-3-2.dtd")
 )

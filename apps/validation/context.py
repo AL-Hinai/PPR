@@ -10,6 +10,8 @@ from lxml import etree
 
 from .ectd import attr, child_text, local_name, locate_sequence_dir, parse_xml
 from .pdf import PdfReport, inspect_pdf
+from .regions import get_profile
+from .regions.gcc import parse_envelopes, select_envelope
 
 
 @dataclass
@@ -44,8 +46,10 @@ class ValidationContext:
     dtd_path: Path
     limits: Limits
     previous: dict[str, Path] = field(default_factory=dict)  # accepted sequence no. -> its folder
+    country: str = "om"  # receiving country (ECTD_COUNTRY), as in the GCC envelope
 
     def __post_init__(self):
+        self.region_profile = get_profile(self.region)
         self.seq_dir, self.folder_name = locate_sequence_dir(self.root)
         self.index_path = self.seq_dir / "index.xml"
         self.index_error = ""
@@ -77,7 +81,7 @@ class ValidationContext:
 
     @property
     def regional_rel(self) -> str:
-        return f"m1/{self.region}/{self.region}-regional.xml"
+        return self.region_profile.regional_rel
 
     @property
     def regional_path(self) -> Path:
@@ -104,6 +108,24 @@ class ValidationContext:
         except etree.XMLSyntaxError as exc:
             self.regional_error = str(exc)
             return None
+
+    @property
+    def regional_root_ok(self) -> bool:
+        """The regional XML has the root element and namespace the region's specification requires."""
+        if self.regional_tree is None:
+            return False
+        root = self.regional_tree.getroot()
+        profile = self.region_profile
+        return local_name(root) == profile.root_element and etree.QName(root).namespace == profile.namespace
+
+    @cached_property
+    def envelopes(self) -> list[dict]:
+        return parse_envelopes(self.regional_tree) if self.regional_tree is not None else []
+
+    @cached_property
+    def envelope(self) -> dict | None:
+        """The submission envelope addressed to the receiving country (or to all GCC countries)."""
+        return select_envelope(self.envelopes, self.country)
 
     def _collect_leaves(self, tree, source: str, base_dir: Path) -> list[Leaf]:
         leaves = []

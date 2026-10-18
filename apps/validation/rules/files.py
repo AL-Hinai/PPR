@@ -5,6 +5,7 @@ from .base import Layer, Rule, Severity
 
 ALLOWED_EXTENSIONS = {"pdf", "xml", "xsd", "dtd", "xsl", "txt", "xpt", "jpg", "jpeg", "png", "gif", "svg"}
 MODULE1_ONLY_EXTENSIONS = {"docx", "doc", "rtf"}
+DTD_MODULE_EXTENSIONS = {"mod"}  # modular DTD parts (GCC gc-envelope.mod, gc-leaf.mod), only in util/dtd
 ALLOWED_PDF_VERSIONS = {"1.4", "1.5", "1.6", "1.7"}
 
 
@@ -29,6 +30,8 @@ class AllowedFileTypes(Rule):
             rel = ctx.rel(path)
             ext = path.suffix.lower().lstrip(".")
             if ext in ALLOWED_EXTENSIONS:
+                continue
+            if ext in DTD_MODULE_EXTENSIONS and "/util/dtd/" in f"/{rel}":
                 continue
             if ext in MODULE1_ONLY_EXTENSIONS:
                 if not rel.startswith("m1/"):

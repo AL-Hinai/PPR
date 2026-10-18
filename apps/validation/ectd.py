@@ -108,9 +108,17 @@ def _leaf_info(leaf, base_dir: Path, seq_dir: Path) -> dict:
 
 
 def _node_label(element) -> str:
+    from .regions.gcc import COUNTRY_NAMES, HEADINGS, LANGUAGE_NAMES
+
     name = local_name(element)
     if name == "node-extension":
         return child_text(element, "title") or name
+    if name in HEADINGS:
+        return HEADINGS[name]
+    if name in ("specific", "pi-doc"):  # GCC country (and language) containers
+        country = COUNTRY_NAMES.get(element.get("country", ""), element.get("country", ""))
+        lang = element.get("{http://www.w3.org/XML/1998/namespace}lang", "")
+        return f"{country} – {LANGUAGE_NAMES.get(lang, lang)}" if lang else country
     label = heading_label(name)
     extras = [element.get(a) for a in ("substance", "product-name", "dosageform", "manufacturer", "indication", "excipient")]
     extras = [e for e in extras if e]
@@ -145,9 +153,18 @@ def _regional_tree(path: Path, seq_dir: Path, depth: int) -> dict | None:
     except (etree.XMLSyntaxError, OSError):
         return None
     node = _build_node(root, path.parent, seq_dir, depth)
-    if node:
+    if node and len(node["children"]) == 1 and not node["leaves"]:
+        node = node["children"][0]  # skip the backbone root: show "Module 1 – GCC regional information" directly
+        _shift_depth(node, depth)
+    elif node:
         node["label"] = "Regional information (" + path.name.replace("-regional.xml", "").upper() + ")"
     return node
+
+
+def _shift_depth(node: dict, depth: int) -> None:
+    node["depth"] = depth
+    for child in node["children"]:
+        _shift_depth(child, depth + 1)
 
 
 def build_dossier_tree(seq_dir: Path) -> list[dict]:

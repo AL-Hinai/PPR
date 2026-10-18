@@ -29,16 +29,20 @@ audit trail (`StatusHistory`) and sends in-app and email notifications.
 | **Head of Department (HOD)** | Set each reviewer's specialties (a module cannot be removed while the reviewer holds it on an active review), assign the review team (only qualified specialists are offered per module), see KPIs, approve/reject, return to the lead |
 | Superuser | Django admin (`/admin/`): users, companies, roles |
 
-## eCTD technical validation (3 layers, 20 rules)
+## eCTD technical validation (3 layers, 29 rules)
 
 Code: `apps/validation/`. Each rule is a small class in `rules/`, so new rules can be added without touching the engine.
+Module 1 follows the **GCC Module 1 Specifications v1.5** (`apps/validation/regions/gcc.py`): the regional backbone is
+`m1/gc/gc-regional.xml`, and its envelope must be addressed to `ECTD_COUNTRY` (default `om`, agency `OM-MOH`).
 
 | Layer | Rule | Checks |
 |---|---|---|
 | 1. XML schema | SCH-01 | `index.xml` exists |
 | | SCH-02 | `index.xml` is well-formed |
 | | SCH-03 | `index.xml` is valid against the ICH eCTD 3.2 DTD |
-| | SCH-04 | Regional Module 1 XML (`m1/<region>/<region>-regional.xml`) exists and is well-formed |
+| | SCH-04 | Regional Module 1 XML (`m1/gc/gc-regional.xml`) exists and is well-formed |
+| | GCC-01 | Its root is `gc:gc-backbone` in the `http://sfda.gov.sa` namespace |
+| | GCC-02 | It is valid against the GCC regional DTD (`gc-regional.dtd` + `gc-envelope.mod` + `gc-leaf.mod`) |
 | 2. Business rules | BR-01 | One sequence folder with the expected number (0000, 0001, …) |
 | | BR-02 | `index-md5.txt` matches the MD5 of `index.xml` |
 | | BR-03 | Every leaf `xlink:href` points to an existing file inside the sequence |
@@ -48,6 +52,13 @@ Code: `apps/validation/`. Each rule is a small class in `rules/`, so new rules c
 | | BR-07 | Lifecycle operations (new/replace/append/delete) are valid; `modified-file` resolves to a leaf in an earlier accepted sequence |
 | | BR-08 | ICH naming: lowercase `a-z0-9-`, names ≤ 64 characters, paths ≤ 180 characters |
 | | BR-09 | `util/dtd/ich-ectd-3-2.dtd` present |
+| | GCC-03 | An envelope for the receiving country (or `common`) names its agency |
+| | GCC-04 | Envelope `sequence` is this sequence; each `related-sequence` is an earlier accepted one |
+| | GCC-05 | Submission type fits the application type (e.g. `new-gen` for a generic) |
+| | GCC-06 | Submission unit fits the sequence: `initial` for 0000, `reformat` only with type `none`; `initial` later is a warning |
+| | GCC-07 | Required Module 1 documents for the country: cover letter, form, SPC, labeling, Arabic and English leaflets, GMP, price list (per type; later sequences: cover letter + 1.9 responses) |
+| | GCC-08 | `index.xml` references `gc-regional.xml` with operation `new` |
+| | GCC-09 | The GCC DTD files are in `util/dtd/` |
 | 3. File compliance | FC-00 | Safe, valid ZIP (no zip-slip, symlinks, encryption or zip bombs) |
 | | FC-01 | Accepted file formats only (`.docx` only in Module 1) |
 | | FC-02 | PDFs open without passwords or security settings |
@@ -62,8 +73,10 @@ in the dossier viewer (CTD tree → documents).
 
 > **Note on the DTD:** `apps/validation/dtd/ich-ectd-3-2.dtd` is the official ICH eCTD v3.2 DTD, unchanged
 > (source and checksum in [apps/validation/dtd/README.md](apps/validation/dtd/README.md)). `ECTD_DTD_PATH`
-> can point elsewhere if needed. The Module 1 region folder is set with
-> `ECTD_REGION` (default `gcc`).
+> can point elsewhere if needed. The GCC regional DTD in `dtd/gcc/` is transcribed from the GCC Module 1
+> specification, because SFDA does not publish the files; replace it with the distributed files when available.
+> The GCC-07 list of required Module 1 documents follows the Oman MOH draft eCTD guideline and should be
+> confirmed with the Drug Safety Center.
 
 ## Dossier assistant
 

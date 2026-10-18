@@ -118,6 +118,15 @@ class Command(BaseCommand):
     def _new(self, user, **fields):
         return Application.objects.create(company=user.company, created_by=user, **fields)
 
+    def _files(self, application, number="0000", **kwargs):
+        """Sample sequence whose GCC envelope names this application's product, company and substance."""
+        envelope = {"applicant": application.company.name_en, "inn": application.active_ingredients.lower()}
+        return samples.build_files(number, application_type=application.application_type,
+                                   product_title=application.product_name, envelope=envelope, **kwargs)
+
+    def _package(self, application, number="0000", **kwargs):
+        return samples.to_zip(self._files(application, number, **kwargs), number)
+
     def _applications(self, users):
         if Application.objects.filter(company__registration_no__startswith="DEMO-").exists():
             self.stdout.write("Demo applications already exist (use --reset to recreate).")
@@ -129,13 +138,13 @@ class Command(BaseCommand):
 
         # 1. Draft with an uploaded (not yet submitted) package
         app = self._new(acme, application_type="GENERIC", product_name="Acme-Paracetamol 500 mg", **paracetamol)
-        self._upload(app, acme, samples.build_package("0000", "GENERIC"))
+        self._upload(app, acme, self._package(app))
 
         # 2. Validation failed (broken package)
         app = self._new(gulf, application_type="GENERIC", product_name="Gulf-Ibuprofen 400 mg",
                         active_ingredients="Ibuprofen", dosage_form="Tablet", strength="400 mg",
                         route="Oral", atc_code="M01AE01")
-        broken = samples.build_files("0000", application_type="GENERIC")
+        broken = self._files(app)
         broken["m2/22-intro/introduction.pdf"] = samples.make_pdf("Edited after checksum")
         broken["m3/32-body-data/Extra File.PDF"] = samples.make_pdf("Unreferenced", version="1.3")
         self._upload(app, gulf, samples.to_zip(broken))
@@ -145,27 +154,27 @@ class Command(BaseCommand):
         app = self._new(acme, application_type="NEW_DRUG", product_name="Cardiolex 10 mg",
                         active_ingredients="Rosuvastatin calcium", dosage_form="Film-coated tablet",
                         strength="10 mg", route="Oral", atc_code="C10AA07")
-        self._upload(app, acme, samples.build_package("0000", "NEW_DRUG"))
+        self._upload(app, acme, self._package(app))
         services.submit(app, acme)
 
         # 4. Under review, with an information request answered by sequence 0001
         app = self._new(acme, application_type="NEW_DRUG", product_name="Acme-Paracetamol IV 10 mg/ml",
                         active_ingredients="Paracetamol", dosage_form="Solution for infusion",
                         strength="10 mg/ml", route="Intravenous", atc_code="N02BE01")
-        self._upload(app, acme, samples.build_package("0000", "NEW_DRUG"))
+        self._upload(app, acme, self._package(app))
         services.submit(app, acme)
         team = self._team(app, hod, users)
         services.add_review(app, team["M1"], "M1", "ACCEPTABLE", "Labelling and SmPC are consistent with the application form.")
         services.request_information(app, regulatory, "1. Provide 12-month long-term stability data for batch B-003.\n"
                                                   "2. Clarify the specification limit for impurity C.", sections=["M3"])
-        response = SimpleUploadedFile("response.zip", samples.build_package("0001", documents=samples.response_documents()))
+        response = SimpleUploadedFile("response.zip", self._package(app, "0001", documents=samples.response_documents()))
         services.respond_to_info_request(app, acme, response, "Updated stability summary provided in 3.2.P.8.1.")
 
         # 5. Review complete, waiting for the HOD decision
         app = self._new(gulf, application_type="GENERIC", product_name="Gulf-Metformin 850 mg",
                         active_ingredients="Metformin hydrochloride", dosage_form="Film-coated tablet",
                         strength="850 mg", route="Oral", atc_code="A10BA02")
-        self._upload(app, gulf, samples.build_package("0000", "GENERIC"))
+        self._upload(app, gulf, self._package(app))
         services.submit(app, gulf)
         team = self._team(app, hod, users)
         self._assess_all(app, {s: r for s, r in team.items() if s != "M5"},
@@ -178,7 +187,7 @@ class Command(BaseCommand):
         app = self._new(acme, application_type="GENERIC", product_name="Acme-Amoxicillin 500 mg",
                         active_ingredients="Amoxicillin trihydrate", dosage_form="Capsule",
                         strength="500 mg", route="Oral", atc_code="J01CA04")
-        self._upload(app, acme, samples.build_package("0000", "GENERIC"))
+        self._upload(app, acme, self._package(app))
         services.submit(app, acme)
         team = self._team(app, hod, users)
         self._assess_all(app, team, {})

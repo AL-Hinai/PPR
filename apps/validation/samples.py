@@ -14,7 +14,10 @@ from django.conf import settings
 from lxml import etree
 
 from .ectd import ECTD_NS, MODULES, XLINK_NS
+from .regions import get_profile
+from .regions.gcc import AGENCIES, SUBMISSION_TYPES
 
+XML_LANG = "{http://www.w3.org/XML/1998/namespace}lang"
 M2 = MODULES["m2"]
 M3 = MODULES["m3"]
 M4 = MODULES["m4"]
@@ -32,7 +35,7 @@ class Doc:
     path: str  # relative to the sequence folder
     title: str
     section: tuple = ()  # element path in index.xml; empty for regional (Module 1) documents
-    regional_section: str = ""  # element in the regional XML
+    regional_section: tuple = ()  # element path in the regional XML (under m1-gc)
     operation: str = "new"
     modified_file: str = ""
     content: bytes | None = None
@@ -95,13 +98,13 @@ def make_pdf(text: str, version: str = "1.7", javascript: bool = False, font: st
 
 # Body text for the demo documents, so the dossier assistant has something real to search and quote.
 SAMPLE_BODY = {
-    "10-cover/cover-letter.pdf": "Initial marketing authorisation application for Paracetamol 500 mg film-coated "
+    "10-cover/om/om-cover.pdf": "Initial marketing authorisation application for Paracetamol 500 mg film-coated "
     "tablets submitted by Demo Pharma LLC in eCTD format (sequence 0000).",
-    "13-pi/smpc.pdf": "4.1 Therapeutic indications: symptomatic treatment of mild to moderate pain and fever.\n"
+    "131-spc/om/en/om-spc.pdf": "4.1 Therapeutic indications: symptomatic treatment of mild to moderate pain and fever.\n"
     "4.2 Posology: adults and adolescents over 12 years: 1 to 2 tablets every 4 to 6 hours, maximum 8 tablets "
     "(4 g) in 24 hours.\n4.3 Contraindications: hypersensitivity to paracetamol; severe hepatic impairment.\n"
     "6.3 Shelf life: 36 months. 6.4 Special precautions for storage: store below 30 C in the original package.",
-    "13-pi/patient-leaflet.pdf": "Do not take more than 8 tablets in 24 hours. Talk to your doctor if you have "
+    "133-leaflet/om/en/om-leaflet.pdf": "Do not take more than 8 tablets in 24 hours. Talk to your doctor if you have "
     "liver or kidney problems. Store below 30 C.",
     "m2/23-qos/quality-overall-summary.pdf": "Drug substance paracetamol complies with Ph. Eur. Drug product: "
     "immediate-release film-coated tablet. Dissolution: not less than 80 percent (Q) in 30 minutes, "
@@ -122,7 +125,7 @@ SAMPLE_BODY = {
     "5312-compar-ba-be-stud-rep/be-study-001.pdf": "Single-dose, two-way crossover study in 24 healthy volunteers "
     "under fasting conditions. 90 percent confidence intervals of the test/reference ratio: Cmax 94.2 - 108.7 "
     "percent, AUC0-t 96.5 - 103.1 percent, within the 80.00 - 125.00 percent acceptance range.",
-    "responses/response-to-questions.pdf": "Question 1: justify the proposed shelf life. Response: 18-month long-term "
+    "19-responses/om/om-responses.pdf": "Question 1: justify the proposed shelf life. Response: 18-month long-term "
     "data at 30 C / 75 percent RH are now provided (updated 3.2.P.8.1); all results are within specification and "
     "a shelf life of 36 months is proposed.",
 }
@@ -135,18 +138,41 @@ def sample_body(path: str, title: str) -> str:
     return next((body for suffix, body in SAMPLE_BODY.items() if path.endswith(suffix)), "")
 
 
-def module1_documents(region: str) -> list[Doc]:
-    base = f"m1/{region}"
+def _m1_base(region: str | None) -> str:
+    return f"m1/{get_profile(region or settings.ECTD_REGION).folder}"
+
+
+def _specific(cc: str) -> tuple:
+    return ("specific", {"country": cc})
+
+
+def _pi_doc(kind: str, cc: str, lang: str) -> tuple:
+    return ("pi-doc", {XML_LANG: lang, "type": kind, "country": cc})
+
+
+def module1_documents(region: str | None = None, country: str | None = None) -> list[Doc]:
+    """GCC Module 1 for a new product, in the element order the GCC regional DTD requires."""
+    base, cc = _m1_base(region), country or settings.ECTD_COUNTRY
+    pi = "m1-3-pi"
     return [
-        Doc(f"{base}/10-cover/cover-letter.pdf", "Cover letter", regional_section="m1-0-cover-letter"),
-        Doc(f"{base}/12-form/application-form.pdf", "Application form", regional_section="m1-2-application-form"),
-        Doc(f"{base}/13-pi/smpc.pdf", "Summary of product characteristics", regional_section="m1-3-product-information"),
-        Doc(f"{base}/13-pi/patient-leaflet.pdf", "Patient information leaflet", regional_section="m1-3-product-information"),
+        Doc(f"{base}/10-cover/{cc}/{cc}-cover.pdf", "Cover letter", regional_section=("m1-0-cover", _specific(cc))),
+        Doc(f"{base}/12-form/{cc}/{cc}-form.pdf", "Application form", regional_section=("m1-2-form", _specific(cc))),
+        Doc(f"{base}/13-pi/131-spc/{cc}/en/{cc}-spc.pdf", "Summary of product characteristics",
+            regional_section=(pi, "m1-3-1-spc", _pi_doc("spc", cc, "en"))),
+        Doc(f"{base}/13-pi/132-labeling/{cc}/en/{cc}-label.pdf", "Labeling",
+            regional_section=(pi, "m1-3-2-label", _pi_doc("label", cc, "en"))),
+        Doc(f"{base}/13-pi/133-leaflet/{cc}/ar/{cc}-leaflet.pdf", "Patient information leaflet (Arabic)",
+            regional_section=(pi, "m1-3-3-pil", _pi_doc("pil", cc, "ar"))),
+        Doc(f"{base}/13-pi/133-leaflet/{cc}/en/{cc}-leaflet.pdf", "Patient information leaflet (English)",
+            regional_section=(pi, "m1-3-3-pil", _pi_doc("pil", cc, "en"))),
+        Doc(f"{base}/17-certificates/171-gmp/{cc}-gmp.pdf", "GMP certificate",
+            regional_section=("m1-7-certificates", "m1-7-1-gmp")),
+        Doc(f"{base}/18-pricing/181-price-list/{cc}-price.pdf", "Price list",
+            regional_section=("m1-8-pricing", "m1-8-1-price-list")),
     ]
 
 
 def initial_documents(application_type: str = "NEW_DRUG", region: str | None = None) -> list[Doc]:
-    region = region or settings.ECTD_REGION
     docs = module1_documents(region) + [
         Doc("m2/22-intro/introduction.pdf", "Introduction", (M2, "m2-2-introduction")),
         Doc("m2/23-qos/quality-overall-summary.pdf", "Quality overall summary", (M2, "m2-3-quality-overall-summary", "m2-3-introduction")),
@@ -192,14 +218,12 @@ def initial_documents(application_type: str = "NEW_DRUG", region: str | None = N
 
 def response_documents(region: str | None = None) -> list[Doc]:
     """Sequence 0001: answers to questions + a replaced stability report."""
-    region = region or settings.ECTD_REGION
+    base, cc = _m1_base(region), settings.ECTD_COUNTRY
     return [
-        Doc(f"m1/{region}/10-cover/cover-letter.pdf", "Cover letter – response", regional_section="m1-0-cover-letter"),
-        Doc(
-            f"m1/{region}/responses/response-to-questions.pdf",
-            "Response to request for information",
-            regional_section="m1-responses",
-        ),
+        Doc(f"{base}/10-cover/{cc}/{cc}-cover-response.pdf", "Cover letter – response",
+            regional_section=("m1-0-cover", _specific(cc))),
+        Doc(f"{base}/19-responses/{cc}/{cc}-responses.pdf", "Response to request for information",
+            regional_section=("m1-9-responses", _specific(cc))),
         Doc(
             STABILITY_PATH,
             "Stability summary and conclusion (updated)",
@@ -238,18 +262,56 @@ def _section(parent, segment):
     return element
 
 
-def regional_xml(number, docs, files, region, application_title) -> bytes:
-    ns = f"urn:ppr:ectd:{region}-regional"
-    root = etree.Element(f"{{{ns}}}{region}-regional", nsmap={region: ns, "xlink": XLINK_NS})
-    admin = etree.SubElement(root, "admin")
-    etree.SubElement(admin, "applicant").text = PRODUCT["manufacturer"]
-    etree.SubElement(admin, "product-name").text = application_title
-    etree.SubElement(admin, "sequence").text = number
-    body = etree.SubElement(root, f"m1-{region}")
+def envelope_values(number: str, application_type: str, product_title: str, country: str) -> dict:
+    """GCC envelope for a sample sequence: 0000 starts the activity, later sequences respond to questions."""
+    initial = number == "0000"
+    return {
+        "country": country,
+        "applicant": PRODUCT["manufacturer"],
+        "agency": AGENCIES[country],
+        "submission": SUBMISSION_TYPES[application_type][0],
+        "submission-unit": "initial" if initial else "response",
+        "procedure": "national",
+        "invented-name": product_title,
+        "inn": SUBSTANCE["substance"],
+        "sequence": number,
+        "related-sequence": None if initial else "0000",
+        "submission-description": "Initial application" if initial else "Response to request for information",
+    }
+
+
+def regional_xml(number, docs, files, profile, envelope: dict) -> bytes:
+    """``gc-regional.xml``: the envelope (``None`` values are left out) and the m1-gc table of contents."""
+    root = etree.Element(
+        f"{{{profile.namespace}}}{profile.root_element}", nsmap={"gc": profile.namespace, "xlink": XLINK_NS}
+    )
+    root.set("dtd-version", "1.1")
+    env = etree.SubElement(etree.SubElement(root, "gc-envelope"), "envelope", country=envelope["country"])
+    etree.SubElement(env, "application")
+    for name in ("applicant", "agency", "submission", "submission-unit", "procedure", "invented-name", "inn",
+                 "sequence", "related-sequence", "submission-description"):
+        value = envelope.get(name)
+        if value is None:
+            continue
+        if name == "agency":
+            etree.SubElement(env, name, code=value)
+        elif name in ("submission", "submission-unit", "procedure"):
+            etree.SubElement(env, name, type=value)
+        else:
+            etree.SubElement(env, name).text = value
+    body = etree.SubElement(root, "m1-gc")
     for doc in docs:
-        section = _section(body, doc.regional_section)
-        _leaf(section, number, doc, files, doc.path.split("/", 2)[2])
-    return etree.tostring(root, xml_declaration=True, encoding="UTF-8", pretty_print=True)
+        parent = body
+        for segment in doc.regional_section:
+            parent = _section(parent, segment)
+        _leaf(parent, number, doc, files, doc.path.split("/", 2)[2])
+    return etree.tostring(
+        root,
+        xml_declaration=True,
+        encoding="UTF-8",
+        pretty_print=True,
+        doctype=f'<!DOCTYPE gc:{profile.root_element} SYSTEM "../../util/dtd/{profile.dtd_file}">',
+    )
 
 
 def index_xml(number, docs, files, regional_rel) -> bytes:
@@ -278,9 +340,13 @@ def build_files(
     application_type: str = "NEW_DRUG",
     region: str | None = None,
     product_title: str = PRODUCT["product-name"],
+    envelope: dict | None = None,
 ) -> dict[str, bytes]:
-    """All files of one sequence, keyed by path relative to the sequence folder."""
-    region = region or settings.ECTD_REGION
+    """All files of one sequence, keyed by path relative to the sequence folder.
+
+    ``envelope`` overrides GCC envelope values (``None`` removes an element), for broken test packages.
+    """
+    profile = get_profile(region or settings.ECTD_REGION)
     docs = documents if documents is not None else initial_documents(application_type, region)
     files: dict[str, bytes] = {}
     for doc in docs:
@@ -289,11 +355,14 @@ def build_files(
                 f"{doc.title} - {product_title}\n" + sample_body(doc.path, doc.title)
             )
 
-    regional_rel = f"m1/{region}/{region}-regional.xml"
-    files[regional_rel] = regional_xml(number, [d for d in docs if d.regional_section], files, region, product_title)
-    files["index.xml"] = index_xml(number, [d for d in docs if not d.regional_section], files, regional_rel)
+    values = {**envelope_values(number, application_type, product_title, settings.ECTD_COUNTRY), **(envelope or {})}
+    regional_docs = [d for d in docs if d.regional_section]
+    files[profile.regional_rel] = regional_xml(number, regional_docs, files, profile, values)
+    files["index.xml"] = index_xml(number, [d for d in docs if not d.regional_section], files, profile.regional_rel)
     files["index-md5.txt"] = md5(files["index.xml"]).encode()
     files["util/dtd/ich-ectd-3-2.dtd"] = Path(settings.ECTD_DTD_PATH).read_bytes()
+    for name in profile.dtd_files:
+        files[f"util/dtd/{name}"] = (profile.dtd_dir / name).read_bytes()
     return files
 
 

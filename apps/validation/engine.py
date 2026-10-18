@@ -15,7 +15,7 @@ from .rules.base import Severity
 from .rules.files import PACKAGE_RULE
 
 logger = logging.getLogger(__name__)
-VALIDATOR_VERSION = "2.0"  # 2.0: official ICH eCTD 3.2 DTD
+VALIDATOR_VERSION = "2.1"  # 2.0: official ICH eCTD 3.2 DTD; 2.1: GCC Module 1 rules
 MB = 1024 * 1024
 
 
@@ -75,6 +75,7 @@ def validate_sequence(sequence) -> ValidationRun:
         )
     except ArchiveError as exc:
         issues = [PACKAGE_RULE.issue(str(exc))]
+        envelope = {}
     else:
         expected, previous = _previous_sequences(sequence)
         ctx = ValidationContext(
@@ -85,8 +86,10 @@ def validate_sequence(sequence) -> ValidationRun:
             dtd_path=Path(settings.ECTD_DTD_PATH),
             limits=Limits(max_file_bytes=settings.ECTD_MAX_FILE_MB * MB),
             previous=previous,
+            country=settings.ECTD_COUNTRY,
         )
         issues = run_rules(ctx)
+        envelope = ctx.envelope or {}
 
     Finding.objects.bulk_create(
         Finding(
@@ -114,7 +117,8 @@ def validate_sequence(sequence) -> ValidationRun:
     else:
         sequence.validation_status = Status.PASSED_WITH_WARNINGS if run.warning_count else Status.PASSED
         sequence.extracted_path = rel_dir
-    sequence.save(update_fields=["validation_status", "extracted_path"])
+    sequence.envelope = envelope
+    sequence.save(update_fields=["validation_status", "extracted_path", "envelope"])
     logger.info(
         "Validated %s: %s (%d errors, %d warnings)", sequence, sequence.validation_status, run.error_count, run.warning_count
     )

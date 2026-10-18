@@ -13,8 +13,8 @@ _dtd_cache: dict[tuple[str, float], etree.DTD] = {}
 def load_dtd(path: Path) -> etree.DTD:
     key = (str(path), path.stat().st_mtime)
     if key not in _dtd_cache:
-        with open(path, "rb") as fh:
-            _dtd_cache[key] = etree.DTD(fh)
+        # Loaded by file name so modular DTDs (GCC gc-envelope.mod, gc-leaf.mod) resolve next to it.
+        _dtd_cache[key] = etree.DTD(str(path))
     return _dtd_cache[key]
 
 
