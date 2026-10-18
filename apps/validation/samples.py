@@ -183,7 +183,7 @@ def initial_documents(application_type: str = "NEW_DRUG", region: str | None = N
                 M5,
                 "m5-3-clinical-study-reports",
                 "m5-3-1-reports-of-biopharmaceutic-studies",
-                "m5-3-1-2-comparative-ba-and-bioequivalence-be-study-reports",
+                "m5-3-1-2-comparative-ba-and-bioequivalence-study-reports",
             ),
         )
     )

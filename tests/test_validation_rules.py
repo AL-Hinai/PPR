@@ -1,5 +1,7 @@
 """Each validation rule is proven by a package that breaks exactly that rule."""
+import hashlib
 import io
+from pathlib import Path
 
 import pytest
 from django.test import override_settings
@@ -196,6 +198,22 @@ def test_modified_file_must_exist_in_previous_sequence(validate, make_applicatio
 def test_zip_bomb_budget(validate):
     _, _, codes = validate(samples.build_package())
     assert codes == {"FC-00"}
+
+
+OFFICIAL_ICH_DTD_SHA256 = "c094aa2bded99564ade8ac78ae1540f95e518461b8eebe9a3063f67a165c2731"
+
+
+def test_bundled_dtd_is_the_official_ich_dtd(settings):
+    """SCH-03 must check against the unchanged ICH file (source in apps/validation/dtd/README.md)."""
+    data = Path(settings.ECTD_DTD_PATH).read_bytes()
+    assert hashlib.sha256(data).hexdigest() == OFFICIAL_ICH_DTD_SHA256
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("application_type", ["NEW_DRUG", "GENERIC", "VARIATION", "RENEWAL"])
+def test_sample_packages_pass_the_official_dtd(validate, application_type):
+    _, _, codes = validate(samples.build_package("0000", application_type), application_type)
+    assert "SCH-03" not in codes
 
 
 def test_heading_labels():

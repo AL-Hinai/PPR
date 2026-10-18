@@ -15,7 +15,7 @@ from .rules.base import Severity
 from .rules.files import PACKAGE_RULE
 
 logger = logging.getLogger(__name__)
-VALIDATOR_VERSION = "1.0"
+VALIDATOR_VERSION = "2.0"  # 2.0: official ICH eCTD 3.2 DTD
 MB = 1024 * 1024
 
 

@@ -50,7 +50,7 @@ class IndexMatchesDtd(Rule):
 
     def check(self, ctx):
         if not ctx.dtd_path.is_file():
-            yield self.issue(f"The reference DTD is missing on the server: {ctx.dtd_path}")
+            yield self.issue(f"The ICH eCTD DTD is missing on the server: {ctx.dtd_path}")
             return
         dtd = load_dtd(ctx.dtd_path)
         if dtd.validate(ctx.index_tree):

@@ -60,9 +60,9 @@ Any **error** fails the sequence. Warnings let it pass ("Passed with warnings").
 `ValidationRun` with its `Finding`s, shown as a report (with CSV export). Accepted sequences can be browsed
 in the dossier viewer (CTD tree → documents).
 
-> **Note on the DTD:** `apps/validation/dtd/ich-ectd-3-2.dtd` is a reference DTD that follows the
-> ICH eCTD v3.2.2 hierarchy. Before going live, replace it with the official `ich-ectd-3-2.dtd` from the
-> ICH eCTD v3.2.2 specification package, or point `ECTD_DTD_PATH` at it. The Module 1 region folder is set with
+> **Note on the DTD:** `apps/validation/dtd/ich-ectd-3-2.dtd` is the official ICH eCTD v3.2 DTD, unchanged
+> (source and checksum in [apps/validation/dtd/README.md](apps/validation/dtd/README.md)). `ECTD_DTD_PATH`
+> can point elsewhere if needed. The Module 1 region folder is set with
 > `ECTD_REGION` (default `gcc`).
 
 ## Dossier assistant
