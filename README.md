@@ -190,6 +190,7 @@ variant per rule. They also cover the full workflow, permissions, protected file
 |---|---|
 | `manage.py validate_sequence <id> [...]` | Re-run validation (e.g. after updating the DTD) |
 | `manage.py seed_demo --reset` | Recreate demo data |
+| `manage.py seed_bulk [--count N] [--reset]` | Add test data: 10 more companies, 7 more reviewers and N applications (default 150) in every state, a failed application for each validation rule, history spread over the past year |
 | `manage.py build_sample_packages` | Write demo eCTD zips |
 | `manage.py build_sample_packages --benchmark --out <dir>` | Write the benchmark set (valid, one broken package per rule, `manifest.csv`) |
 | `manage.py benchmark_validation <dir>` | Validate a folder of packages without the database and write comparison CSVs ([docs/validation_benchmark.md](docs/validation_benchmark.md)) |

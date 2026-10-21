@@ -45,6 +45,9 @@ class Command(BaseCommand):
             self.stdout.write(f"  {user.username:<16} {user.get_role_display():<20} {user.get_specialties_display()}")
 
     def _reset(self):
+        from .seed_bulk import delete_bulk_data
+
+        delete_bulk_data()  # bulk records point at the demo accounts
         demo_companies = Company.objects.filter(registration_no__startswith="DEMO-")
         for application in Application.objects.filter(company__in=demo_companies):
             for sequence in application.sequences.all():

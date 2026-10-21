@@ -7,10 +7,10 @@
       "runtimeArgs": [
         "manage.py",
         "runserver",
-        "8010",
+        "8011",
         "--noreload"
       ],
-      "port": 8010
+      "port": 8011
     }
   ]
 }
