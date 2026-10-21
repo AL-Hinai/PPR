@@ -22,6 +22,7 @@ node_modules/
 Thumbs.db
 .vscode/
 .idea/
+~$*
 
 # Generated demo packages (manage.py build_sample_packages)
 /sample_packages/
