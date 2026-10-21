@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PPR and EXTEDO comparison</title>
+<style>
+  :root{
+    --brand-50:#eefbf8; --brand-100:#d5f4ee; --brand-200:#aee8dd; --brand-300:#78d5c6;
+    --brand-400:#42baa9; --brand-500:#229e8e; --brand-600:#157f74; --brand-700:#13665e;
+    --brand-800:#13514c; --brand-900:#134440; --brand-950:#042825;
+    --ink:#1e293b; --muted:#475569; --faint:#64748b; --border:#e2e8f0; --bg-tint:#f8fafc;
+    --ok-fg:#166534; --ok-bg:#dcfce7; --warn-fg:#92400e; --warn-bg:#fef3c7;
+    --bad-fg:#991b1b; --bad-bg:#fee2e2; --na-fg:#475569; --na-bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  html{ background:#e2e8f0; }
+  body{
+    font-family:"Segoe UI","Noto Sans Arabic",Arial,Helvetica,sans-serif;
+    color:var(--ink); font-size:10.3pt; line-height:1.5; background:#fff;
+    max-width:210mm; margin:0 auto; box-shadow:0 0 0 1px rgba(0,0,0,0.06);
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  @page{ size:A4; margin:0; }
+  section.page{ break-before:page; padding:16mm 16mm 18mm 16mm; }
+  section.page:first-of-type{ break-before:auto; }
+  @media print{ body{ max-width:none; margin:0; box-shadow:none; } html{ background:#fff; } }
+  h1,h2,h3,h4{ color:var(--brand-900); font-weight:700; line-height:1.25; }
+  h2.section-title{
+    font-size:15pt; margin:0 0 3mm 0; padding-bottom:2mm; border-bottom:2px solid var(--brand-600);
+    display:flex; align-items:baseline; gap:3mm;
+  }
+  h2.section-title .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:7mm; height:7mm; border-radius:2px; background:var(--brand-700); color:#fff;
+    font-size:10pt; flex:none;
+  }
+  h3{ font-size:11.5pt; margin:6mm 0 2mm; }
+  h4{ font-size:10.3pt; margin:4mm 0 1.5mm; }
+  p{ margin:0 0 2.5mm 0; }
+  .muted{ color:var(--muted); }
+  .faint{ color:var(--faint); font-size:9pt; }
+  table{ width:100%; border-collapse:collapse; font-size:9.3pt; margin:2mm 0 4mm; }
+  th,td{ text-align:left; vertical-align:top; padding:2mm 2.5mm; border:1px solid var(--border); }
+  th{ background:var(--brand-900); color:#fff; font-weight:600; font-size:9pt; }
+  tr:nth-child(even) td{ background:var(--bg-tint); }
+  table.tight td, table.tight th{ padding:1.6mm 2mm; }
+  .pill{ display:inline-block; padding:0.6mm 2.2mm; border-radius:20px; font-size:8.3pt; font-weight:700; white-space:nowrap; }
+  .pill-full{ color:var(--ok-fg); background:var(--ok-bg); }
+  .pill-partial{ color:var(--warn-fg); background:var(--warn-bg); }
+  .pill-none{ color:var(--bad-fg); background:var(--bad-bg); }
+  .pill-na{ color:var(--na-fg); background:var(--na-bg); }
+  .pill-closed{ color:var(--ok-fg); background:var(--ok-bg); }
+  .pill-progress{ color:var(--warn-fg); background:var(--warn-bg); }
+  .pill-open{ color:var(--bad-fg); background:var(--bad-bg); }
+  ul,ol{ margin:1.5mm 0 3mm; padding-left:4.5mm; }
+  li{ margin-bottom:1mm; }
+  .cols2{ display:flex; gap:5mm; }
+  .cols2 > *{ flex:1 1 0; min-width:0; }
+  .card{ border:1px solid var(--border); border-radius:3px; padding:3.5mm 4mm; background:#fff; break-inside:avoid; }
+  .card h4{ margin-top:0; }
+  .tint{ background:var(--brand-50); border-color:var(--brand-200); }
+  .callout{ border-left:3px solid var(--brand-600); background:var(--brand-50); padding:3mm 4mm; margin:3mm 0 4mm; break-inside:avoid; }
+  .callout.amber{ border-left-color:#d97706; background:#fffbeb; }
+  .small-caps{ letter-spacing:0.08em; text-transform:uppercase; font-size:8pt; color:var(--brand-700); font-weight:700; }
+
+  /* ---------- Cover page ---------- */
+  .cover{
+    background:linear-gradient(160deg,var(--brand-950) 0%,var(--brand-900) 55%,var(--brand-800) 100%);
+    color:#fff; margin:-16mm -16mm 0 -16mm; padding:16mm; min-height:277mm; position:relative;
+    display:flex; flex-direction:column;
+  }
+  .cover .brandline{ display:flex; align-items:center; gap:3mm; font-size:9.5pt; letter-spacing:0.14em; text-transform:uppercase; color:var(--brand-200); }
+  .cover .brandline .ar{ font-size:11pt; letter-spacing:0; text-transform:none; direction:rtl; color:var(--brand-100); }
+  .cover .kicker{ margin-top:14mm; font-size:9pt; letter-spacing:0.16em; text-transform:uppercase; color:var(--brand-300); }
+  .cover h1{ color:#fff; font-size:30pt; margin:4mm 0 2mm; line-height:1.15; }
+  .cover h1 .ar{ display:block; direction:rtl; text-align:left; font-size:19pt; color:var(--brand-100); margin-top:2mm; font-weight:700; }
+  .cover .subtitle{ font-size:12.5pt; color:var(--brand-100); max-width:140mm; margin-bottom:2mm; }
+  .cover .subtitle-ar{ direction:rtl; text-align:left; font-size:11pt; color:var(--brand-200); max-width:150mm; line-height:1.7; }
+  .cover .status-row{ margin-top:8mm; display:flex; gap:3mm; }
+  .cover .status-chip{ background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.25); border-radius:3px; padding:2mm 3.5mm; font-size:9pt; }
+  .cover .status-chip b{ display:block; font-size:10.5pt; }
+  .cover .meta{ margin-top:auto; background:rgba(0,0,0,0.18); border-radius:4px; padding:5mm 6mm; }
+  .cover .meta table{ margin:0; font-size:9.3pt; }
+  .cover .meta td{ border:none; padding:1.3mm 0; color:var(--brand-50); }
+  .cover .meta td.k{ color:var(--brand-300); width:44mm; }
+  .cover .meta table tr td{ background:transparent; }
+  .cover .histtitle{ margin-top:4mm; font-size:8.3pt; text-transform:uppercase; letter-spacing:0.1em; color:var(--brand-300); }
+  .cover .hist td{ color:var(--brand-50); font-size:8.7pt; }
+
+  /* ---------- TOC ---------- */
+  .toc-list{ list-style:none; margin:0; padding:0; }
+  .toc-list li{ display:flex; justify-content:space-between; gap:3mm; padding:2.3mm 0; border-bottom:1px dotted var(--border); font-size:10.3pt; }
+  .toc-list li .n{ color:var(--brand-700); font-weight:700; width:8mm; flex:none; }
+  .toc-list li .t{ flex:1; }
+
+  /* ---------- Page footer banner ---------- */
+  .docfoot{ margin-top:6mm; padding-top:2mm; border-top:1px solid var(--border); font-size:7.6pt; color:var(--faint); display:flex; justify-content:space-between; }
+
+  /* ---------- Visual comparison ---------- */
+  .compare-pair{ border:1px solid var(--border); border-radius:4px; overflow:hidden; margin:0 0 6mm; break-inside:avoid; }
+  .compare-pair .pair-title{ background:var(--brand-900); color:#fff; padding:2.3mm 4mm; font-size:10pt; font-weight:700; display:flex; justify-content:space-between; align-items:center;}
+  .compare-pair .pair-title .cap{ font-weight:600; font-size:8.3pt; color:var(--brand-200); }
+  .compare-grid{ display:grid; grid-template-columns:1fr 1fr; }
+  .compare-cell{ padding:3mm; border-left:1px solid var(--border); }
+  .compare-cell:first-child{ border-left:none; }
+  .compare-cell .who{ font-size:8.3pt; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--brand-700); margin-bottom:1.5mm; }
+  .compare-cell.extedo .who{ color:#9a3412; }
+  .compare-cell img{ width:100%; border:1px solid var(--border); border-radius:2px; display:block; }
+  .compare-cell .desc{ font-size:8.6pt; color:var(--muted); margin-top:1.5mm; }
+  .vendor-note{ border:1px dashed #c2410c; background:#fff7ed; border-radius:3px; padding:3mm; font-size:8.8pt; color:#7c2d12; min-height:34mm; display:flex; flex-direction:column; justify-content:center; }
+  .vendor-note .src{ margin-top:2mm; font-size:7.8pt; color:#9a3412; font-style:italic; }
+  .solo-gallery{ display:flex; flex-wrap:wrap; gap:4mm; }
+  .solo-card{ flex:0 0 calc(50% - 2mm); border:1px solid var(--border); border-radius:4px; overflow:hidden; break-inside:avoid; }
+  .solo-card .cap{ background:var(--brand-50); padding:2mm 3mm; font-size:8.8pt; color:var(--brand-800); border-top:1px solid var(--border); }
+  .solo-card .cap b{ display:block; font-size:9.3pt; color:var(--brand-900); }
+  .solo-card img{ width:100%; display:block; }
+  .tag-no-extedo{ display:inline-block; margin-top:1mm; font-size:7.6pt; font-weight:700; color:#9a3412; background:#ffedd5; border-radius:10px; padding:0.5mm 2mm; }
+
+  .gap-status{ font-weight:700; }
+  .prio-high{ color:#b91c1c; font-weight:700; }
+  .prio-med{ color:#b45309; font-weight:700; }
+  .prio-low{ color:#166534; font-weight:700; }
+
+  .progress-banner{ display:flex; gap:0; border:1px solid var(--border); border-radius:4px; overflow:hidden; margin:3mm 0 5mm; break-inside:avoid; }
+  .progress-banner .seg{ flex:1; padding:3.5mm 3mm; text-align:center; border-left:1px solid var(--border); }
+  .progress-banner .seg:first-child{ border-left:none; }
+  .progress-banner .seg .num{ font-size:17pt; font-weight:800; display:block; }
+  .progress-banner .seg .lbl{ font-size:7.8pt; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+  .progress-banner .closed{ background:var(--ok-bg); } .progress-banner .closed .num{ color:var(--ok-fg); }
+  .progress-banner .progress{ background:var(--warn-bg); } .progress-banner .progress .num{ color:var(--warn-fg); }
+  .progress-banner .open{ background:var(--bad-bg); } .progress-banner .open .num{ color:var(--bad-fg); }
+
+  code{ background:var(--bg-tint); border:1px solid var(--border); border-radius:2px; padding:0 1mm; font-size:9pt; }
+  a{ color:var(--brand-700); }
+</style>
+</head>
+<body>
+
+<!-- ======================= COVER PAGE ======================= -->
+<section class="page">
+<div class="cover">
+  <div class="brandline">
+    <span>Pharmacy Department &nbsp;·&nbsp; Pharmaceutical Product Registration</span>
+  </div>
+  <div class="ar brandline" style="margin-top:1mm;"><span class="ar">دائرة الصيدلة · تسجيل المستحضرات الصيدلانية</span></div>
+
+  <div class="kicker">Internal · For departmental review &nbsp;|&nbsp; PPR&#8209;CMP&#8209;001 · Version 0.2 · 21 October 2026</div>
+  <h1>Comparative Assessment Report<span class="ar">تقرير التقييم المقارن</span></h1>
+  <div class="subtitle">PPR and EXTEDO — a side-by-side comparison, updated</div>
+  <p class="subtitle" style="font-size:11pt; color:var(--brand-200); max-width:150mm;">
+    The PPR medicine approval system compared with the EXTEDO eCTD validation and review products used by
+    regulatory authorities, revised after three weeks of development that closed most of the gaps the first
+    comparison found — now with a side-by-side look at the two systems' screens.
+  </p>
+  <div class="subtitle-ar">
+    تقرير مقارنة محدَّث: نظام تسجيل المستحضرات الصيدلانية (PPR) مقابل حلول EXTEDO للتحقق من ملفات eCTD ومراجعتها،
+    مع مقارنة بصرية مباشرة بين واجهتي النظامين.
+  </div>
+
+  <div class="status-row">
+    <div class="status-chip">Report status<b>Draft for review</b></div>
+    <div class="status-chip">Supersedes<b>PPR&#8209;CMP&#8209;001 v0.1 (18 Oct 2026)</b></div>
+    <div class="status-chip">Gaps closed since v0.1<b>7 of 12</b></div>
+  </div>
+
+  <div class="meta">
+    <table>
+      <tr><td class="k">Document reference</td><td>PPR-CMP-001</td></tr>
+      <tr><td class="k">Version / status</td><td>0.2 · Draft for review</td></tr>
+      <tr><td class="k">Date of issue</td><td>21 October 2026</td></tr>
+      <tr><td class="k">Prepared for</td><td>Head of Department, Pharmacy</td></tr>
+      <tr><td class="k">Prepared by</td><td>PPR project team</td></tr>
+      <tr><td class="k">Related documents</td><td>PPR-POC-001 Proof of Concept Report v0.2 (21 Oct 2026) · PPR-VAL-URS, PPR-VAL-RA, PPR-VAL-QP (docs/validation/)</td></tr>
+      <tr><td class="k">Classification</td><td>Internal</td></tr>
+    </table>
+    <div class="histtitle">Revision history</div>
+    <table class="hist">
+      <tr><td class="k">0.1</td><td>18 Oct 2026 — First issue of the comparison report</td></tr>
+      <tr><td class="k">0.2</td><td>21 Oct 2026 — Updated validation, workflow and platform sections for gaps closed since v0.1; added the visual (screenshot) comparison section; refreshed the gap analysis and recommendation</td></tr>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ======================= CONTENTS ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">·</span>Contents</h2>
+<ol class="toc-list">
+  <li><span class="n">1</span><span class="t">Executive summary</span></li>
+  <li><span class="n">2</span><span class="t">Scope, method and sources</span></li>
+  <li><span class="n">3</span><span class="t">The two systems at a glance</span></li>
+  <li><span class="n">4</span><span class="t">Capability coverage matrix</span></li>
+  <li><span class="n">5</span><span class="t">Detailed comparison</span></li>
+  <li><span class="n">6</span><span class="t">eCTD technical validation in depth</span></li>
+  <li><span class="n">7</span><span class="t">Visual comparison: PPR and EXTEDO side by side</span></li>
+  <li><span class="n">8</span><span class="t">Strengths and weaknesses</span></li>
+  <li><span class="n">9</span><span class="t">Progress since v0.1 and what PPR still needs for production</span></li>
+  <li><span class="n">10</span><span class="t">Options and recommendation</span></li>
+  <li><span class="n">A</span><span class="t">Sources</span></li>
+</ol>
+<div class="callout">
+  <b>What changed in this version.</b> Since the first comparison (18 October 2026), PPR adopted the official
+  ICH eCTD 3.2 DTD and implemented the GCC Module&nbsp;1 v1.5 validation criteria as real rules, added background
+  (queued) validation, a printable short/long PDF validation report, a cumulative "current dossier" lifecycle
+  view, full-text search across every dossier a reader may open, a key-protected read-only API, optional staff
+  single sign-on, and a full set of system-validation documents (URS, risk assessment, IQ/OQ/PQ protocol,
+  automated traceability). Section&nbsp;9 tracks each of the twelve original gaps against this progress. The one
+  item still outstanding that matters most for go-live is executing the validation benchmark against a real
+  reference validator — the procedure is written, but PPR has no EURSvalidator licence to run it against.
+</div>
+</section>
+
+<!-- ======================= 1. EXECUTIVE SUMMARY ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">1</span>Executive summary</h2>
+<p>
+  This report compares <b>PPR</b>, the department's in-house medicine approval system, with the <b>EXTEDO</b>
+  products that regulatory authorities use to receive, validate and review eCTD dossiers: EURS (desktop review
+  system), EURSnext (its web companion, sold only to authorities) and EURSvalidator (the validation engine).
+  It updates the first comparison (PPR-CMP-001 v0.1, 18 October 2026) after three weeks in which the project
+  team closed most of the high-priority gaps that report identified, and adds a new side-by-side look at what
+  each system's screens actually show (section&nbsp;7).
+</p>
+<p>The two remain different kinds of system, so they still overlap only in part:</p>
+<p>
+  <b>EXTEDO EURS</b> is a mature, specialised validation and dossier-review tool. By EXTEDO's account, more
+  than 35 authorities use it, including the European Medicines Agency (EMA). EXTEDO also names Oman,
+  Saudi Arabia, Bahrain, Qatar and the UAE among the agencies that use or recommend EURS or EURSvalidator.
+  Its strengths are official, regularly updated validation criteria for each region (GCC included), deep
+  document-review tools (annotation, full-text search, lifecycle navigation) and enterprise scale.
+</p>
+<p>
+  <b>PPR</b> is an end-to-end registration workflow system: a company portal, automated eCTD validation,
+  assignment of specialist reviewers per CTD module, information requests, the HOD's decision, and a bilingual
+  approval certificate. Its interface is in Arabic and English, it has an AI dossier assistant, and the
+  department owns it.
+</p>
+
+<div class="progress-banner">
+  <div class="seg closed"><span class="num">7</span><span class="lbl">Gaps closed</span></div>
+  <div class="seg progress"><span class="num">2</span><span class="lbl">In progress / partial</span></div>
+  <div class="seg open"><span class="num">3</span><span class="lbl">Still open</span></div>
+</div>
+
+<p>
+  <b>Key finding.</b> The balance has shifted since v0.1. PPR's validator now runs against the <b>official ICH
+  eCTD 3.2 DTD</b> (checksum-verified) and implements the <b>GCC Module&nbsp;1 v1.5</b> criteria as explicit
+  rules — the two items the first report flagged as most important before go-live are done in code. PPR also
+  gained background (queued) validation, a printable short/long PDF report, a cumulative dossier view,
+  department-wide search, an integration API and optional staff single sign-on. EXTEDO remains ahead on
+  reach and proof: validation sets kept current across every region by the vendor, true in-PDF annotation,
+  NeeS and eCTD&nbsp;4.0 support, and years of production use at 35+ authorities including the EMA. PPR
+  remains the only one of the two that runs the whole registration case — company portal, validation,
+  specialist review, decision and certificate — in one system.
+</p>
+<p>
+  <b>What is not yet done.</b> PPR's validation criteria have not been independently checked against a real
+  reference validator: the benchmark procedure is written (<code>docs/validation_benchmark.md</code>) and the
+  tooling exists, but the department has no EURSvalidator evaluation licence to run it against, so this has
+  not been executed. The new system-validation documentation (URS, risk assessment, IQ/OQ/PQ protocol) is
+  drafted and every requirement is traced to an automated test, but qualification execution and the HOD/QA/IT
+  sign-off have not happened. The GCC regional DTD PPR validates against is still transcribed from the
+  published specification text, because SFDA does not distribute the file itself.
+</p>
+<p>
+  <b>Recommendation (section 10, unchanged in substance).</b> Keep PPR as the registration and workflow system.
+  The two most important remaining steps are to run the validation benchmark against EURSvalidator (or another
+  reference validator) and to execute and sign off the qualification protocol, before go-live. If budget allows,
+  an integration in which PPR manages the case and calls an EXTEDO validator or review tool remains a viable
+  fallback if the benchmark turns up material gaps.
+</p>
+</section>
+
+<!-- ======================= 2. SCOPE ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">2</span>Scope, method and sources</h2>
+<h3>What was compared</h3>
+<p>
+  <b>PPR:</b> the code in the project repository as of 21 October 2026, including uncommitted work in progress
+  at the time of writing. This update reviewed the README, data models, validation rules (<code>apps/validation/</code>),
+  workflow, tests, and the new validation documentation set in <code>docs/validation/</code>
+  (URS, risk assessment, IQ/OQ/PQ protocol, traceability matrix) and <code>docs/validation_benchmark.md</code>.
+</p>
+<p>
+  <b>EXTEDO:</b> the products offered to regulatory authorities (EURS, EURSnext, EURSvalidator), plus
+  eCTDmanager where the applicant side is relevant. The wider EXTEDOpulse RIM suite (registration, safety,
+  quality and document hubs) is mentioned only where it fills a gap. This update re-checked EXTEDO's current
+  public pages; their structure has changed since v0.1 under EXTEDO's "a Cormeo brand" refresh, but the
+  products and their described capabilities have not.
+</p>
+<h3>Method and limitations</h3>
+<ul>
+  <li>EXTEDO was assessed from public material only: product information sheets, EXTEDO web pages and
+    announcements, and the EMA eSubmission page. No EXTEDO software was installed or tested, and no pricing
+    was available. This has not changed since v0.1.</li>
+  <li>Most EXTEDO claims come from the vendor. Customer counts differ between sources (25, 30 and 35+
+    authorities). They are quoted as EXTEDO's own claims.</li>
+  <li>"Not stated" in this report means that the feature was not described in the material reviewed. It does
+    not mean that EXTEDO lacks it. These points should be confirmed with the vendor.</li>
+  <li>PPR is a proof of concept. Statements about PPR describe what is in the code and its tests, not what has
+    been proven in a production deployment. Where a PPR claim is backed by an automated test or a specific
+    file, this report names it so a reader can verify it directly.</li>
+  <li><b>New in this version:</b> section 7 places real PPR screenshots (captured 21 October 2026 from the
+    running application with demonstration data) next to EXTEDO material. EXTEDO's current marketing pages
+    carry no embedded screenshots of the live product; where a real vendor screenshot could not be obtained,
+    the EXTEDO side is shown as a short, sourced description from vendor material instead of an image — this
+    is marked clearly on each pair and is not a simulated or reconstructed screenshot.</li>
+</ul>
+</section>
+
+<!-- ======================= 3. AT A GLANCE ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">3</span>The two systems at a glance</h2>
+<div class="cols2">
+  <div class="card tint">
+    <h4>PPR · Pharmaceutical Product Registration</h4>
+    <table class="tight">
+      <tr><td class="k" style="width:30mm;color:var(--muted)">Type</td><td>Web-based registration workflow system with built-in eCTD validation</td></tr>
+      <tr><td style="color:var(--muted)">Built by</td><td>PPR project team for the Pharmacy Department (in-house)</td></tr>
+      <tr><td style="color:var(--muted)">Users</td><td>Company applicants, specialist reviewers, the lead reviewer, the HOD and an administrator</td></tr>
+      <tr><td style="color:var(--muted)">Technology</td><td>Django, Tailwind CSS, SQLite locally and MySQL on PythonAnywhere</td></tr>
+      <tr><td style="color:var(--muted)">Languages</td><td>English and Arabic (right-to-left)</td></tr>
+      <tr><td style="color:var(--muted)">Validation</td><td>31 rules in 3 layers (XML schema, business rules incl. GCC Module&nbsp;1 v1.5, file compliance), against the official ICH eCTD 3.2 DTD</td></tr>
+      <tr><td style="color:var(--muted)">Status</td><td>Proof of concept with an automated test suite (23 traced requirements); qualification protocol drafted but not yet executed; not yet in production</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>EXTEDO · EURS, EURSnext, EURSvalidator</h4>
+    <table class="tight">
+      <tr><td class="k" style="width:30mm;color:var(--muted)">Type</td><td>Commercial eCTD/NeeS validation and review software for authorities</td></tr>
+      <tr><td style="color:var(--muted)">Vendor</td><td>EXTEDO (Germany), a Regulatory Information Management (RIM) vendor, now "a Cormeo brand"</td></tr>
+      <tr><td style="color:var(--muted)">Users</td><td>Agency validators and assessors, including external assessors (EURSnext)</td></tr>
+      <tr><td style="color:var(--muted)">Technology</td><td>Windows desktop and server services; EURSnext runs in the browser</td></tr>
+      <tr><td style="color:var(--muted)">Languages</td><td>English; Arabic is not mentioned in the material reviewed</td></tr>
+      <tr><td style="color:var(--muted)">Validation</td><td>Official validation sets per region, including all GCC member states, sold as subscription packages, selected automatically</td></tr>
+      <tr><td style="color:var(--muted)">Status</td><td>Mature product; selected for EMA use and offered to EU national authorities</td></tr>
+    </table>
+  </div>
+</div>
+
+<h3>Where each system fits in the regulatory process</h3>
+<table>
+<tr><th style="width:34mm">Process step</th><th style="width:8mm">PPR</th><th>PPR</th><th style="width:8mm">EXTEDO</th><th>EXTEDO (authority-side products)</th></tr>
+<tr><td>Applicant builds the dossier</td><td><span class="pill pill-none">—</span></td><td>Not covered. Companies build the eCTD with their own tools.</td><td><span class="pill pill-full">✓</span></td><td>eCTDmanager (applicant product) builds, validates and publishes dossiers.</td></tr>
+<tr><td>Applicant submits</td><td><span class="pill pill-full">✓</span></td><td>Company portal: create the application, upload the sequence ZIP, submit.</td><td><span class="pill pill-partial">↝</span></td><td>Via gateway: receipt through CESP connect, EMA Common Repository connector, server monitoring.</td></tr>
+<tr><td>Technical validation</td><td><span class="pill pill-full">✓</span></td><td>Automatic on submission or queued in the background; 31 rules against the official DTD and GCC M1 v1.5.</td><td><span class="pill pill-full">✓</span></td><td>EURSvalidator with official regional validation sets, auto-selected.</td></tr>
+<tr><td>Scientific review</td><td><span class="pill pill-full">✓</span></td><td>Assessment per CTD module by a named specialist, recorded in the system.</td><td><span class="pill pill-full">✓</span></td><td>Viewing, search, annotation and export of annotations for the assessment report.</td></tr>
+<tr><td>Case management (assignment, questions, deadlines)</td><td><span class="pill pill-full">✓</span></td><td>Automatic team assignment by workload, information requests, status tracking, notifications.</td><td><span class="pill pill-na">?</span></td><td>Not stated: filtering by regulatory activity; case workflow through the API or other EXTEDO hubs.</td></tr>
+<tr><td>Decision and certificate</td><td><span class="pill pill-full">✓</span></td><td>HOD approves or rejects; bilingual certificate with validity period.</td><td><span class="pill pill-none">—</span></td><td>Not part of EURS.</td></tr>
+</table>
+</section>
+
+<!-- ======================= 4. CAPABILITY MATRIX ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">4</span>Capability coverage matrix</h2>
+<p class="faint">
+  <span class="pill pill-full">Full</span> available and substantial &nbsp;
+  <span class="pill pill-partial">Partial</span> available but limited &nbsp;
+  <span class="pill pill-none">None</span> not available &nbsp;
+  <span class="pill pill-na">Not stated</span> not described in the public material
+  &nbsp;·&nbsp; changes since v0.1 are marked <b>▲</b>
+</p>
+<table class="tight">
+<tr><th style="width:46mm">Capability</th><th style="width:19mm">PPR</th><th style="width:19mm">EXTEDO</th><th>Comment</th></tr>
+<tr><td colspan="4" style="background:var(--brand-800);color:#fff;font-weight:700;">VALIDATION</td></tr>
+<tr><td>eCTD v3.2.2 validation</td><td><span class="pill pill-full">Full ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR now validates against the official ICH DTD, checksum-pinned (was: reference copy)</td></tr>
+<tr><td>GCC Module 1 validation</td><td><span class="pill pill-full">Full ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR implements GCC M1 v1.5 as rules (was: existence/well-formedness only). Regional DTD is still transcribed from the spec, not SFDA's own file</td></tr>
+<tr><td>NeeS and other formats</td><td><span class="pill pill-none">None</span></td><td><span class="pill pill-full">Full</span></td><td>PPR accepts eCTD only — unchanged</td></tr>
+<tr><td>eCTD 4.0 readiness</td><td><span class="pill pill-none">None ▲</span></td><td><span class="pill pill-partial">Partial</span></td><td>PPR now recognises an eCTD 4.0 package and refuses it with a clear message (was: no handling); still no validation support. EXTEDO says it is "prepared for" eCTD 4.0</td></tr>
+<tr><td>PDF compliance checks</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-full">Full</span></td><td>PPR: version, security, JavaScript, fonts — unchanged</td></tr>
+<tr><td>Validation report export</td><td><span class="pill pill-full">Full ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR now adds a printable short/long PDF report alongside on-screen and CSV (was: on-screen/CSV only). EXTEDO additionally auto-saves and emails the PDF itself</td></tr>
+<tr><td colspan="4" style="background:var(--brand-800);color:#fff;font-weight:700;">REVIEW</td></tr>
+<tr><td>CTD tree and dossier viewer</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-full">Full</span></td><td>Unchanged</td></tr>
+<tr><td>Lifecycle (cumulative) view</td><td><span class="pill pill-full">Full ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR's "Current dossier" tab now applies replace/append/delete across all accepted sequences (was: sequence-by-sequence only)</td></tr>
+<tr><td>PDF annotation</td><td><span class="pill pill-partial">Partial ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR adds page-linked review notes, quoting selected text, inserted into the module assessment (was: none). Still not in-PDF highlighting/markup the way EXTEDO describes it</td></tr>
+<tr><td>Full-text search</td><td><span class="pill pill-full">Full ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR now searches every dossier a reader may open, not just the one open in the assistant (was: single-dossier only)</td></tr>
+<tr><td>AI dossier assistant</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-na">Not stated</span></td><td>PPR: cited answers, offline mode without a key; a smoke-test command exists but a live-model run has not been recorded</td></tr>
+<tr><td colspan="4" style="background:var(--brand-800);color:#fff;font-weight:700;">WORKFLOW AND ADMINISTRATION</td></tr>
+<tr><td>Applicant portal</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-none">None</span></td><td>EXTEDO receives dossiers through gateways — unchanged</td></tr>
+<tr><td>Specialist assignment per module</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-na">Not stated</span></td><td>PPR: automatic by workload is now the default, with manual HOD assignment as a fallback</td></tr>
+<tr><td>Information requests</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-na">Not stated</span></td><td>Unchanged</td></tr>
+<tr><td>Decision and certificate</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-none">None</span></td><td>Unchanged</td></tr>
+<tr><td>KPIs and dashboards</td><td><span class="pill pill-full">Full ▲</span></td><td><span class="pill pill-na">Not stated</span></td><td>PPR: HOD dashboard with status breakdown, reviewer workload and average days to decision — a complete departmental KPI view, not an enterprise BI suite</td></tr>
+<tr><td>Audit trail</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-full">Full</span></td><td>Unchanged</td></tr>
+<tr><td>Arabic interface</td><td><span class="pill pill-full">Full</span></td><td><span class="pill pill-na">Not stated</span></td><td>Unchanged — see section 7 for a real screenshot</td></tr>
+<tr><td colspan="4" style="background:var(--brand-800);color:#fff;font-weight:700;">PLATFORM</td></tr>
+<tr><td>Integration API / SSO</td><td><span class="pill pill-partial">Partial ▲</span></td><td><span class="pill pill-full">Full</span></td><td>PPR now has a key-protected read-only JSON API and optional staff OpenID Connect SSO (was: none). No write API, Active Directory binding or document-management connectors yet</td></tr>
+<tr><td>Scale and parallel processing</td><td><span class="pill pill-partial">Partial ▲</span></td><td><span class="pill pill-full">Full</span></td><td>A background validation queue now decouples large uploads from the web request (was: fully synchronous); still a single web application, not distributed services</td></tr>
+<tr><td>Formal system validation</td><td><span class="pill pill-partial">Partial ▲</span></td><td><span class="pill pill-full">Full</span></td><td>URS, risk assessment, IQ/OQ/PQ protocol and an automated traceability matrix are now drafted and every requirement is tested (was: none); execution and sign-off are still outstanding</td></tr>
+</table>
+</section>
+
+<!-- ======================= 5. DETAILED COMPARISON ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">5</span>Detailed comparison</h2>
+<table class="tight">
+<tr><th style="width:30mm">Area</th><th>PPR</th><th>EXTEDO</th></tr>
+<tr><td>Primary purpose</td><td>Manage a marketing authorisation application from submission to certificate, with validation built in.</td><td>Validate, accept, import, review and maintain eCTD and NeeS submissions inside an authority.</td></tr>
+<tr><td>Submission intake</td><td>Companies upload one ZIP per sequence (0000, 0001, …) through the portal. Safety checks on the ZIP: no zip-slip, symlinks, encryption or zip bombs.</td><td>Import from gateways: CESP connect (automatic import of CESP/FTP receipts), CR Connect (EMA Common Repository), and server monitoring that unzips and imports automatically.</td></tr>
+<tr><td>Application types</td><td>New drug, generic, variation, renewal. The modules required for each type are enforced by rule BR-06.</td><td>Any standard submission format and regulatory activity; filtering by activity and by product status.</td></tr>
+<tr><td>Validation engine</td><td>31 rules in 3 layers against the official ICH eCTD 3.2 DTD and the GCC Module&nbsp;1 v1.5 criteria, each rule a small class so new ones are easy to add. Runs synchronously in development or in a background queue in production (<code>VALIDATION_MODE</code>); any error fails the sequence, warnings let it pass.</td><td>EURSvalidator applies official validation sets that EXTEDO keeps current in cooperation with authorities. The validation set and DTD are selected automatically. Batch validation of all pending submissions.</td></tr>
+<tr><td>Validation results</td><td>Stored per run with findings; shown as a report with CSV export and a printable short/long PDF report, linked from the validation email.</td><td>Short PDF report (errors) and long PDF report (errors, warnings and details); reports are saved automatically and can be emailed.</td></tr>
+<tr><td>Dossier navigation</td><td>CTD tree for each accepted sequence, plus a cumulative "Current dossier" view applying every replace/append/delete across sequences, with links to the documents (served through access-controlled views).</td><td>Navigation through the whole lifecycle of a product, envelope information, and table-of-contents elements.</td></tr>
+<tr><td>Document review tools</td><td>PDFs open in the browser. Reviewers add page-linked notes, optionally quoting selected text, collected for the assessment. The assistant can search and read documents and cites <code>sequence/path p.N</code>.</td><td>Annotate, highlight and hyperlink PDFs without changing the originals; export annotations to support the assessment report; full-text search across documents, envelopes, TOC elements and annotations.</td></tr>
+<tr><td>Review organisation</td><td>The HOD sets each reviewer's specialties (M1–M5); the review team is now assembled automatically by workload (least-loaded qualified reviewer per module, with a default lead), or by hand when a module has no qualified reviewer. Reviewers write assessments only for their own modules; the lead sends questions and the recommendation once every module is assessed.</td><td>Parallel work by many users. Not stated: per-module assignment, recommendation or decision workflow.</td></tr>
+<tr><td>Communication with applicants</td><td>Information requests with due dates; the company answers with a validated response sequence. In-app and email notifications.</td><td>Not stated for EURS (handled outside the review tool).</td></tr>
+<tr><td>Decision</td><td>The HOD approves (bilingual certificate with a validity period), rejects, or returns the application to the lead.</td><td>Not part of EURS.</td></tr>
+<tr><td>AI assistance</td><td>Dossier assistant on every page: knows the current application and document, uses read-only tools limited to what the reader may see, and runs in offline mode (search passages) without an API key; a smoke-test command checks a configured model's citations.</td><td>Not stated in the material reviewed.</td></tr>
+<tr><td>Security and access</td><td>Role-based access, documents served only to authorised users, audit trail in <code>StatusHistory</code>, plus optional OpenID Connect single sign-on for staff.</td><td>Extensive audit trail of user activity; Active Directory integration; optional storage in a document management system (Documentum, FileNet).</td></tr>
+<tr><td>Integration</td><td>Key-protected read-only JSON API for other Ministry systems, plus optional SSO (was: Django admin only).</td><td>REST API, command-line automation engine, Web Broker for task queues, connectors for portals and document management systems.</td></tr>
+<tr><td>Scale</td><td>Single web application on PythonAnywhere; large uploads and validation now run through a background worker queue, decoupled from the web request.</td><td>Scales beyond 400 users; background Windows services and load balancing for long imports and validations.</td></tr>
+<tr><td>Deployment</td><td>Web; PythonAnywhere with MySQL. No client software.</td><td>EURS: desktop client with server services, installed on site. EURSnext: browser access, suited to external assessors.</td></tr>
+<tr><td>Language</td><td>English and Arabic, with a full right-to-left layout.</td><td>English; Arabic not mentioned.</td></tr>
+<tr><td>Cost and ownership</td><td>Owned by the department; hosting costs and staff time. Can be changed freely.</td><td>Commercial licences and validation-set subscriptions, priced per region (prices not public). Updates to standards are the vendor's job.</td></tr>
+<tr><td>Validation documentation</td><td>URS (23 requirements), risk assessment (12 hazards) and an IQ/OQ/PQ qualification protocol are drafted, with every requirement traced to automated tests. Execution and HOD/QA/IT sign-off have not happened yet.</td><td>Not stated in the material reviewed; EXTEDO's flyers state the product is validated by the vendor and "installed and validated within days" at a customer site.</td></tr>
+<tr><td>Maturity and references</td><td>Proof of concept with automated tests and a drafted validation pack; no production use yet.</td><td>Selected for EMA use and offered to EU national authorities; EXTEDO reports more than 35 authority customers, including GCC agencies.</td></tr>
+</table>
+</section>
+
+<!-- ======================= 6. VALIDATION IN DEPTH ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">6</span>eCTD technical validation in depth</h2>
+<p>
+  Technical validation was the HOD's core requirement, so it is compared in more detail. Both systems follow
+  the same principle as the FDA and EMA: an automated technical check must pass before scientific review
+  starts.
+</p>
+<h3>PPR validation rules</h3>
+<table class="tight">
+<tr><th style="width:28mm">Layer</th><th style="width:20mm">Rules</th><th>What is checked</th></tr>
+<tr><td>1. XML schema</td><td>SCH-01 to SCH-04, GCC-01 to GCC-02</td><td><code>index.xml</code> exists, is well-formed and is valid against the official ICH eCTD 3.2 DTD; the regional Module&nbsp;1 XML exists, is well-formed and its root is <code>gc:gc-backbone</code>.</td></tr>
+<tr><td>2. Business rules</td><td>BR-01 to BR-10, GCC-03 to GCC-09</td><td>Sequence numbering; <code>index-md5.txt</code>; every leaf points to an existing file with a matching MD5; no unreferenced files; required modules for the application type; lifecycle operations resolve to earlier accepted sequences; ICH file naming and path length; the GCC envelope (receiving agency, submission type and unit, related sequences) and the required Module&nbsp;1 documents for Oman, including Arabic and English leaflets.</td></tr>
+<tr><td>3. File compliance</td><td>FC-00 to FC-08</td><td>Safe ZIP; accepted file formats (DOCX only in Module&nbsp;1); PDFs not password-protected; PDF version 1.4–1.7; no JavaScript or launch actions; embedded fonts (warning); size limit; no empty files; searchable text rather than scanned images (warning).</td></tr>
+</table>
+
+<h3>How this compares with EURSvalidator</h3>
+<div class="cols2">
+  <div class="card">
+    <h4 style="color:var(--ok-fg)">Where PPR is now on par</h4>
+    <ul>
+      <li><b>The official ICH eCTD 3.2 DTD</b>, checksum-verified against the published file (was a reference copy in v0.1)</li>
+      <li><b>The GCC Module&nbsp;1 v1.5 criteria</b> implemented as rules: regional structure, envelope fields, submission type and unit, required Module&nbsp;1 documents</li>
+      <li>Checksums of the backbone and of every leaf</li>
+      <li>Broken references and unreferenced files</li>
+      <li>Lifecycle operations against earlier sequences</li>
+      <li>PDF security, version, JavaScript and fonts</li>
+      <li>File naming and path-length rules</li>
+      <li>Clear separation of errors and warnings</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4 style="color:var(--warn-fg)">Where EURSvalidator still goes further</h4>
+    <ul>
+      <li>Validation sets kept current with every specification change, in cooperation with authorities, across <b>every</b> region EXTEDO supports — not only the GCC</li>
+      <li>Automatic selection of the validation set and DTD across those regions</li>
+      <li>NeeS, and actual preparation for eCTD&nbsp;4.0 (PPR only detects and refuses an eCTD 4.0 package)</li>
+      <li>PDF reports that auto-save and can be emailed directly from the tool</li>
+      <li>The GCC regional DTD itself: EXTEDO's is the authority-distributed file; PPR's is still transcribed from the specification text, because SFDA does not publish the file</li>
+      <li>Years of production use and, by EXTEDO's account, independent validation at 35+ authorities</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout amber">
+  <b>Practical risk, updated.</b> PPR's validation criteria are now aligned with the published GCC Module&nbsp;1
+  v1.5 specification and the official ICH DTD — the design gap from v0.1 is closed. What remains is
+  <b>confirmation</b>: this alignment has not been independently checked against EURSvalidator or another
+  reference validator on the same dossiers. The benchmark procedure and tooling are ready
+  (<code>docs/validation_benchmark.md</code>, <code>manage.py benchmark_validation</code>, automated regression
+  tests in <code>apps/validation/benchmark.py</code>), but the department has no EURSvalidator evaluation
+  licence to run it against, so PQ-02 in the qualification protocol is still open. GCC applicants typically
+  validate their sequences with EXTEDO tools before submitting; until the benchmark runs, there remains a
+  residual chance that a dossier which passed the applicant's check could fail in PPR, or the reverse. This is
+  now the single most important step before go-live.
+</div>
+</section>
+
+<!-- ======================= 7. VISUAL COMPARISON ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">7</span>Visual comparison: PPR and EXTEDO side by side</h2>
+<p>
+  PPR's screens below are real screenshots, captured on 21 October 2026 from the running application using
+  demonstration data (fictional companies and products seeded for review — no real applicant information).
+  EXTEDO's current marketing pages do not carry screenshots of the live product, so for most pairs the EXTEDO
+  side is shown as a short, directly sourced description instead of a reconstructed or simulated image. Any
+  EXTEDO screenshot that does appear is reproduced from EXTEDO's own published material and credited to it —
+  it is not an independent test of the product (see section 2).
+</p>
+
+<div class="compare-pair">
+  <div class="pair-title"><span>A &nbsp;·&nbsp; Sign-in and branding</span><span class="cap">PPR: live screenshot, 21 Oct 2026</span></div>
+  <div class="compare-grid">
+    <div class="compare-cell">
+      <div class="who">PPR</div>
+      <img src="images/ppr-vs-extedo/ppr-login.jpg" alt="PPR sign-in page with demonstration accounts">
+      <div class="desc">Bilingual branding, one-click demonstration accounts for every role, language switch top-right.</div>
+    </div>
+    <div class="compare-cell extedo">
+      <div class="who">EXTEDO</div>
+      <div class="vendor-note">
+        No independently obtained screenshot — EXTEDO software was not installed or tested, and the vendor's
+        current marketing pages carry no embedded product screenshots.<br><br>
+        <b>From vendor material:</b> EURS runs as a Windows desktop client with server services, installed on
+        site; EURSnext gives browser access, built for external assessors. English interface — Arabic is not
+        mentioned in the material reviewed.
+        <div class="src">Source: EXTEDO EURS Product Information (flyer); EXTEDO EURSnext product page</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="compare-pair">
+  <div class="pair-title"><span>B &nbsp;·&nbsp; Technical validation report</span><span class="cap">PPR: MA-2026-00014, sequence 0000 — 3 errors, 1 warning</span></div>
+  <div class="compare-grid">
+    <div class="compare-cell">
+      <div class="who">PPR</div>
+      <img src="images/ppr-vs-extedo/ppr-validation-report-summary.jpg" alt="PPR validation report summary with per-layer findings">
+      <div class="desc">Three-layer summary, SHA-256 of the package, GCC envelope fields, and filterable findings by severity — this example fails on business-rule and file-compliance checks.</div>
+    </div>
+    <div class="compare-cell extedo">
+      <div class="who">EXTEDO</div>
+      <div class="vendor-note">
+        No independently obtained screenshot.<br><br>
+        <b>From vendor material:</b> EURSvalidator issues a short PDF report (errors) and a long PDF report
+        (errors, warnings and full detail); both save automatically and can be emailed. The validation set and
+        DTD are selected automatically for the detected region.
+        <div class="src">Source: EXTEDO EURSvalidator Product Information (flyer)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="compare-pair">
+  <div class="pair-title"><span>C &nbsp;·&nbsp; Dossier and CTD navigation</span><span class="cap">PPR: MA-2026-00018, current (cumulative) dossier</span></div>
+  <div class="compare-grid">
+    <div class="compare-cell">
+      <div class="who">PPR</div>
+      <img src="images/ppr-vs-extedo/ppr-current-dossier.jpg" alt="PPR current dossier CTD tree">
+      <div class="desc">The CTD tree after every accepted sequence is applied in order; replaced and deleted documents drop out automatically.</div>
+    </div>
+    <div class="compare-cell extedo">
+      <div class="who">EXTEDO</div>
+      <div class="vendor-note">
+        No independently obtained screenshot.<br><br>
+        <b>From vendor material:</b> EURS navigates the whole lifecycle of a product — envelope information,
+        table-of-contents elements and every prior sequence — from the Windows desktop client or the EURSnext
+        browser client.
+        <div class="src">Source: EXTEDO EURS Product Information (flyer)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="compare-pair">
+  <div class="pair-title"><span>D &nbsp;·&nbsp; Document review</span><span class="cap">PPR: in-app PDF.js viewer with review notes</span></div>
+  <div class="compare-grid">
+    <div class="compare-cell">
+      <div class="who">PPR</div>
+      <img src="images/ppr-vs-extedo/ppr-pdf-viewer-notes.jpg" alt="PPR PDF viewer with the review notes panel">
+      <div class="desc">PDFs open in the browser with page navigation and zoom; a reviewer's note links to a page and an optional text quote, without touching the file.</div>
+    </div>
+    <div class="compare-cell extedo">
+      <div class="who">EXTEDO</div>
+      <div class="vendor-note">
+        No independently obtained screenshot.<br><br>
+        <b>From vendor material:</b> reviewers annotate, highlight and hyperlink PDFs without changing the
+        original files; full-text search spans documents, envelopes, TOC elements and annotations; annotations
+        export to support the assessment report.
+        <div class="src">Source: EXTEDO EURS Product Information (flyer)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>PPR capabilities with no EXTEDO equivalent in the material reviewed</h3>
+<p class="faint">EURS and EURSnext validate and review submissions inside an authority; they do not run the registration case itself. The six screens below have no counterpart in the vendor material because EXTEDO's own flyers describe this ground as outside EURS (see sections 3–5).</p>
+<div class="solo-gallery">
+  <div class="solo-card">
+    <img src="images/ppr-vs-extedo/ppr-application-overview.jpg" alt="PPR application case overview with status timeline">
+    <div class="cap"><b>The whole case in one place</b>A single timeline from preparation to decision issued, with the review team and next step always visible.<span class="tag-no-extedo">EXTEDO: "not part of EURS"</span></div>
+  </div>
+  <div class="solo-card">
+    <img src="images/ppr-vs-extedo/ppr-module-assessment.jpg" alt="PPR module assessment screen">
+    <div class="cap"><b>Per-module specialist assessment</b>Each CTD module goes to one named specialist; the lead reviewer records the team's progress and recommendation.<span class="tag-no-extedo">EXTEDO: "not stated" — no per-module workflow described</span></div>
+  </div>
+  <div class="solo-card">
+    <img src="images/ppr-vs-extedo/ppr-dossier-assistant.jpg" alt="PPR dossier assistant drawer">
+    <div class="cap"><b>AI dossier assistant</b>Answers questions from the dossier the reader may see, citing the document and page; shows which host receives the text.<span class="tag-no-extedo">EXTEDO: "not stated" in the material reviewed</span></div>
+  </div>
+  <div class="solo-card">
+    <img src="images/ppr-vs-extedo/ppr-certificate.jpg" alt="PPR bilingual approval certificate">
+    <div class="cap"><b>Bilingual approval certificate</b>Issued automatically on HOD approval, with a validity period, in English and Arabic.<span class="tag-no-extedo">EXTEDO: "not part of EURS"</span></div>
+  </div>
+  <div class="solo-card">
+    <img src="images/ppr-vs-extedo/ppr-reviewer-specialties.jpg" alt="PPR reviewer specialties grid">
+    <div class="cap"><b>Reviewer specialties and workload</b>The HOD sets which CTD modules each reviewer may assess; teams are assembled automatically from this grid.<span class="tag-no-extedo">EXTEDO: "not stated" — no equivalent screen described</span></div>
+  </div>
+  <div class="solo-card">
+    <img src="images/ppr-vs-extedo/ppr-arabic-rtl.jpg" alt="PPR dashboard in Arabic, right-to-left layout">
+    <div class="cap"><b>Full Arabic, right-to-left</b>Every screen, including this HOD dashboard, mirrors into a complete RTL layout — not just translated labels.<span class="tag-no-extedo">EXTEDO: "not mentioned in the material reviewed"</span></div>
+  </div>
+</div>
+</section>
+
+<!-- ======================= 8. STRENGTHS/WEAKNESSES ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">8</span>Strengths and weaknesses</h2>
+<div class="cols2">
+  <div class="card tint">
+    <h4>PPR · strengths</h4>
+    <ul>
+      <li>Covers the complete case, from application to certificate, in one system</li>
+      <li>Validates against the official ICH DTD and the GCC Module&nbsp;1 v1.5 criteria, not a reference copy</li>
+      <li>Review by specialists per CTD module, with a lead reviewer and automatic assignment by workload</li>
+      <li>Arabic and English, built for the department's own process</li>
+      <li>AI assistant that answers from the dossier and cites page references</li>
+      <li>Full validation documentation pack drafted, every requirement traced to an automated test</li>
+      <li>Background validation queue, department-wide search, printable PDF reports, staff SSO and a
+        read-only API added since the first comparison</li>
+      <li>Owned by the department: no licence fees, and it can be changed quickly</li>
+      <li>Web-only, so there is no client software to install</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>PPR · weaknesses</h4>
+    <ul>
+      <li>Validation criteria are implemented but not yet benchmarked against a live reference validator — no
+        EURSvalidator licence to test against</li>
+      <li>The GCC regional DTD is still transcribed from the published specification, not SFDA's own distributed file</li>
+      <li>Qualification protocol (IQ/OQ/PQ) and risk assessment are drafted but not yet executed or signed off</li>
+      <li>No true in-PDF annotation — review notes are linked to a page, not drawn on the document itself</li>
+      <li>Still a single web application; a background queue was added, but there is no distributed/multi-instance deployment</li>
+      <li>No eCTD 4.0 or NeeS support (eCTD 4.0 is now detected and refused cleanly, not silently mishandled)</li>
+      <li>Relies on a small team for support</li>
+    </ul>
+  </div>
+</div>
+<div class="cols2" style="margin-top:4mm;">
+  <div class="card">
+    <h4>EXTEDO · strengths</h4>
+    <ul>
+      <li>Validation sets aligned with authorities, covering the GCC and kept current by the vendor, across every region it supports</li>
+      <li>Proven at EMA and many national authorities</li>
+      <li>Rich review tools: true annotation, highlighting and hyperlinking of PDFs; full-text search; lifecycle navigation</li>
+      <li>Enterprise features: API, Active Directory, document management integration, 400+ users</li>
+      <li>Vendor support, training and consulting (Agency Services)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>EXTEDO · weaknesses</h4>
+    <ul>
+      <li>No applicant portal, case workflow, decision or certificate in EURS itself</li>
+      <li>Licence and subscription costs (not public), plus local partner fees</li>
+      <li>Mainly a Windows desktop client; full web access only through EURSnext</li>
+      <li>Arabic interface not mentioned</li>
+      <li>Customisation depends on the vendor</li>
+      <li>No public screenshots of the live product on EXTEDO's current marketing site (section 7)</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ======================= 9. GAP ANALYSIS / PROGRESS ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">9</span>Progress since v0.1 and what PPR still needs for production</h2>
+<p>
+  The first comparison listed twelve gaps between PPR and the level of the EXTEDO tools for the parts the
+  department needs. The table below carries the same numbering and tracks what has happened to each one since
+  18 October 2026.
+</p>
+<table class="tight">
+<tr><th style="width:7mm">#</th><th style="width:24mm">Gap (v0.1)</th><th style="width:19mm">Status</th><th>What happened / what is left</th><th style="width:15mm">Priority</th></tr>
+<tr><td>1</td><td>Reference DTD instead of the official one</td><td><span class="pill pill-closed">Closed</span></td><td>The official ICH eCTD v3.2.2 DTD is bundled and checksum-verified (<code>apps/validation/dtd/README.md</code>, <code>test_bundled_dtd_is_the_official_ich_dtd</code>).</td><td class="prio-high">High</td></tr>
+<tr><td>2</td><td>GCC Module 1 checked only for well-formedness</td><td><span class="pill pill-closed">Closed</span></td><td>GCC M1 v1.5 implemented as rules GCC-01 to GCC-09 (<code>apps/validation/regions/gcc.py</code>). The regional DTD file itself is still a transcription — tracked below as a residual note, not a reopened gap.</td><td class="prio-high">High</td></tr>
+<tr><td>3</td><td>No benchmark against a reference validator</td><td><span class="pill pill-open">Open</span></td><td>Procedure, sample-package generator and comparison tooling are built and tested (<code>docs/validation_benchmark.md</code>, <code>apps/validation/benchmark.py</code>). Not run: the department has no EURSvalidator evaluation licence. This is PQ-02 in the qualification protocol.</td><td class="prio-high">High</td></tr>
+<tr><td>4</td><td>Synchronous validation on PythonAnywhere</td><td><span class="pill pill-closed">Closed</span></td><td><code>VALIDATION_MODE=queue</code> plus <code>run_validation_worker</code> as an always-on task; stale jobs are requeued and failures notify the company (<code>test_validation_queue.py</code>). Upload size limits for very large dossiers still need confirming in production (PQ-01).</td><td class="prio-high">High</td></tr>
+<tr><td>5</td><td>No formal system validation</td><td><span class="pill pill-progress">In progress</span></td><td>URS (23 requirements), risk assessment (12 hazards), an IQ/OQ/PQ protocol and an automated traceability matrix are drafted, with every requirement linked to tests. All three documents are "version 0.1, draft" with blank signature blocks and an empty execution log — qualification execution and HOD/QA/Ministry&nbsp;IT sign-off are the work still to do.</td><td class="prio-high">High</td></tr>
+<tr><td>6</td><td>No cumulative lifecycle view</td><td><span class="pill pill-closed">Closed</span></td><td>"Current dossier" tab applies replace/append/delete across all accepted sequences (<code>test_lifecycle_view.py</code>).</td><td class="prio-med">Medium</td></tr>
+<tr><td>7</td><td>Validation report only on screen and as CSV</td><td><span class="pill pill-closed">Closed</span></td><td>Printable short and long PDF validation reports added (<code>test_validation_report.py</code>).</td><td class="prio-med">Medium</td></tr>
+<tr><td>8</td><td>No review annotations</td><td><span class="pill pill-progress">Partly closed</span></td><td>Page-linked notes, optionally quoting selected text, collected and inserted into the module assessment (<code>test_document_notes.py</code>). This is notes alongside the page, not true in-PDF highlighting/markup — the original gap's "kept separate from the file" goal is met; the annotation-on-the-document itself is not.</td><td class="prio-med">Medium</td></tr>
+<tr><td>9</td><td>Assistant tested only in offline mode</td><td><span class="pill pill-open">Open</span></td><td>A data-protection decision framework is written (<code>docs/assistant_data_protection.md</code>) and a smoke-test command exists, but the HOD has not yet recorded a decision on where the model runs, and no live-key test has been logged.</td><td class="prio-med">Medium</td></tr>
+<tr><td>10</td><td>Search limited to one dossier</td><td><span class="pill pill-closed">Closed</span></td><td>Full-text search across every dossier a reader may open, grouped by document, with a MySQL FULLTEXT index (<code>test_search.py</code>).</td><td class="prio-low">Low</td></tr>
+<tr><td>11</td><td>No integration interface or single sign-on</td><td><span class="pill pill-closed">Closed</span></td><td>Key-protected read-only API plus optional OpenID Connect SSO for staff (<code>docs/sso.md</code>, <code>test_api_and_sso.py</code>).</td><td class="prio-low">Low</td></tr>
+<tr><td>12</td><td>No eCTD 4.0 or NeeS support</td><td><span class="pill pill-open">Open</span></td><td>An eCTD 4.0 package is now recognised and refused with a clear message instead of being mishandled. No actual eCTD 4.0 or NeeS validation support was added; still low priority while GCC authorities remain on eCTD 3.2.</td><td class="prio-low">Low</td></tr>
+</table>
+<p class="faint">
+  Summary: 7 of 12 closed outright, 1 partly closed, 1 in progress with documentation complete but unexecuted,
+  3 still open. The three open items (3, 9, 12) and the in-progress item (5) are the focus for the next cycle
+  of work; of these, item 3 (the benchmark) and item 5 (qualification sign-off) are what stand between PPR and
+  a defensible go-live decision.
+</p>
+</section>
+
+<!-- ======================= 10. OPTIONS AND RECOMMENDATION ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">10</span>Options and recommendation</h2>
+<table class="tight">
+<tr><th style="width:24mm">Option</th><th>Description</th><th style="width:38mm">Advantages</th><th style="width:38mm">Disadvantages</th></tr>
+<tr><td><b>A. PPR on its own</b></td><td>Continue PPR; run the benchmark and execute the qualification protocol (section 9, items 3 and 5).</td><td>Lowest cost; full control; Arabic; complete workflow; the design-level validation gap from v0.1 is already closed.</td><td>The team must still prove its GCC criteria against a reference validator and complete formal sign-off.</td></tr>
+<tr><td><b>B. EXTEDO on its own</b></td><td>License EURS/EURSnext and EURSvalidator; manage the workflow outside the system (email, paper, spreadsheets).</td><td>Proven validation and review tools; vendor support.</td><td>No portal, assignment, decision or certificate; licence costs; English only.</td></tr>
+<tr><td><b>C. Hybrid</b></td><td>PPR manages the case, portal and decisions; an EXTEDO validator or EURS is called through its API, or used alongside PPR for validation and review.</td><td>Best validation and review depth together with the department's own workflow.</td><td>Licence costs plus integration work; two systems to support.</td></tr>
+</table>
+
+<p><b>Recommendation.</b> Proceed with option A and keep option C open, same as v0.1 — but the next steps have narrowed:</p>
+<ol>
+  <li>Run the validation benchmark against EURSvalidator or another reference validator (gap 3 / PQ-02). This
+    is now the single highest-value remaining step: the tooling is ready, only the reference run is missing.
+    A trial or evaluation licence could be requested from EXTEDO or its regional partner for this purpose.</li>
+  <li>Execute the IQ/OQ/PQ qualification protocol in a production-like environment and obtain the HOD/QA/Ministry&nbsp;IT
+    sign-off on the URS, risk assessment and qualification protocol (gap 5).</li>
+  <li>Record the HOD's decision on where the dossier assistant's language model runs, and log a live-key test
+    before relying on written answers in production (gap 9).</li>
+  <li>If the benchmark shows differences that are costly to close, or dossier volumes grow beyond what
+    PythonAnywhere can handle, move to option C and let PPR call an external validator while keeping its
+    workflow, Arabic interface and assistant.</li>
+  <li>Ask EXTEDO to confirm the points marked "Not stated" in this report, and to provide a price for a GCC
+    validation-set subscription or evaluation licence, so the options can be compared on cost. This has not
+    yet been done.</li>
+</ol>
+</section>
+
+<!-- ======================= APPENDIX A: SOURCES ======================= -->
+<section class="page">
+<h2 class="section-title"><span class="num">A</span>Sources</h2>
+<p class="faint">Vendor material is quoted as the vendor's own claims. EXTEDO links re-checked 21 October 2026; the PPR comparison report v0.1 was based on material retrieved 18 October 2026.</p>
+<h4>PPR</h4>
+<ul>
+  <li>PPR project repository: <code>README.md</code>, <code>apps/applications</code>, <code>apps/validation</code>, <code>apps/assistant</code>, <code>apps/accounts</code>, <code>tests/</code> (state as of 21 October 2026)</li>
+  <li>PPR-CMP-001 v0.1, Comparative assessment report (18 October 2026) — the version this report updates</li>
+  <li><code>docs/validation/urs.md</code>, <code>risk_assessment.md</code>, <code>iq_oq_pq.md</code>, <code>traceability.md</code> — PPR-VAL-URS, PPR-VAL-RA, PPR-VAL-QP (version 0.1, draft)</li>
+  <li><code>docs/validation_benchmark.md</code> — benchmark procedure against a reference validator</li>
+  <li><code>docs/sso.md</code>, <code>docs/assistant_data_protection.md</code></li>
+</ul>
+<h4>EXTEDO</h4>
+<ul>
+  <li>EXTEDO, EURS Product Information (flyer): <a href="https://www.extedo.com/hubfs/Documents/Flyers/EXTEDO_EURS_Product_Information.pdf">extedo.com/hubfs/Documents/Flyers/EXTEDO_EURS_Product_Information.pdf</a></li>
+  <li>EXTEDO, EURSvalidator Product Information: <a href="https://www.extedo.com/hubfs/Documents/Flyers/EXTEDO_EURSvalidator_Product_Information.pdf">extedo.com/hubfs/Documents/Flyers/EXTEDO_EURSvalidator_Product_Information.pdf</a></li>
+  <li>EXTEDO, EURSnext Product Information: <a href="https://www.extedo.com/hubfs/Documents/Flyers/EXTEDO_EURSnext_Product_Information.pdf">extedo.com/hubfs/Documents/Flyers/EXTEDO_EURSnext_Product_Information.pdf</a></li>
+  <li>EXTEDO, eCTDmanager Product Information: <a href="https://www.extedo.com/hubfs/Documents/Flyers/EXTEDO_eCTDmanager_Product_Information.pdf">extedo.com/hubfs/Documents/Flyers/EXTEDO_eCTDmanager_Product_Information.pdf</a></li>
+  <li>EXTEDO, Solutions for Regulatory Agencies: <a href="https://www.extedo.com/solutions-for-regulatory-agencies">extedo.com/solutions-for-regulatory-agencies</a></li>
+  <li>EXTEDO, EURSvalidator product page: <a href="https://www.extedo.com/products/submission-validation/eursvalidator">extedo.com/products/submission-validation/eursvalidator</a></li>
+  <li>EXTEDO, EURSnext product page: <a href="https://extedo.com/submission-viewing-and-reviewing/eurs">extedo.com/submission-viewing-and-reviewing/eurs</a></li>
+  <li>EXTEDO, Corporate Overview (agencies using or recommending EURS/EURSvalidator): <a href="https://www.extedo.com/hubfs/Documents/Flyers/EXTEDO_Corporate_Overview_Company_Information.pdf">extedo.com/hubfs/Documents/Flyers/EXTEDO_Corporate_Overview_Company_Information.pdf</a></li>
+  <li>EXTEDO, Partnership with the UAE Ministry of Health (15 October 2015): <a href="https://extedo.com/blog/extedo-announces-new-regional-partnership-with-the-united-arab-emirates-ministry-of-health">extedo.com/blog/…-united-arab-emirates-ministry-of-health</a></li>
+  <li>EXTEDO, NHRA Bahrain chooses EURS: <a href="https://extedo.com/blog/the-national-health-regulatory-authority-in-kingdom-of-bahrain-chooses-extedos-eurs-solution-for-validation-reviewing">extedo.com/blog/…-chooses-extedos-eurs-solution-for-validation-reviewing</a></li>
+  <li>EXTEDO, Support for eCTD 4.0: <a href="https://www.extedo.com/blog/extedos-support-for-ectd-4.0-rps">extedo.com/blog/extedos-support-for-ectd-4.0-rps</a></li>
+  <li>European Medicines Agency, eSubmission: EURS: <a href="https://esubmission.ema.europa.eu/tiges/eurs.htm">esubmission.ema.europa.eu/tiges/eurs.htm</a></li>
+  <li>Pharmaknowl, SFDA eCTD module requirements (GCC specification version): <a href="https://pharmaknowl.com/sfda-ectd-modules-requirements/">pharmaknowl.com/sfda-ectd-modules-requirements</a></li>
+  <li>Biomapas, eCTD implementation across the MENA region: <a href="https://www.biomapas.com/ectd-implementation-across-mena-region-what-is-the-current-status/">biomapas.com/ectd-implementation-across-mena-region</a></li>
+</ul>
+</section>
+
+</body>
+</html>
