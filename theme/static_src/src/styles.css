@@ -111,7 +111,7 @@
   }
 
   .nav-link {
-    @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-brand-50/80 hover:bg-white/10 hover:text-white;
+    @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap text-brand-50/80 hover:bg-white/10 hover:text-white;
   }
   .nav-link-active {
     @apply bg-white/15 text-white;

@@ -3,8 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, F
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.utils.translation import get_language
 
 from apps.applications.models import Application, Decision, ReviewAssignment
+
+from . import guide as training
 
 S = Application.Status
 
@@ -27,6 +30,26 @@ def dashboard(request):
     if user.is_superuser:
         return redirect("admin:index")
     return render(request, "core/no_role.html", status=403)
+
+
+@login_required
+def guide(request):
+    """The workflow training guide: every workflow, step by step, filterable by role."""
+    workflows = training.workflows()
+    return render(
+        request,
+        "core/guide.html",
+        {
+            "workflows": workflows,
+            "videos": training.videos(get_language()),
+            "stages": training.stages(),
+            "loops": training.LOOPS,
+            "statuses": training.statuses(),
+            "audiences": training.AUDIENCES,
+            "matrix": training.matrix(workflows),
+            "my_role": request.user.role if request.user.role in dict(training.AUDIENCES) else "",
+        },
+    )
 
 
 def _status_counts(queryset):

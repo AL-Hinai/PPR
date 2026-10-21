@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load i18n static ui %}
+{% block title %}{% trans "Training guide" %}{% endblock %}
+{% block content %}
+<div x-data="{ role: '' }">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-sm text-slate-500">{% trans "Pharmacy Department · Training" %}</p>
+      <h1 class="text-2xl font-bold text-slate-900">{% trans "Workflow training guide" %}</h1>
+      <p class="mt-1 max-w-3xl text-sm text-slate-500">{% trans "Every workflow in PPR, step by step: who does what, which button to use, and what happens next. Button and screen names are written exactly as they appear on screen." %}</p>
+    </div>
+    <button type="button" data-print class="btn btn-secondary print:hidden">{% icon "printer" "size-4" %}{% trans "Print / save as PDF" %}</button>
+  </div>
+
+  {# Role filter #}
+  <div class="mt-6 flex flex-wrap items-center gap-2 print:hidden" role="group" aria-label="{% trans 'Show workflows for' %}">
+    <span class="me-1 text-sm text-slate-500">{% trans "Show workflows for" %}</span>
+    <button type="button" @click="role = ''" :aria-pressed="role === ''"
+            class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-inset" :class="role === '' ? 'bg-brand-700 text-white ring-brand-700' : 'bg-white text-slate-700 ring-slate-300 hover:bg-slate-50'">{% trans "Every role" %}</button>
+    {% for value, label in audiences %}
+      <button type="button" @click="role = '{{ value }}'" :aria-pressed="role === '{{ value }}'"
+              class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-inset" :class="role === '{{ value }}' ? 'bg-brand-700 text-white ring-brand-700' : 'bg-white text-slate-700 ring-slate-300 hover:bg-slate-50'">
+        {{ label }}{% if value == my_role %} <span class="opacity-75">({% trans "you" %})</span>{% endif %}
+      </button>
+    {% endfor %}
+  </div>
+
+  {# Video walkthroughs #}
+  <section class="mt-6 print:hidden" aria-labelledby="videos">
+    <div class="flex flex-wrap items-end justify-between gap-2">
+      <h2 id="videos" class="text-lg font-semibold text-slate-900">{% trans "Video walkthroughs" %}</h2>
+      <p class="help">{% trans "Short recordings of the real system with demonstration data. Captions explain each step." %}</p>
+    </div>
+    <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {% for v in videos %}
+        <article id="video-{{ v.key }}" class="card scroll-mt-6 overflow-hidden" x-show="!role || '{{ v.roles|join:' ' }}'.split(' ').includes(role)">
+          <video controls preload="none" playsinline poster="{% static v.poster %}" class="aspect-video w-full bg-brand-950" aria-label="{{ v.title }}">
+            <source src="{% static v.src %}" type="video/webm">
+          </video>
+          <div class="space-y-2 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="text-sm font-semibold text-slate-900">{{ v.title }}</h3>
+              <span class="badge bg-slate-100 font-mono text-slate-600 ring-slate-500/20">{{ v.duration }}</span>
+            </div>
+            <ul class="space-y-0.5 text-xs">
+              {% for w in v.covers %}<li><a href="#{{ w.key }}" class="text-brand-700 hover:underline">{{ w.number }}. {{ w.title }}</a></li>{% endfor %}
+            </ul>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# Lifecycle #}
+  <section class="card mt-6" aria-labelledby="lifecycle">
+    <div class="card-header">
+      <h2 id="lifecycle" class="card-title">{% trans "How an application moves" %}</h2>
+      <p class="help">{% trans "The progress bar on every application shows these six stages." %}</p>
+    </div>
+    <ol class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-3">
+      {% for stage in stages %}
+        <li class="relative rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p class="flex items-center gap-2 text-sm font-semibold text-slate-900">
+            <span class="grid size-6 shrink-0 place-items-center rounded-full bg-brand-700 text-xs font-bold text-white">{{ stage.number }}</span>{{ stage.label }}
+          </p>
+          <div class="mt-2 flex flex-wrap gap-1">{% for s in stage.statuses %}{% status_badge s %}{% endfor %}</div>
+          {% if stage.actor %}<p class="mt-2 text-xs text-slate-500">{% trans "Moved on by" %} <span class="badge {{ stage.css }}">{{ stage.actor }}</span></p>{% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+    <div class="border-t border-slate-100 px-5 py-4">
+      <p class="text-sm font-medium text-slate-900">{% trans "Going back a step" %}</p>
+      <ul class="mt-2 grid gap-2 lg:grid-cols-3">
+        {% for from, to, text in loops %}
+          <li class="rounded-lg bg-white p-3 text-sm text-slate-600 ring-1 ring-slate-200">
+            <span class="flex flex-wrap items-center gap-1.5">{% status_badge from %}{% icon "chevron-right" "size-4 text-slate-400 rtl:rotate-180" %}{% status_badge to %}</span>
+            <span class="mt-1.5 block">{{ text }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+    {# Contents #}
+    <nav class="min-w-0 lg:col-span-3 print:hidden" aria-label="{% trans 'Workflows' %}">
+      <div class="card lg:sticky lg:top-6">
+        <div class="card-header"><h2 class="card-title">{% trans "Workflows" %}</h2></div>
+        <ol class="space-y-0.5 p-2 text-sm">
+          {% for w in workflows %}
+            <li x-show="!role || '{{ w.roles|join:' ' }}'.split(' ').includes(role)">
+              <a href="#{{ w.key }}" class="flex gap-2 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-brand-700">
+                <span class="w-5 shrink-0 font-semibold text-slate-400">{{ w.number }}</span>{{ w.title }}
+              </a>
+            </li>
+          {% endfor %}
+          <li><a href="#statuses" class="flex gap-2 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-brand-700"><span class="w-5 shrink-0"></span>{% trans "Status reference" %}</a></li>
+          <li><a href="#matrix" class="flex gap-2 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-brand-700"><span class="w-5 shrink-0"></span>{% trans "Who does what" %}</a></li>
+        </ol>
+      </div>
+    </nav>
+
+    <div class="min-w-0 space-y-6 lg:col-span-9">
+      {% for w in workflows %}
+        <article id="{{ w.key }}" class="card scroll-mt-6 break-inside-avoid" x-show="!role || '{{ w.roles|join:' ' }}'.split(' ').includes(role)">
+          <header class="card-header items-start">
+            <div class="flex min-w-0 items-start gap-3">
+              <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-50 text-sm font-bold text-brand-800 ring-1 ring-brand-200">{{ w.number }}</span>
+              <div class="min-w-0">
+                <h2 class="card-title">{{ w.title }}</h2>
+                <p class="mt-0.5 text-sm text-slate-500">{{ w.summary }}</p>
+                {% if w.video %}<a href="#video-{{ w.video }}" class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline print:hidden">{% icon "play" "size-4" %}{% trans "Watch the video" %}</a>{% endif %}
+              </div>
+            </div>
+            {% if w.from %}
+              <p class="flex flex-wrap items-center gap-1.5" aria-label="{% trans 'Status change' %}">
+                {% status_badge w.from %}{% if w.to %}{% icon "chevron-right" "size-4 text-slate-400 rtl:rotate-180" %}{% status_badge w.to %}{% endif %}
+              </p>
+            {% endif %}
+          </header>
+          <div class="card-body space-y-4">
+            <ol class="space-y-3">
+              {% for step in w.steps %}
+                <li class="flex gap-3 text-sm">
+                  <span class="grid size-6 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">{{ forloop.counter }}</span>
+                  <div class="min-w-0 flex-1">
+                    <span class="badge {{ step.css }}">{{ step.label }}</span>
+                    <p class="mt-1 text-slate-700">{{ step.text }}</p>
+                  </div>
+                </li>
+              {% endfor %}
+            </ol>
+            <div class="flex gap-2.5 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900 ring-1 ring-emerald-200">
+              {% icon "check-circle" "size-5 shrink-0 text-emerald-600" %}
+              <p><span class="font-semibold">{% trans "Result:" %}</span> {{ w.result }}</p>
+            </div>
+            {% if w.tips %}
+              <div class="flex gap-2.5 rounded-lg bg-sky-50 p-3 text-sm text-sky-900 ring-1 ring-sky-200">
+                {% icon "info" "size-5 shrink-0 text-sky-600" %}
+                <ul class="space-y-1">{% for tip in w.tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+              </div>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+
+      <section id="statuses" class="card scroll-mt-6 overflow-hidden break-inside-avoid">
+        <div class="card-header"><h2 class="card-title">{% trans "Status reference" %}</h2></div>
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead><tr><th>{% trans "Status" %}</th><th>{% trans "What it means" %}</th><th>{% trans "Next action by" %}</th></tr></thead>
+            <tbody>
+              {% for row in statuses %}
+                <tr>
+                  <td>{% status_badge row.status %}</td>
+                  <td>{{ row.meaning }}</td>
+                  <td>{% if row.next %}<span class="badge {{ row.css }}">{{ row.next }}</span>{% else %}<span class="text-slate-400">{% trans "Final" %}</span>{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="matrix" class="card scroll-mt-6 overflow-hidden break-inside-avoid">
+        <div class="card-header"><h2 class="card-title">{% trans "Who does what" %}</h2></div>
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{% trans "Workflow" %}</th>
+                {% for value, label in audiences %}<th class="text-center">{{ label }}</th>{% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in matrix %}
+                <tr>
+                  <td><a href="#{{ row.key }}" class="text-brand-700 hover:underline">{{ row.number }}. {{ row.title }}</a></td>
+                  {% for cell in row.cells %}
+                    <td class="relative text-center">{% if cell %}<span class="inline-flex text-emerald-600">{% icon "check" "size-5" %}</span><span class="sr-only">{% trans "Yes" %}</span>{% else %}<span class="text-slate-300" aria-label="{% trans 'No' %}">—</span>{% endif %}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

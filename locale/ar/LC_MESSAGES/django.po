@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PPR\n"
-"POT-Creation-Date: 2026-10-18 14:24+0000\n"
+"POT-Creation-Date: 2026-10-21 11:47+0000\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -113,12 +113,8 @@ msgstr "أصبح %(name)s يقود فرق المراجعة المعيّنة تل
 
 #: apps/accounts/services.py:34
 #, python-format
-msgid ""
-"%(name)s still holds these modules on active reviews: %(held)s. Reassign "
-"them first."
-msgstr ""
-"لا يزال %(name)s مكلفًا بهذه الوحدات في مراجعات نشطة: %(held)s. أعد إسنادها "
-"أولًا."
+msgid "%(name)s still holds these modules on active reviews: %(held)s. Reassign them first."
+msgstr "لا يزال %(name)s مكلفًا بهذه الوحدات في مراجعات نشطة: %(held)s. أعد إسنادها أولًا."
 
 #: apps/applications/models.py:95
 msgid "(draft)"
@@ -145,6 +141,14 @@ msgstr "٤. القرار"
 msgid "[PPR] %(ref)s: %(status)s"
 msgstr "[PPR] %(ref)s: %(status)s"
 
+#: apps/core/guide.py:210
+msgid "A passed response sequence restarts the review clock (Under review). The modules concerned need a fresh assessment."
+msgstr "عند اجتياز تسلسل الرد للتحقق تُستأنف ساعة المراجعة (قيد المراجعة)، وتحتاج الوحدات المعنية إلى تقييم جديد."
+
+#: apps/core/guide.py:121
+msgid "A passed sequence is accepted into the dossier and the application moves on to review team assignment."
+msgstr "يُقبل التسلسل الناجح في الملف، وينتقل الطلب إلى مرحلة تعيين فريق المراجعة."
+
 #: apps/applications/services.py:133
 msgid "A review team cannot be assigned at this stage."
 msgstr "لا يمكن تعيين فريق المراجعة في هذه المرحلة."
@@ -154,31 +158,20 @@ msgid "A reviewer assesses each CTD module and can request more information."
 msgstr "يقيّم المراجع كل وحدة من وحدات CTD ويمكنه طلب معلومات إضافية."
 
 #: apps/applications/services.py:24
-msgid ""
-"A sequence is still being validated. Wait for the result before uploading "
-"another."
-msgstr ""
-"ما زال التحقق من أحد التسلسلات جارياً. انتظر النتيجة قبل رفع تسلسل آخر."
+msgid "A sequence is still being validated. Wait for the result before uploading another."
+msgstr "ما زال التحقق من أحد التسلسلات جارياً. انتظر النتيجة قبل رفع تسلسل آخر."
 
 #: apps/applications/forms.py:34
-msgid ""
-"A zip file containing one sequence folder (e.g. 0000/) with index.xml at its"
-" root."
-msgstr ""
-"ملف مضغوط (zip) يحتوي على مجلد تسلسل واحد (مثل 0000/) وفي جذره الملف "
-"index.xml."
+msgid "A zip file containing one sequence folder (e.g. 0000/) with index.xml at its root."
+msgstr "ملف مضغوط (zip) يحتوي على مجلد تسلسل واحد (مثل 0000/) وفي جذره الملف index.xml."
 
 #: apps/applications/models.py:285
 msgid "Acceptable"
 msgstr "مقبول"
 
 #: templates/core/home.html
-msgid ""
-"Accepted formats, PDF version, no passwords or scripts, embedded fonts and "
-"size limits."
-msgstr ""
-"الصيغ المقبولة، إصدار PDF، عدم وجود كلمات مرور أو برمجيات نصية، تضمين الخطوط"
-" وحدود الحجم."
+msgid "Accepted formats, PDF version, no passwords or scripts, embedded fonts and size limits."
+msgstr "الصيغ المقبولة، إصدار PDF، عدم وجود كلمات مرور أو برمجيات نصية، تضمين الخطوط وحدود الحجم."
 
 #: templates/403.html
 msgid "Access denied"
@@ -229,6 +222,10 @@ msgstr "العنوان"
 msgid "adds to “%(t)s”"
 msgstr "يُضاف إلى «%(t)s»"
 
+#: apps/core/guide.py:177
+msgid "After the company answers questions, the modules concerned show “Re-assessment needed”: record a fresh assessment."
+msgstr "بعد أن تجيب الشركة عن الأسئلة، تظهر الوحدات المعنية بعبارة «يلزم إعادة التقييم»: سجّل تقييمًا جديدًا."
+
 #: templates/applications/sequence_detail.html
 msgid "All"
 msgstr "الكل"
@@ -237,8 +234,7 @@ msgstr "الكل"
 msgid "All applications"
 msgstr "جميع الطلبات"
 
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "All checks in this layer passed."
 msgstr "اجتازت جميع فحوصات هذه الطبقة."
 
@@ -258,6 +254,10 @@ msgstr "كل المراجعين"
 msgid "All statuses"
 msgstr "جميع الحالات"
 
+#: apps/core/guide.py:244
+msgid "An approval receives an approval number (PPR-year-number) and a validity date."
+msgstr "تحصل الموافقة على رقم موافقة (PPR-السنة-الرقم) وتاريخ صلاحية."
+
 #: apps/applications/models.py:307
 msgid "Answered"
 msgstr "تمت الإجابة"
@@ -265,6 +265,10 @@ msgstr "تمت الإجابة"
 #: templates/assistant/_drawer.html
 msgid "Answers from the eCTD documents of the medicine you are viewing"
 msgstr "إجابات من مستندات eCTD للدواء الذي تستعرضه"
+
+#: apps/core/guide.py:117
+msgid "Any error fails the sequence (Validation failed). Warnings are reported but do not block it (Validated)."
+msgstr "أي خطأ يُفشل التسلسل (فشل التحقق). أما التحذيرات فتُذكر في التقرير ولا تمنع قبوله (تم التحقق)."
 
 #: apps/api/apps.py:8
 msgid "API"
@@ -278,8 +282,7 @@ msgstr "مفتاح API"
 msgid "API keys"
 msgstr "مفاتيح API"
 
-#: apps/applications/views.py:484 templates/applications/_tab_overview.html
-#: templates/applications/validation_report.html
+#: apps/applications/views.py:484 templates/applications/_tab_overview.html templates/applications/validation_report.html
 msgid "Applicant"
 msgstr "مقدّم الطلب"
 
@@ -320,9 +323,7 @@ msgstr "نوع الطلب"
 msgid "Application updated."
 msgstr "تم تحديث الطلب."
 
-#: apps/applications/apps.py:8 templates/applications/detail.html
-#: templates/applications/list.html templates/applications/list.html
-#: templates/applications/search.html templates/base.html templates/base.html
+#: apps/applications/apps.py:8 templates/applications/detail.html templates/applications/list.html templates/applications/list.html templates/applications/search.html templates/base.html templates/base.html
 msgid "Applications"
 msgstr "الطلبات"
 
@@ -334,8 +335,7 @@ msgstr "الطلبات"
 msgid "Applications by status"
 msgstr "الطلبات حسب الحالة"
 
-#: templates/applications/_tab_overview.html
-#: templates/applications/_tab_review.html templates/applications/detail.html
+#: templates/applications/_tab_overview.html templates/applications/_tab_review.html templates/applications/detail.html
 msgid "Approval certificate"
 msgstr "شهادة الموافقة"
 
@@ -356,8 +356,7 @@ msgstr "نظرة عامة على الموافقات"
 msgid "Approve"
 msgstr "الموافقة"
 
-#: apps/applications/models.py:42 apps/applications/models.py:333
-#: templates/core/dashboard_company.html
+#: apps/applications/models.py:42 apps/applications/models.py:333 templates/core/dashboard_company.html
 msgid "Approved"
 msgstr "تمت الموافقة"
 
@@ -382,20 +381,19 @@ msgstr "هل توجد ملاحظات تحقق يجب أن أعرفها؟"
 msgid "Ask"
 msgstr "اسأل"
 
+#: apps/core/guide.py:274
+msgid "Ask about composition, specifications, stability, clinical data or validation findings. Answers cite the document and page; open the citation to check it."
+msgstr "اسأل عن التركيب أو المواصفات أو الثبات أو البيانات السريرية أو نتائج التحقق. تذكر الإجابات المستند والصفحة؛ افتح المرجع للتأكد منه."
+
 #: templates/assistant/_drawer.html
-msgid ""
-"Ask about the dossier: composition, specifications, stability, clinical "
-"data, validation findings… Answers cite the document and page."
-msgstr ""
-"اسأل عن الملف: التركيب، المواصفات، الثبات، البيانات السريرية، ملاحظات "
-"التحقق… تُذكر في الإجابات المستند والصفحة."
+msgid "Ask about the dossier: composition, specifications, stability, clinical data, validation findings… Answers cite the document and page."
+msgstr "اسأل عن الملف: التركيب، المواصفات، الثبات، البيانات السريرية، ملاحظات التحقق… تُذكر في الإجابات المستند والصفحة."
 
 #: templates/assistant/_drawer.html
 msgid "Ask about this medicine’s dossier…"
 msgstr "اسأل عن ملف هذا الدواء…"
 
-#: templates/applications/document_viewer.html
-#: templates/assistant/_drawer.html
+#: templates/applications/document_viewer.html templates/assistant/_drawer.html
 msgid "Ask the assistant"
 msgstr "اسأل المساعد"
 
@@ -404,18 +402,21 @@ msgid "Ask the assistant about this document"
 msgstr "اسأل المساعد عن هذا المستند"
 
 #: templates/core/no_role.html
-msgid ""
-"Ask the system administrator to assign you a role (and company, for "
-"applicants)."
+msgid "Ask the system administrator to assign you a role (and company, for applicants)."
 msgstr "اطلب من مسؤول النظام تعيين دور لك (وشركة لمقدّمي الطلبات)."
 
 #: templates/applications/_tab_overview.html
 #, python-format
-msgid ""
-"Assess your assigned modules: %(modules)s. The whole dossier is open to you "
-"read-only."
-msgstr ""
-"قيّم الوحدات المسندة إليك: %(modules)s. الملف كاملًا متاح لك للاطلاع فقط."
+msgid "Assess your assigned modules: %(modules)s. The whole dossier is open to you read-only."
+msgstr "قيّم الوحدات المسندة إليك: %(modules)s. الملف كاملًا متاح لك للاطلاع فقط."
+
+#: apps/core/guide.py:294
+msgid "Assess your CTD module"
+msgstr "تقييم وحدة CTD المسندة إليك"
+
+#: apps/core/guide.py:164
+msgid "Assess your CTD modules"
+msgstr "قيّم وحدات CTD المسندة إليك"
 
 #: apps/applications/models.py:292
 msgid "assessment"
@@ -430,9 +431,7 @@ msgstr "التقييم"
 msgid "Assessment led by %(name)s."
 msgstr "التقييم بقيادة %(name)s."
 
-#: templates/applications/_tab_review.html
-#: templates/applications/notes_print.html
-#: templates/applications/notes_print.html
+#: templates/applications/_tab_review.html templates/applications/notes_print.html templates/applications/notes_print.html
 msgid "Assessment notes"
 msgstr "ملاحظات التقييم"
 
@@ -441,8 +440,7 @@ msgid "Assessment summary"
 msgstr "ملخص التقييم"
 
 #: apps/applications/services.py:210
-msgid ""
-"Assessments can only be recorded while the application is under review."
+msgid "Assessments can only be recorded while the application is under review."
 msgstr "لا يمكن تسجيل التقييمات إلا أثناء مراجعة الطلب."
 
 #: templates/core/dashboard_hod.html
@@ -458,11 +456,15 @@ msgstr "عيّن مراجعًا لكل وحدة مطلوبة: %(modules)s."
 msgid "Assign review team"
 msgstr "تعيين فريق المراجعة"
 
+#: apps/core/guide.py:145
+msgid "Assign the review team"
+msgstr "تعيين فريق المراجعة"
+
 #: apps/applications/services.py:198
 msgid "Assigned automatically from reviewer specialties. "
 msgstr "عُيّن تلقائياً بناءً على تخصصات المراجعين. "
 
-#: apps/applications/views.py:44
+#: apps/applications/views.py:44 apps/core/guide.py:39
 msgid "Assignment"
 msgstr "التعيين"
 
@@ -502,9 +504,7 @@ msgstr "بانتظار التعيين"
 msgid "Awaiting your decision"
 msgstr "بانتظار قرارك"
 
-#: templates/applications/certificate.html templates/applications/form.html
-#: templates/applications/notes_print.html
-#: templates/applications/validation_report.html
+#: templates/applications/certificate.html templates/applications/form.html templates/applications/notes_print.html templates/applications/validation_report.html
 msgid "Back"
 msgstr "رجوع"
 
@@ -536,9 +536,21 @@ msgstr "إلغاء"
 msgid "Change password"
 msgstr "تغيير كلمة المرور"
 
+#: apps/core/guide.py:134
+msgid "Check the coverage cards at the top: a module marked “No reviewer” cannot be assigned automatically."
+msgstr "راجع بطاقات التغطية في الأعلى: الوحدة المعلَّمة بعبارة «لا يوجد مراجع» لا يمكن تعيينها تلقائيًا."
+
+#: apps/core/guide.py:96
+msgid "Check the file name shown, then choose “Submit for validation”. While it is still a draft you can correct the details with “Edit”."
+msgstr "تحقّق من اسم الملف المعروض، ثم اختر «التقديم للتحقق». ما دام الطلب مسودة يمكنك تصحيح البيانات من «تعديل»."
+
 #: apps/accounts/urls.py:63
 msgid "Check your email"
 msgstr "تحقق من بريدك الإلكتروني"
+
+#: apps/core/guide.py:223
+msgid "Check “Section reviews” on the “Assessment” tab: every module needs an assessment and none may be waiting for re-assessment."
+msgstr "راجع «مراجعات الأقسام» في تبويب «التقييم»: يجب أن يكون لكل وحدة تقييم، وألا تكون أي وحدة بانتظار إعادة التقييم."
 
 #: apps/accounts/urls.py:73
 msgid "Choose a new password"
@@ -547,6 +559,30 @@ msgstr "اختر كلمة مرور جديدة"
 #: apps/applications/services.py:226
 msgid "Choose the module or modules the questions concern."
 msgstr "اختر الوحدة أو الوحدات التي تتعلق بها الأسئلة."
+
+#: apps/core/guide.py:273
+msgid "Choose “Ask the assistant” at the bottom of the page. It knows the application and the document you have open."
+msgstr "اختر «اسأل المساعد» أسفل الصفحة. يعرف المساعد الطلب والمستند المفتوحين لديك."
+
+#: apps/core/guide.py:136
+msgid "Choose “Make default lead” for the reviewer who should lead review teams by default."
+msgstr "اختر «تعيين كقائد افتراضي» للمراجع الذي يقود فرق المراجعة افتراضيًا."
+
+#: apps/core/guide.py:93
+msgid "Choose “New application” in the top bar."
+msgstr "اختر «طلب جديد» في الشريط العلوي."
+
+#: apps/core/guide.py:133
+msgid "Choose “Reviewers” in the top bar."
+msgstr "اختر «المراجعون» في الشريط العلوي."
+
+#: apps/core/guide.py:190
+msgid "Choose “Send questions (clock stop)”. The company is notified straight away."
+msgstr "اختر «إرسال الأسئلة (إيقاف الساعة)». تُشعَر الشركة فورًا."
+
+#: apps/core/guide.py:225
+msgid "Choose “Send to Head of Department”."
+msgstr "اختر «إرسال إلى رئيس القسم»."
 
 #: templates/accounts/reviewers.html
 msgid "Clear"
@@ -584,17 +620,15 @@ msgstr "الشركات"
 msgid "companies"
 msgstr "الشركات"
 
-#: apps/accounts/models.py:27 apps/applications/models.py:57
-#: apps/companies/models.py:22
+#: apps/accounts/models.py:27 apps/applications/models.py:57 apps/companies/models.py:22
 msgid "company"
 msgstr "الشركة"
 
-#: templates/base.html templates/base.html templates/companies/profile.html
-#: templates/components/application_table.html
+#: templates/base.html templates/base.html templates/companies/profile.html templates/components/application_table.html
 msgid "Company"
 msgstr "الشركة"
 
-#: apps/accounts/models.py:20
+#: apps/accounts/models.py:20 apps/core/guide.py:20 apps/core/guide.py:30
 msgid "Company applicant"
 msgstr "شركة مقدّمة للطلب"
 
@@ -609,6 +643,14 @@ msgstr "تم تحديث ملف الشركة."
 #: templates/applications/_tab_review.html
 msgid "Complete review"
 msgstr "إكمال المراجعة"
+
+#: apps/core/guide.py:298
+msgid "Complete the review"
+msgstr "إكمال المراجعة"
+
+#: apps/core/guide.py:217
+msgid "Complete the review and send the recommendation"
+msgstr "إكمال المراجعة وإرسال التوصية"
 
 #: templates/core/dashboard_reviewer.html
 msgid "Completed"
@@ -631,10 +673,12 @@ msgid "contact phone"
 msgstr "هاتف التواصل"
 
 #: apps/applications/forms.py:82
-msgid ""
-"Coordinates the module reviewers, sends questions to the applicant and the "
-"recommendation to you."
+msgid "Coordinates the module reviewers, sends questions to the applicant and the recommendation to you."
 msgstr "ينسّق بين مراجعي الوحدات، ويرسل الأسئلة إلى مقدم الطلب والتوصية إليك."
+
+#: apps/core/guide.py:119
+msgid "Correct the package, upload it under “Upload a corrected package” and choose “Resubmit for validation”."
+msgstr "صحّح الحزمة، وارفعها من «رفع حزمة مصححة»، ثم اختر «إعادة التقديم للتحقق»."
 
 #: apps/companies/models.py:13
 msgid "country"
@@ -644,31 +688,35 @@ msgstr "الدولة"
 msgid "Country"
 msgstr "الدولة"
 
+#: apps/core/guide.py:87
+msgid "Create an application and submit the eCTD package"
+msgstr "إنشاء طلب وتقديم حزمة eCTD"
+
 #: templates/applications/form.html
 msgid "Create and continue"
 msgstr "إنشاء ومتابعة"
+
+#: apps/core/guide.py:290
+msgid "Create and submit an application"
+msgstr "إنشاء طلب وتقديمه"
 
 #: templates/core/dashboard_company.html
 msgid "Create your first application to start an eCTD submission."
 msgstr "أنشئ طلبك الأول لبدء تقديم ملف eCTD."
 
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "Criterion and detail"
 msgstr "المعيار والتفاصيل"
 
 #: templates/applications/sequence_detail.html
-msgid ""
-"CTD structure from index.xml. PDF documents open in the built-in viewer."
+msgid "CTD structure from index.xml. PDF documents open in the built-in viewer."
 msgstr "هيكل CTD من ملف index.xml. تُفتح مستندات PDF في العارض المدمج."
 
 #: apps/applications/views.py:159 templates/applications/_tab_dossier.html
 msgid "Current dossier"
 msgstr "الملف الحالي"
 
-#: templates/base.html templates/base.html templates/base.html
-#: templates/core/dashboard_company.html templates/core/dashboard_hod.html
-#: templates/core/dashboard_reviewer.html
+#: templates/base.html templates/base.html templates/base.html templates/core/dashboard_company.html templates/core/dashboard_hod.html templates/core/dashboard_reviewer.html
 msgid "Dashboard"
 msgstr "لوحة التحكم"
 
@@ -681,6 +729,10 @@ msgstr "عزيزي/عزيزتي %(name)s،"
 msgid "Decide"
 msgstr "اتخاذ القرار"
 
+#: apps/core/guide.py:234 apps/core/guide.py:300
+msgid "Decide and issue the certificate"
+msgstr "اتخاذ القرار وإصدار الشهادة"
+
 #: apps/applications/forms.py:131 templates/applications/_tab_review.html
 msgid "Decision"
 msgstr "القرار"
@@ -689,7 +741,7 @@ msgstr "القرار"
 msgid "decision"
 msgstr "قرار"
 
-#: apps/applications/views.py:47
+#: apps/applications/views.py:47 apps/core/guide.py:42
 msgid "Decision issued"
 msgstr "صدور القرار"
 
@@ -727,6 +779,10 @@ msgstr "حذف هذه الملاحظة؟"
 #, python-format
 msgid "deleted in %(s)s"
 msgstr "حُذف في %(s)s"
+
+#: apps/core/guide.py:74
+msgid "Department staff can use “Sign in with your Ministry account” instead of a password when single sign-on is switched on."
+msgstr "يمكن لموظفي الدائرة استخدام «تسجيل الدخول بحساب الوزارة» بدلًا من كلمة المرور عند تفعيل الدخول الموحّد."
 
 #: apps/applications/models.py:193
 msgid "description"
@@ -823,6 +879,18 @@ msgstr "الموعد النهائي %(d)s"
 msgid "e.g. shelf life, impurity C, MA-2026-00012"
 msgstr "مثال: مدة الصلاحية، الشائبة C، MA-2026-00012"
 
+#: apps/core/guide.py:138
+msgid "Each change records who set it and when. Reviewers see their specialties on their dashboard but cannot change them."
+msgstr "يُسجَّل في كل تغيير من أجراه ومتى. يرى المراجعون تخصصاتهم في لوحة التحكم ولا يمكنهم تغييرها."
+
+#: apps/core/guide.py:149
+msgid "Each required CTD module is given to a specialist reviewer, and one team member is named lead reviewer."
+msgstr "تُسند كل وحدة CTD مطلوبة إلى مراجع متخصص، ويُسمّى أحد أعضاء الفريق مراجعًا رئيسيًا."
+
+#: apps/core/guide.py:167
+msgid "Each specialist reads the dossier and records an assessment for the modules assigned to them."
+msgstr "يقرأ كل متخصص الملف ويسجّل تقييمًا للوحدات المسندة إليه."
+
 #: apps/applications/forms.py:32
 msgid "eCTD package (.zip)"
 msgstr "حزمة eCTD (.zip)"
@@ -852,23 +920,16 @@ msgid "Edit application"
 msgstr "تعديل الطلب"
 
 #: templates/accounts/login.html
-msgid ""
-"Electronic submission, eCTD technical validation and approval of medicinal "
-"products."
-msgstr ""
-"التقديم الإلكتروني والتحقق الفني بصيغة eCTD والموافقة على المستحضرات "
-"الدوائية."
+msgid "Electronic submission, eCTD technical validation and approval of medicinal products."
+msgstr "التقديم الإلكتروني والتحقق الفني بصيغة eCTD والموافقة على المستحضرات الدوائية."
 
 #: config/settings/base.py:132
 msgid "English"
 msgstr "الإنجليزية"
 
 #: apps/accounts/urls.py:55
-msgid ""
-"Enter the email address of your account. We will send you a link to choose a"
-" new password."
-msgstr ""
-"أدخل البريد الإلكتروني لحسابك وسنرسل إليك رابطاً لاختيار كلمة مرور جديدة."
+msgid "Enter the email address of your account. We will send you a link to choose a new password."
+msgstr "أدخل البريد الإلكتروني لحسابك وسنرسل إليك رابطاً لاختيار كلمة مرور جديدة."
 
 #: apps/applications/models.py:195
 msgid "envelope"
@@ -888,42 +949,47 @@ msgstr "الأخطاء"
 
 #: templates/applications/_tab_dossier.html
 #, python-format
-msgid ""
-"Every accepted sequence applied in order (%(seqs)s): replaced and deleted "
-"documents drop out, appended documents sit next to the one they add to."
-msgstr ""
-"تُطبَّق كل التسلسلات المقبولة بالترتيب (%(seqs)s): تُستبعد المستندات "
-"المستبدلة والمحذوفة، وتظهر المستندات المضافة بجانب المستند الذي تُكمله."
+msgid "Every accepted sequence applied in order (%(seqs)s): replaced and deleted documents drop out, appended documents sit next to the one they add to."
+msgstr "تُطبَّق كل التسلسلات المقبولة بالترتيب (%(seqs)s): تُستبعد المستندات المستبدلة والمحذوفة، وتظهر المستندات المضافة بجانب المستند الذي تُكمله."
 
 #: apps/applications/services.py:241
 #, python-format
-msgid ""
-"Every assigned module needs an assessment from its reviewer first. Still "
-"missing: %(modules)s."
-msgstr ""
-"يجب أن يقيّم كل مراجع وحدته المسندة أولًا. لا تزال ناقصة: %(modules)s."
+msgid "Every assigned module needs an assessment from its reviewer first. Still missing: %(modules)s."
+msgstr "يجب أن يقيّم كل مراجع وحدته المسندة أولًا. لا تزال ناقصة: %(modules)s."
 
 #: apps/validation/rules/business.py:65
-msgid ""
-"Every document reference (leaf) must point to a file inside the sequence"
+msgid "Every document reference (leaf) must point to a file inside the sequence"
 msgstr "يجب أن يشير كل مرجع مستند (leaf) إلى ملف داخل التسلسل"
 
 #: apps/validation/rules/business.py:92
 msgid "Every document's MD5 checksum must match the value declared in the XML"
-msgstr ""
-"يجب أن يطابق المجموع الاختباري MD5 لكل مستند القيمة المصرّح بها في XML"
+msgstr "يجب أن يطابق المجموع الاختباري MD5 لكل مستند القيمة المصرّح بها في XML"
+
+#: templates/core/guide.html
+msgid "Every role"
+msgstr "جميع الأدوار"
+
+#: apps/core/guide.py:25
+msgid "Every user"
+msgstr "جميع المستخدمين"
+
+#: apps/core/guide.py:71
+msgid "Every user signs in with the account issued by the Pharmacy Department. There is no self-registration."
+msgstr "يسجّل كل مستخدم الدخول بالحساب الصادر عن دائرة الصيدلة، ولا يوجد تسجيل ذاتي."
+
+#: templates/core/guide.html
+msgid "Every workflow in PPR, step by step: who does what, which button to use, and what happens next. Button and screen names are written exactly as they appear on screen."
+msgstr "جميع مسارات العمل في النظام خطوة بخطوة: من يقوم بماذا، وأي زر يُستخدم، وماذا يحدث بعد ذلك. أسماء الأزرار والشاشات مكتوبة كما تظهر على الشاشة تمامًا."
 
 #: templates/applications/sequence_detail.html
 msgid "Expand all"
 msgstr "توسيع الكل"
 
-#: apps/applications/models.py:179 apps/validation/models.py:17
-#: templates/applications/validation_report.html
+#: apps/applications/models.py:179 apps/validation/models.py:17 templates/applications/validation_report.html
 msgid "Failed"
 msgstr "فشل"
 
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "File / location"
 msgstr "الملف / الموقع"
 
@@ -935,6 +1001,10 @@ msgstr "يجب أن تتبع أسماء الملفات والمجلدات قوا
 msgid "File compliance inspection"
 msgstr "فحص امتثال الملفات"
 
+#: apps/core/guide.py:102
+msgid "File names must be lowercase. PDFs must be version 1.4 to 1.7 with no password or security settings."
+msgstr "يجب أن تكون أسماء الملفات بأحرف صغيرة، وأن تكون ملفات PDF من الإصدار 1.4 إلى 1.7 دون كلمة مرور أو إعدادات حماية."
+
 #: apps/validation/rules/business.py:122
 msgid "Files in the package should be referenced by the XML backbone"
 msgstr "يُفضّل أن تكون جميع ملفات الحزمة مُشاراً إليها في ملف XML الرئيسي"
@@ -943,9 +1013,17 @@ msgstr "يُفضّل أن تكون جميع ملفات الحزمة مُشارا
 msgid "Files must not be empty"
 msgstr "يجب ألا تكون الملفات فارغة"
 
+#: apps/core/guide.py:94
+msgid "Fill in the product details: application type, product name, active ingredients, dosage form, strength, route and ATC code. Choose “Create and continue”."
+msgstr "أدخل بيانات المستحضر: نوع الطلب، واسم المستحضر، والمواد الفعالة، والشكل الصيدلاني، والتركيز، وطريقة الإعطاء، ورمز ATC. ثم اختر «إنشاء ومتابعة»."
+
 #: templates/applications/list.html
 msgid "Filter"
 msgstr "تصفية"
+
+#: templates/core/guide.html
+msgid "Final"
+msgstr "نهائية"
 
 #: apps/validation/models.py:91
 msgid "finding"
@@ -963,45 +1041,64 @@ msgstr "الملاحظات"
 msgid "Fit width"
 msgstr "ملاءمة العرض"
 
+#: apps/core/guide.py:81
+msgid "Five wrong passwords block sign-in to the account from that address for an hour."
+msgstr "خمس محاولات خاطئة لكلمة المرور تمنع الدخول إلى الحساب من ذلك العنوان لمدة ساعة."
+
 #: templates/core/dashboard_company.html
 msgid "Fix the validation errors and resubmit."
 msgstr "صحّح أخطاء التحقق وأعد التقديم."
+
+#: apps/core/guide.py:254
+msgid "Follow an application: notifications, history and search"
+msgstr "متابعة الطلب: الإشعارات والسجل والبحث"
 
 #: apps/validation/rules/files.py:85
 msgid "Fonts used in PDF files should be embedded"
 msgstr "يُفضّل تضمين الخطوط المستخدمة في ملفات PDF"
 
+#: apps/core/guide.py:135
+msgid "For each reviewer, tick the modules (M1 to M5) they are qualified to assess and save the row."
+msgstr "لكل مراجع، حدّد الوحدات (M1 إلى M5) المؤهَّل لتقييمها واحفظ الصف."
+
 #: templates/accounts/login.html
 msgid "Forgot your password?"
 msgstr "نسيت كلمة المرور؟"
 
+#: apps/core/guide.py:77
+msgid "Forgot your password? Choose “Forgot your password?” on the sign-in page. A one-time reset link is sent to your email address."
+msgstr "نسيت كلمة المرور؟ اختر «نسيت كلمة المرور؟» في صفحة تسجيل الدخول، وسيصلك رابط استعادة صالح لمرة واحدة على بريدك الإلكتروني."
+
 #: templates/applications/sequence_detail.html
-msgid ""
-"From the GCC regional Module 1 XML. Names that differ from the application "
-"are flagged."
-msgstr ""
-"من ملف XML الإقليمي للوحدة 1 الخليجية. يُشار إلى الأسماء التي تختلف عن "
-"بيانات الطلب."
+msgid "From the GCC regional Module 1 XML. Names that differ from the application are flagged."
+msgstr "من ملف XML الإقليمي للوحدة 1 الخليجية. يُشار إلى الأسماء التي تختلف عن بيانات الطلب."
 
 #: templates/applications/validation_report.html
 #, python-format
-msgid ""
-"Generated by PPR from validation run of %(now)s. Any error fails the "
-"sequence; warnings do not."
-msgstr ""
-"أُعدّ بواسطة PPR من عملية التحقق بتاريخ %(now)s. أي خطأ يؤدي إلى رفض "
-"التسلسل، بخلاف التحذيرات."
+msgid "Generated by PPR from validation run of %(now)s. Any error fails the sequence; warnings do not."
+msgstr "أُعدّ بواسطة PPR من عملية التحقق بتاريخ %(now)s. أي خطأ يؤدي إلى رفض التسلسل، بخلاف التحذيرات."
 
 #: apps/applications/models.py:47
 msgid "Generic"
 msgstr "جنيس"
 
+#: apps/core/guide.py:288
+msgid "Getting started with PPR"
+msgstr "البدء في استخدام النظام"
+
+#: apps/core/guide.py:140
+msgid "Give every module at least two reviewers so that work can be shared and leave can be covered."
+msgstr "خصّص لكل وحدة مراجعَين على الأقل لتوزيع العمل وتغطية الإجازات."
+
 #: templates/404.html
 msgid "Go home"
 msgstr "الصفحة الرئيسية"
 
-#: apps/accounts/models.py:22 templates/accounts/reviewers.html
-#: templates/core/dashboard_hod.html
+#: templates/core/guide.html
+msgid "Going back a step"
+msgstr "العودة خطوة إلى الوراء"
+
+#: apps/accounts/models.py:22 apps/core/guide.py:23 apps/core/guide.py:32 templates/accounts/reviewers.html templates/core/dashboard_hod.html
 msgid "Head of Department"
 msgstr "رئيس القسم"
 
@@ -1014,26 +1111,32 @@ msgstr "مرحباً %(name)s،"
 msgid "History"
 msgstr "السجل"
 
-#: apps/applications/views.py:46
+#: apps/applications/views.py:46 apps/core/guide.py:41
 msgid "HOD decision"
 msgstr "قرار رئيس القسم"
 
-#: templates/core/home.html
+#: templates/core/guide.html templates/core/home.html
 msgid "How an application moves"
 msgstr "مسار الطلب"
 
+#: apps/core/guide.py:152
+msgid "If a required module has no qualified reviewer, the application waits on your dashboard under “Validated – assign a review team”."
+msgstr "إذا لم يوجد مراجع مؤهل لوحدة مطلوبة، ينتظر الطلب في لوحة التحكم تحت «تم التحقق – عيّن فريق المراجعة»."
+
 #: apps/accounts/urls.py:64
-msgid ""
-"If an account uses that address, a reset link is on its way. The link works "
-"once."
-msgstr ""
-"إذا كان هناك حساب بهذا العنوان فسيصلك رابط إعادة التعيين. يعمل الرابط مرة "
-"واحدة."
+msgid "If an account uses that address, a reset link is on its way. The link works once."
+msgstr "إذا كان هناك حساب بهذا العنوان فسيصلك رابط إعادة التعيين. يعمل الرابط مرة واحدة."
+
+#: apps/core/guide.py:229
+msgid "If the Head of Department returns the application, it comes back Under review with their note in the history."
+msgstr "إذا أعاد رئيس القسم الطلب، يعود إلى حالة «قيد المراجعة» مع ملاحظته في السجل."
+
+#: apps/core/guide.py:118
+msgid "If validation failed, open “View report & resubmit”. Each finding shows the rule, the file and the line. Download it with “Report (CSV)” or “Report (PDF)” for your regulatory team."
+msgstr "إذا فشل التحقق، افتح «عرض التقرير وإعادة التقديم». تُظهر كل ملاحظة القاعدة والملف والسطر. نزّل التقرير عبر «التقرير (CSV)» أو «التقرير (PDF)» لفريق الشؤون التنظيمية لديك."
 
 #: templates/accounts/password_reset_email.txt
-msgid ""
-"If you did not ask for this, ignore this email; your password does not "
-"change."
+msgid "If you did not ask for this, ignore this email; your password does not change."
 msgstr "إذا لم تطلب ذلك فتجاهل هذه الرسالة؛ لن تتغير كلمة المرور."
 
 #: templates/core/dashboard_company.html
@@ -1044,14 +1147,17 @@ msgstr "قيد الإجراء"
 msgid "In scientific review"
 msgstr "قيد المراجعة العلمية"
 
+#: apps/core/guide.py:171
+msgid "In the viewer, select text and choose “Add note on page” to keep internal notes. Notes are never shown to the company."
+msgstr "في العارض، حدّد نصًا واختر «إضافة ملاحظة على الصفحة» لتدوين ملاحظات داخلية. لا تظهر الملاحظات للشركة أبدًا."
+
 #: templates/accounts/reviewers.html
 msgid "inactive"
 msgstr "غير نشط"
 
 #: apps/validation/rules/business.py:43
 msgid "index-md5.txt must exist and match the MD5 checksum of index.xml"
-msgstr ""
-"يجب وجود الملف index-md5.txt ومطابقته للمجموع الاختباري MD5 لملف index.xml"
+msgstr "يجب وجود الملف index-md5.txt ومطابقته للمجموع الاختباري MD5 لملف index.xml"
 
 #: templates/core/home.html
 msgid "index.xml is well-formed and valid against the ICH eCTD 3.2 DTD."
@@ -1129,12 +1235,23 @@ msgstr "آخر تحديد"
 msgid "Latest sequence"
 msgstr "أحدث تسلسل"
 
+#: apps/core/guide.py:114
+msgid "Layer 1, XML schema: index.xml is well-formed and valid against the ICH eCTD 3.2 DTD, and the regional Module 1 against the GCC specification."
+msgstr "الطبقة 1، مخطط XML: ملف index.xml سليم البنية ومطابق لـ DTD الخاص بـ ICH eCTD 3.2، والوحدة 1 الإقليمية مطابقة لمواصفات دول الخليج."
+
+#: apps/core/guide.py:115
+msgid "Layer 2, business rules: sequence numbers, MD5 checksums, required modules for the application type, lifecycle operations and naming rules."
+msgstr "الطبقة 2، قواعد العمل: أرقام التسلسل، ومجاميع MD5، والوحدات المطلوبة لنوع الطلب، وعمليات دورة الحياة، وقواعد التسمية."
+
+#: apps/core/guide.py:116
+msgid "Layer 3, file compliance: accepted formats, PDF version, no passwords or scripts, embedded fonts and size limits."
+msgstr "الطبقة 3، مطابقة الملفات: الصيغ المقبولة، وإصدار PDF، وخلوّها من كلمات المرور والبرمجيات، والخطوط المضمّنة، وحدود الحجم."
+
 #: templates/accounts/reviewers.html templates/applications/_review_team.html
 msgid "Lead"
 msgstr "المراجع الرئيسي"
 
-#: apps/applications/forms.py:79 templates/applications/_tab_overview.html
-#: templates/core/dashboard_hod.html
+#: apps/applications/forms.py:79 apps/core/guide.py:22 templates/applications/_tab_overview.html templates/core/dashboard_hod.html
 msgid "Lead reviewer"
 msgstr "المراجع الرئيسي"
 
@@ -1160,11 +1277,8 @@ msgid "License"
 msgstr "الترخيص"
 
 #: apps/validation/rules/business.py:162
-msgid ""
-"Lifecycle operations must be valid and refer to documents in earlier "
-"sequences"
-msgstr ""
-"يجب أن تكون عمليات دورة الحياة صحيحة وتشير إلى مستندات في تسلسلات سابقة"
+msgid "Lifecycle operations must be valid and refer to documents in earlier sequences"
+msgstr "يجب أن تكون عمليات دورة الحياة صحيحة وتشير إلى مستندات في تسلسلات سابقة"
 
 #: templates/applications/document_viewer.html
 msgid "Loading document…"
@@ -1184,8 +1298,7 @@ msgstr "تقرير مطوّل: الأخطاء والتحذيرات والمعل�
 
 #: templates/applications/_tab_sequences.html
 msgid "Lowercase file names; PDF 1.4–1.7 without passwords"
-msgstr ""
-"أسماء ملفات بأحرف صغيرة؛ ملفات PDF من الإصدار 1.4 إلى 1.7 بدون كلمات مرور"
+msgstr "أسماء ملفات بأحرف صغيرة؛ ملفات PDF من الإصدار 1.4 إلى 1.7 بدون كلمات مرور"
 
 #: templates/base.html
 msgid "Main"
@@ -1267,6 +1380,10 @@ msgstr "الوحدات المعنية"
 msgid "modules concerned"
 msgstr "الوحدات المعنية"
 
+#: templates/core/guide.html
+msgid "Moved on by"
+msgstr "يُنقل بواسطة"
+
 #: templates/applications/notes_print.html
 msgid "My notes"
 msgstr "ملاحظاتي"
@@ -1291,9 +1408,7 @@ msgstr "الاسم (بالإنجليزية)"
 msgid "Name (English)"
 msgstr "الاسم (بالإنجليزية)"
 
-#: templates/applications/form.html templates/applications/list.html
-#: templates/base.html templates/base.html
-#: templates/core/dashboard_company.html
+#: templates/applications/form.html templates/applications/list.html templates/base.html templates/base.html templates/core/dashboard_company.html
 msgid "New application"
 msgstr "طلب جديد"
 
@@ -1317,14 +1432,21 @@ msgstr "طلب ترخيص تسويق جديد"
 msgid "Next"
 msgstr "التالي"
 
-#: templates/applications/document_viewer.html
-#: templates/applications/document_viewer.html
+#: templates/core/guide.html
+msgid "Next action by"
+msgstr "الإجراء التالي على"
+
+#: templates/applications/document_viewer.html templates/applications/document_viewer.html
 msgid "Next page"
 msgstr "الصفحة التالية"
 
 #: templates/applications/_tab_overview.html
 msgid "Next step"
 msgstr "الخطوة التالية"
+
+#: templates/core/guide.html
+msgid "No"
+msgstr "لا"
 
 #: templates/applications/_tab_dossier.html
 msgid "No accepted sequence yet"
@@ -1351,10 +1473,8 @@ msgid "No decisions pending"
 msgstr "لا توجد قرارات معلقة"
 
 #: apps/accounts/views.py:39
-msgid ""
-"No default lead: each team is led by the reviewer covering the most modules."
-msgstr ""
-"لا يوجد قائد افتراضي: يقود كل فريق المراجعُ الذي يغطي أكبر عدد من الوحدات."
+msgid "No default lead: each team is led by the reviewer covering the most modules."
+msgstr "لا يوجد قائد افتراضي: يقود كل فريق المراجعُ الذي يغطي أكبر عدد من الوحدات."
 
 #: templates/applications/search.html
 msgid "No documents match"
@@ -1373,9 +1493,7 @@ msgid "No information requests"
 msgstr "لا توجد طلبات معلومات"
 
 #: templates/assistant/_drawer.html
-msgid ""
-"No medicine open. Open an application, or ask about any application you can "
-"access."
+msgid "No medicine open. Open an application, or ask about any application you can access."
 msgstr "لا يوجد دواء مفتوح. افتح طلبًا، أو اسأل عن أي طلب يمكنك الوصول إليه."
 
 #: templates/applications/_notes_list.html
@@ -1383,8 +1501,7 @@ msgid "No notes on this document yet."
 msgstr "لا توجد ملاحظات على هذا المستند بعد."
 
 #: templates/applications/notes_print.html
-msgid ""
-"No notes yet. Add them from the document viewer while reading the dossier."
+msgid "No notes yet. Add them from the document viewer while reading the dossier."
 msgstr "لا توجد ملاحظات بعد. أضفها من عارض المستندات أثناء قراءة الملف."
 
 #: templates/notifications/list.html
@@ -1392,17 +1509,11 @@ msgid "No notifications yet"
 msgstr "لا توجد إشعارات بعد"
 
 #: apps/assistant/llm.py:237
-msgid ""
-"No passage in the dossier matched the question. Try the exact term used in "
-"the documents (dossiers are usually in English)."
-msgstr ""
-"لم يطابق أي مقطع في الملف السؤال. جرّب المصطلح المستخدم في المستندات "
-"(الملفات عادةً باللغة الإنجليزية)."
+msgid "No passage in the dossier matched the question. Try the exact term used in the documents (dossiers are usually in English)."
+msgstr "لم يطابق أي مقطع في الملف السؤال. جرّب المصطلح المستخدم في المستندات (الملفات عادةً باللغة الإنجليزية)."
 
 #: templates/core/dashboard_reviewer.html
-msgid ""
-"No review specialties yet. The Head of Department sets the CTD modules you "
-"assess."
+msgid "No review specialties yet. The Head of Department sets the CTD modules you assess."
 msgstr "لا توجد تخصصات مراجعة بعد. يحدد رئيس القسم وحدات CTD التي تقيّمها."
 
 #: templates/accounts/reviewers.html
@@ -1445,9 +1556,7 @@ msgstr "لا يوجد ما يُراجَع"
 msgid "notification"
 msgstr "إشعار"
 
-#: apps/notifications/apps.py:8 templates/base.html
-#: templates/notifications/_dropdown.html templates/notifications/list.html
-#: templates/notifications/list.html
+#: apps/notifications/apps.py:8 templates/base.html templates/notifications/_dropdown.html templates/notifications/list.html templates/notifications/list.html
 msgid "Notifications"
 msgstr "الإشعارات"
 
@@ -1456,20 +1565,32 @@ msgid "notifications"
 msgstr "الإشعارات"
 
 #: templates/assistant/_drawer.html
-msgid ""
-"Offline mode: no language model is configured (ASSISTANT_API_KEY), so "
-"answers are matching passages from the dossier."
-msgstr ""
-"وضع عدم الاتصال: لم يُضبط نموذج لغوي (ASSISTANT_API_KEY)، لذا تكون الإجابات "
-"مقاطع مطابقة من الملف."
+msgid "Offline mode: no language model is configured (ASSISTANT_API_KEY), so answers are matching passages from the dossier."
+msgstr "وضع عدم الاتصال: لم يُضبط نموذج لغوي (ASSISTANT_API_KEY)، لذا تكون الإجابات مقاطع مطابقة من الملف."
 
 #: apps/assistant/llm.py:230
-msgid ""
-"Offline mode: no language model is configured, so these are the most "
-"relevant passages from the dossier rather than a written answer."
-msgstr ""
-"وضع عدم الاتصال: لم يُضبط نموذج لغوي، لذا هذه أكثر المقاطع صلة من الملف "
-"بدلًا من إجابة مكتوبة."
+msgid "Offline mode: no language model is configured, so these are the most relevant passages from the dossier rather than a written answer."
+msgstr "وضع عدم الاتصال: لم يُضبط نموذج لغوي، لذا هذه أكثر المقاطع صلة من الملف بدلًا من إجابة مكتوبة."
+
+#: apps/core/guide.py:262
+msgid "On the Applications list, filter by status or search by name to find work quickly."
+msgstr "في قائمة الطلبات، صفِّ حسب الحالة أو ابحث بالاسم للوصول إلى العمل بسرعة."
+
+#: apps/core/guide.py:188
+msgid "On the “Assessment” tab, open “Request information”."
+msgstr "في تبويب «التقييم»، افتح «طلب معلومات»."
+
+#: apps/core/guide.py:172
+msgid "On the “Assessment” tab, under “Add section review”, choose the module, the assessment (Acceptable, Minor issues or Major issues) and write your comments. “Insert my notes on this module” copies your notes in. Choose “Save review”."
+msgstr "في تبويب «التقييم»، ضمن «إضافة مراجعة قسم»، اختر الوحدة والتقييم (مقبول أو ملاحظات بسيطة أو ملاحظات جوهرية) واكتب تعليقاتك. يُدرج زر «إدراج ملاحظاتي على هذه الوحدة» ملاحظاتك. ثم اختر «حفظ المراجعة»."
+
+#: apps/core/guide.py:95
+msgid "On the “eCTD sequences” tab, choose the zip file of sequence 0000 and select “Upload”."
+msgstr "في تبويب «تسلسلات eCTD»، اختر ملف zip للتسلسل 0000 ثم اختر «رفع»."
+
+#: apps/core/guide.py:221
+msgid "Once every assigned module has been assessed, the lead reviewer sends one recommendation for the whole team."
+msgstr "بعد تقييم كل الوحدات المسندة، يرسل المراجع الرئيسي توصية واحدة باسم الفريق كله."
 
 #: templates/applications/_tab_sequences.html
 msgid "One sequence folder (e.g. 0000) containing index.xml and index-md5.txt"
@@ -1478,6 +1599,10 @@ msgstr "مجلد تسلسل واحد (مثل 0000) يحتوي على index.xml �
 #: apps/validation/rules/files.py:26
 msgid "Only accepted file formats may be submitted"
 msgstr "لا يجوز تقديم إلا صيغ الملفات المقبولة"
+
+#: apps/core/guide.py:123
+msgid "Only accepted sequences count. A failed upload keeps the same sequence number for the corrected package."
+msgstr "لا تُحتسب إلا التسلسلات المقبولة. وتحتفظ الحزمة المصححة برقم التسلسل نفسه بعد فشل الرفع."
 
 #: apps/accounts/services.py:49
 msgid "Only an active reviewer can be the default lead."
@@ -1491,14 +1616,33 @@ msgstr "لا ينتمي إلى الشركات إلا مقدّمو الطلبات
 msgid "Only reviewers have review specialties."
 msgstr "تخصصات المراجعة للمراجعين فقط."
 
+#: apps/core/guide.py:194
+msgid "Only the lead reviewer can send questions. Other team members pass theirs to the lead."
+msgstr "المراجع الرئيسي وحده يرسل الأسئلة، ويمرّر بقية أعضاء الفريق أسئلتهم إليه."
+
 #: apps/applications/models.py:306 templates/core/dashboard_company.html
 msgid "Open"
 msgstr "فتح"
 
-#: templates/applications/_tab_overview.html
-#: templates/applications/_tab_overview.html
+#: templates/applications/_tab_overview.html templates/applications/_tab_overview.html
 msgid "Open assessment"
 msgstr "فتح التقييم"
+
+#: apps/core/guide.py:73
+msgid "Open PPR and choose “Sign in”. Enter your username and password."
+msgstr "افتح النظام واختر «تسجيل الدخول»، ثم أدخل اسم المستخدم وكلمة المرور."
+
+#: apps/core/guide.py:205
+msgid "Open the application from “Action needed” on your dashboard and choose “Upload response”."
+msgstr "افتح الطلب من «مطلوب إجراء» في لوحة التحكم واختر «رفع الرد»."
+
+#: apps/core/guide.py:240
+msgid "Open the application from “Awaiting your decision” on your dashboard and choose “Decide”."
+msgstr "افتح الطلب من «بانتظار قرارك» في لوحة التحكم واختر «اتخاذ القرار»."
+
+#: apps/core/guide.py:153
+msgid "Open the application. In the “Next step” panel on the Overview tab, choose a reviewer for each required module and pick the lead reviewer from the team. Choose “Assign review team”."
+msgstr "افتح الطلب. في لوحة «الخطوة التالية» بتبويب نظرة عامة، اختر مراجعًا لكل وحدة مطلوبة وحدّد المراجع الرئيسي من الفريق، ثم اختر «تعيين فريق المراجعة»."
 
 #: apps/assistant/context_processors.py:31
 msgid "Open the cited page"
@@ -1507,6 +1651,14 @@ msgstr "افتح الصفحة المشار إليها"
 #: templates/assistant/_drawer.html
 msgid "Open the dossier assistant"
 msgstr "افتح مساعد الملف"
+
+#: apps/core/guide.py:169
+msgid "Open your dashboard. “Modules awaiting your assessment” lists each application and the modules you still owe."
+msgstr "افتح لوحة التحكم. يعرض قسم «وحدات بانتظار تقييمك» كل طلب والوحدات التي لم تقيّمها بعد."
+
+#: apps/core/guide.py:275
+msgid "Open “Assessment notes” on the Assessment tab to see the team's notes for an application. Filter to “My notes” or print them."
+msgstr "افتح «ملاحظات التقييم» في تبويب التقييم لعرض ملاحظات الفريق على الطلب. اعرض «ملاحظاتي» فقط أو اطبعها."
 
 #: apps/applications/models.py:338
 msgid "outcome"
@@ -1526,9 +1678,7 @@ msgstr "متطلبات الحزمة"
 
 #: apps/applications/views.py:251
 #, python-format
-msgid ""
-"Package uploaded as sequence %(no)s. Submit it to start technical "
-"validation."
+msgid "Package uploaded as sequence %(no)s. Submit it to start technical validation."
 msgstr "تم رفع الحزمة كتسلسل %(no)s. قدّمها لبدء التحقق الفني."
 
 #: apps/applications/models.py:358
@@ -1544,8 +1694,7 @@ msgstr "الصفحة"
 msgid "Page %(n)s of %(total)s"
 msgstr "صفحة %(n)s من %(total)s"
 
-#: templates/applications/_notes_list.html
-#: templates/applications/notes_print.html
+#: templates/applications/_notes_list.html templates/applications/notes_print.html
 #, python-format
 msgid "Page %(p)s"
 msgstr "صفحة %(p)s"
@@ -1554,13 +1703,11 @@ msgstr "صفحة %(p)s"
 msgid "Page not found"
 msgstr "الصفحة غير موجودة"
 
-#: apps/applications/models.py:177
-#: templates/applications/validation_report.html
+#: apps/applications/models.py:177 templates/applications/validation_report.html
 msgid "Passed"
 msgstr "ناجح"
 
-#: apps/applications/models.py:178
-#: templates/applications/validation_report.html
+#: apps/applications/models.py:178 templates/applications/validation_report.html
 msgid "Passed with warnings"
 msgstr "ناجح مع تحذيرات"
 
@@ -1600,8 +1747,7 @@ msgstr "رقم الترخيص الصيدلاني"
 msgid "Pharmaceutical Product Registration"
 msgstr "تسجيل المستحضرات الصيدلانية"
 
-#: templates/accounts/login.html templates/accounts/password_reset_email.txt
-#: templates/applications/validation_report.html
+#: templates/accounts/login.html templates/accounts/password_reset_email.txt templates/applications/validation_report.html
 msgid "Pharmacy Department"
 msgstr "دائرة الصيدلة"
 
@@ -1616,6 +1762,10 @@ msgstr "دائرة الصيدلة · داخلي"
 #: templates/core/home.html
 msgid "Pharmacy Department · Marketing authorisation"
 msgstr "دائرة الصيدلة · ترخيص التسويق"
+
+#: templates/core/guide.html
+msgid "Pharmacy Department · Training"
+msgstr "دائرة الصيدلة · التدريب"
 
 #: apps/assistant/context_processors.py:34
 msgid "Pinned"
@@ -1634,16 +1784,14 @@ msgid "PPR — Pharmaceutical Product Registration"
 msgstr "PPR — تسجيل المستحضرات الصيدلانية"
 
 #: templates/base.html
-msgid ""
-"PPR — Pharmaceutical Product Registration · eCTD-based marketing "
-"authorisation"
+msgid "PPR — Pharmaceutical Product Registration · eCTD-based marketing authorisation"
 msgstr "PPR — تسجيل المستحضرات الصيدلانية · ترخيص التسويق بنظام eCTD"
 
 #: apps/accounts/models.py:34
 msgid "preferred language"
 msgstr "اللغة المفضلة"
 
-#: apps/applications/views.py:42
+#: apps/applications/views.py:42 apps/core/guide.py:37
 msgid "Preparation"
 msgstr "الإعداد"
 
@@ -1651,18 +1799,15 @@ msgstr "الإعداد"
 msgid "Previous"
 msgstr "السابق"
 
-#: templates/applications/document_viewer.html
-#: templates/applications/document_viewer.html
+#: templates/applications/document_viewer.html templates/applications/document_viewer.html
 msgid "Previous page"
 msgstr "الصفحة السابقة"
 
-#: templates/applications/certificate.html
-#: templates/applications/sequence_detail.html
+#: templates/applications/certificate.html templates/applications/sequence_detail.html
 msgid "Print"
 msgstr "طباعة"
 
-#: templates/applications/notes_print.html
-#: templates/applications/validation_report.html
+#: templates/applications/notes_print.html templates/applications/validation_report.html templates/core/guide.html
 msgid "Print / save as PDF"
 msgstr "طباعة / حفظ PDF"
 
@@ -1670,8 +1815,7 @@ msgstr "طباعة / حفظ PDF"
 msgid "Procedure"
 msgstr "الإجراء"
 
-#: templates/applications/validation_report.html
-#: templates/components/application_table.html
+#: templates/applications/validation_report.html templates/components/application_table.html
 msgid "Product"
 msgstr "المستحضر"
 
@@ -1693,11 +1837,8 @@ msgstr "الأسئلة"
 
 #: templates/applications/_tab_review.html
 #, python-format
-msgid ""
-"Questions for the applicant go through the lead reviewer, %(name)s: put them"
-" in your comments."
-msgstr ""
-"تُرسل الأسئلة لمقدم الطلب عبر المراجع الرئيسي %(name)s: اكتبها في ملاحظاتك."
+msgid "Questions for the applicant go through the lead reviewer, %(name)s: put them in your comments."
+msgstr "تُرسل الأسئلة لمقدم الطلب عبر المراجع الرئيسي %(name)s: اكتبها في ملاحظاتك."
 
 #: templates/applications/_tab_sequences.html
 msgid "Questions from the reviewer"
@@ -1711,6 +1852,10 @@ msgstr "أُرسلت الأسئلة إلى مقدّم الطلب. تم إيقا�
 msgid "Questions to the applicant"
 msgstr "الأسئلة الموجهة لمقدّم الطلب"
 
+#: apps/core/guide.py:296
+msgid "Questions to the applicant and the response"
+msgstr "أسئلة لمقدّم الطلب والرد عليها"
+
 #: apps/validation/models.py:14
 msgid "Queued"
 msgstr "في الانتظار"
@@ -1722,6 +1867,18 @@ msgstr "النص المقتبس"
 #: templates/applications/_review_team.html
 msgid "Re-assessment needed"
 msgstr "يلزم إعادة التقييم"
+
+#: apps/core/guide.py:170
+msgid "Read the dossier on the “Current dossier” tab. It shows every accepted sequence applied in order, with replaced and deleted documents marked. PDFs open in the built-in viewer."
+msgstr "اقرأ الملف في تبويب «الملف الحالي». يعرض كل التسلسلات المقبولة مطبّقة بالترتيب، مع تمييز المستندات المستبدلة والمحذوفة. تُفتح ملفات PDF في العارض المدمج."
+
+#: apps/core/guide.py:241
+msgid "Read the “Lead reviewer recommendation” and the “Section reviews”."
+msgstr "اقرأ «توصية المراجع الرئيسي» و«مراجعات الأقسام»."
+
+#: apps/core/guide.py:206
+msgid "Read the “Questions from the reviewer” and the due date."
+msgstr "اقرأ «أسئلة المراجع» وموعد الرد."
 
 #: apps/assistant/models.py:24
 msgid "Reader"
@@ -1832,10 +1989,17 @@ msgstr "التقرير (PDF)"
 msgid "Request information"
 msgstr "طلب معلومات"
 
-#: apps/accounts/urls.py:54 templates/accounts/auth_page.html
-#: templates/accounts/locked_out.html
+#: apps/core/guide.py:182
+msgid "Request information from the company (clock stop)"
+msgstr "طلب معلومات من الشركة (إيقاف الساعة)"
+
+#: apps/accounts/urls.py:54 templates/accounts/auth_page.html templates/accounts/locked_out.html
 msgid "Reset password"
 msgstr "إعادة تعيين كلمة المرور"
+
+#: apps/core/guide.py:199
+msgid "Respond to an information request"
+msgstr "الرد على طلب المعلومات"
 
 #: templates/applications/_tab_sequences.html
 msgid "Respond to the information request"
@@ -1855,22 +2019,17 @@ msgstr "ملاحظة الرد"
 
 #: apps/applications/services.py:98 apps/applications/views.py:239
 #, python-format
-msgid ""
-"Response sequence %(no)s failed technical validation. Fix the errors and "
-"upload again."
+msgid "Response sequence %(no)s failed technical validation. Fix the errors and upload again."
 msgstr "فشل تسلسل الرد %(no)s في التحقق الفني. صحّح الأخطاء وارفعه مجدداً."
 
 #: apps/applications/views.py:235
 #, python-format
-msgid ""
-"Response sequence %(no)s is being validated. You will be notified of the "
-"result."
+msgid "Response sequence %(no)s is being validated. You will be notified of the result."
 msgstr "يجري التحقق من تسلسل الرد %(no)s. سيصلك إشعار بالنتيجة."
 
 #: apps/applications/views.py:237
 #, python-format
-msgid ""
-"Response sequence %(no)s passed validation and was sent to the reviewer."
+msgid "Response sequence %(no)s passed validation and was sent to the reviewer."
 msgstr "اجتاز تسلسل الرد %(no)s التحقق وأُرسل إلى المراجع."
 
 #: apps/applications/forms.py:49
@@ -1884,6 +2043,10 @@ msgstr "الرد على الأسئلة"
 #: templates/applications/_tab_sequences.html
 msgid "Resubmit for validation"
 msgstr "إعادة التقديم للتحقق"
+
+#: templates/core/guide.html
+msgid "Result:"
+msgstr "النتيجة:"
 
 #: templates/applications/_tab_review.html
 msgid "Return for further review"
@@ -1905,8 +2068,7 @@ msgstr "اكتملت المراجعة – بانتظار القرار"
 msgid "Review completed and sent to the Head of Department."
 msgstr "اكتملت المراجعة وأُرسلت إلى رئيس القسم."
 
-#: templates/applications/document_viewer.html
-#: templates/applications/document_viewer.html
+#: templates/applications/document_viewer.html templates/applications/document_viewer.html
 msgid "Review notes"
 msgstr "ملاحظات المراجعة"
 
@@ -1926,8 +2088,7 @@ msgstr "فريق المراجعة"
 msgid "Review team assigned."
 msgstr "تم تعيين فريق المراجعة."
 
-#: apps/accounts/models.py:21 templates/accounts/reviewers.html
-#: templates/applications/_tab_history.html
+#: apps/accounts/models.py:21 apps/core/guide.py:21 apps/core/guide.py:31 templates/accounts/reviewers.html templates/applications/_tab_history.html
 msgid "Reviewer"
 msgstr "المراجع"
 
@@ -1943,6 +2104,10 @@ msgstr "توصية المراجع"
 msgid "Reviewer specialties"
 msgstr "تخصصات المراجعين"
 
+#: apps/core/guide.py:292
+msgid "Reviewer specialties and review teams"
+msgstr "تخصصات المراجعين وفرق المراجعة"
+
 #: templates/core/dashboard_hod.html
 msgid "Reviewer workload"
 msgstr "عبء عمل المراجعين"
@@ -1951,8 +2116,7 @@ msgstr "عبء عمل المراجعين"
 msgid "Reviewer workspace"
 msgstr "مساحة عمل المراجع"
 
-#: templates/accounts/reviewers.html templates/accounts/reviewers.html
-#: templates/base.html templates/base.html
+#: templates/accounts/reviewers.html templates/accounts/reviewers.html templates/base.html templates/base.html
 msgid "Reviewers"
 msgstr "المراجعون"
 
@@ -1972,8 +2136,7 @@ msgstr "طريقة الاستعمال"
 msgid "Route of administration"
 msgstr "طريقة الاستعمال"
 
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "Rule"
 msgstr "القاعدة"
 
@@ -1981,8 +2144,7 @@ msgstr "القاعدة"
 msgid "Running"
 msgstr "قيد التنفيذ"
 
-#: templates/accounts/reviewers.html templates/accounts/reviewers.html
-#: templates/applications/_notes_list.html templates/companies/profile.html
+#: templates/accounts/reviewers.html templates/accounts/reviewers.html templates/applications/_notes_list.html templates/companies/profile.html
 msgid "Save"
 msgstr "حفظ"
 
@@ -1994,7 +2156,7 @@ msgstr "حفظ التغييرات"
 msgid "Save review"
 msgstr "حفظ المراجعة"
 
-#: apps/applications/views.py:45
+#: apps/applications/views.py:45 apps/core/guide.py:40
 msgid "Scientific review"
 msgstr "المراجعة العلمية"
 
@@ -2002,8 +2164,7 @@ msgstr "المراجعة العلمية"
 msgid "Search"
 msgstr "بحث"
 
-#: templates/applications/search.html templates/base.html templates/base.html
-#: templates/base.html
+#: templates/applications/search.html templates/base.html templates/base.html templates/base.html
 msgid "Search dossiers"
 msgstr "البحث في الملفات"
 
@@ -2012,9 +2173,7 @@ msgid "Search reference, product, ingredient or company"
 msgstr "ابحث بالرقم المرجعي أو المستحضر أو المادة الفعالة أو الشركة"
 
 #: templates/applications/search.html
-msgid ""
-"Searches every application you can open: its details and the text of its "
-"accepted documents."
+msgid "Searches every application you can open: its details and the text of its accepted documents."
 msgstr "يبحث في كل طلب يمكنك فتحه: بياناته ونصوص مستنداته المقبولة."
 
 #: apps/assistant/context_processors.py:29
@@ -2057,16 +2216,11 @@ msgstr "إرسال إلى رئيس القسم"
 msgid "Separate multiple ingredients with commas."
 msgstr "افصل بين المواد المتعددة بفواصل."
 
-#: apps/applications/models.py:184 apps/applications/models.py:201
-#: templates/applications/_tab_review.html templates/assistant/_drawer.html
+#: apps/applications/models.py:184 apps/applications/models.py:201 templates/applications/_tab_review.html templates/assistant/_drawer.html
 msgid "sequence"
 msgstr "التسلسل"
 
-#: templates/applications/_current_node.html
-#: templates/applications/_tab_sequences.html
-#: templates/applications/document_viewer.html
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: templates/applications/_current_node.html templates/applications/_tab_sequences.html templates/applications/document_viewer.html templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "Sequence"
 msgstr "التسلسل"
 
@@ -2081,12 +2235,8 @@ msgid "sequence %(number)s"
 msgstr "التسلسل %(number)s"
 
 #: templates/core/home.html
-msgid ""
-"Sequence numbers, MD5 checksums, required modules, lifecycle operations and "
-"naming rules."
-msgstr ""
-"أرقام التسلسل، والمجاميع الاختبارية MD5، والوحدات المطلوبة، وعمليات دورة "
-"الحياة، وقواعد التسمية."
+msgid "Sequence numbers, MD5 checksums, required modules, lifecycle operations and naming rules."
+msgstr "أرقام التسلسل، والمجاميع الاختبارية MD5، والوحدات المطلوبة، وعمليات دورة الحياة، وقواعد التسمية."
 
 #: apps/applications/models.py:202
 msgid "sequences"
@@ -2096,18 +2246,29 @@ msgstr "التسلسلات"
 msgid "Sequences"
 msgstr "التسلسلات"
 
+#: apps/core/guide.py:82
+msgid "Sessions end after a working day or when you close the browser. Sign out on shared computers."
+msgstr "تنتهي الجلسة بعد يوم عمل أو عند إغلاق المتصفح. سجّل الخروج على الأجهزة المشتركة."
+
 #: apps/accounts/urls.py:73
 msgid "Set password"
 msgstr "تعيين كلمة المرور"
 
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: apps/core/guide.py:129
+msgid "Set reviewer specialties"
+msgstr "تحديد تخصصات المراجعين"
+
+#: templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "Severity"
 msgstr "الدرجة"
 
 #: templates/applications/validation_report.html
 msgid "Short (errors)"
 msgstr "مختصر (الأخطاء)"
+
+#: templates/core/guide.html
+msgid "Short recordings of the real system with demonstration data. Captions explain each step."
+msgstr "تسجيلات قصيرة للنظام الفعلي ببيانات تجريبية، مع تعليقات توضح كل خطوة."
 
 #: templates/applications/validation_report.html
 msgid "Short report: errors only"
@@ -2122,11 +2283,17 @@ msgstr "عرض"
 msgid "Show %(r)s replaced and %(d)s deleted"
 msgstr "إظهار %(r)s مستبدل و%(d)s محذوف"
 
-#: apps/accounts/urls.py:81 templates/accounts/login.html
-#: templates/accounts/login.html templates/accounts/login.html
-#: templates/core/home.html
+#: templates/core/guide.html templates/core/guide.html
+msgid "Show workflows for"
+msgstr "عرض مسارات العمل حسب الدور:"
+
+#: apps/accounts/urls.py:81 templates/accounts/login.html templates/accounts/login.html templates/accounts/login.html templates/core/home.html
 msgid "Sign in"
 msgstr "تسجيل الدخول"
+
+#: apps/core/guide.py:69
+msgid "Sign in and manage your account"
+msgstr "تسجيل الدخول وإدارة الحساب"
 
 #: templates/notifications/email_body.txt
 msgid "Sign in to PPR to view the details."
@@ -2146,24 +2313,20 @@ msgstr "تسجيل الخروج"
 
 #: templates/accounts/locked_out.html
 #, python-format
-msgid ""
-"Signing in to this account from your network is blocked for "
-"%(cooloff_time)s. Try again later, or reset your password."
-msgstr ""
-"تم حظر تسجيل الدخول إلى هذا الحساب من شبكتك لمدة %(cooloff_time)s. حاول "
-"لاحقاً أو أعد تعيين كلمة المرور."
+msgid "Signing in to this account from your network is blocked for %(cooloff_time)s. Try again later, or reset your password."
+msgstr "تم حظر تسجيل الدخول إلى هذا الحساب من شبكتك لمدة %(cooloff_time)s. حاول لاحقاً أو أعد تعيين كلمة المرور."
 
 #: templates/applications/_tab_sequences.html
 msgid "Size"
 msgstr "الحجم"
 
 #: templates/accounts/password_reset_email.txt
-msgid ""
-"Someone asked to reset the password of your PPR account. Open this link to "
-"choose a new password:"
-msgstr ""
-"طلب أحدهم إعادة تعيين كلمة مرور حسابك في PPR. افتح هذا الرابط لاختيار كلمة "
-"مرور جديدة:"
+msgid "Someone asked to reset the password of your PPR account. Open this link to choose a new password:"
+msgstr "طلب أحدهم إعادة تعيين كلمة مرور حسابك في PPR. افتح هذا الرابط لاختيار كلمة مرور جديدة:"
+
+#: apps/core/guide.py:59
+msgid "Specialist reviewers assess their CTD modules."
+msgstr "يقيّم المراجعون المتخصصون وحدات CTD المسندة إليهم."
 
 #: apps/accounts/admin.py:25 templates/accounts/reviewers.html
 msgid "Specialties"
@@ -2186,7 +2349,7 @@ msgstr "حدد التخصصات"
 msgid "status"
 msgstr "الحالة"
 
-#: templates/components/application_table.html
+#: templates/components/application_table.html templates/core/guide.html
 msgid "Status"
 msgstr "الحالة"
 
@@ -2194,9 +2357,17 @@ msgstr "الحالة"
 msgid "status change"
 msgstr "تغيير الحالة"
 
+#: templates/core/guide.html
+msgid "Status change"
+msgstr "تغيّر الحالة"
+
 #: apps/applications/models.py:243
 msgid "status history"
 msgstr "سجل الحالات"
+
+#: templates/core/guide.html templates/core/guide.html
+msgid "Status reference"
+msgstr "مرجع الحالات"
 
 #: templates/applications/form.html
 msgid "Step 1 of 2: product details. Next, upload the eCTD package."
@@ -2219,8 +2390,7 @@ msgstr "التركيز"
 msgid "Submission"
 msgstr "التقديم"
 
-#: templates/applications/sequence_detail.html
-#: templates/applications/validation_report.html
+#: templates/applications/sequence_detail.html templates/applications/validation_report.html
 msgid "Submission envelope"
 msgstr "غلاف التقديم"
 
@@ -2237,13 +2407,8 @@ msgid "Submit for validation"
 msgstr "التقديم للتحقق"
 
 #: templates/core/home.html
-msgid ""
-"Submit medicine approval dossiers in the international eCTD format. Every "
-"package is technically validated automatically, the way the FDA and EMA do "
-"it, before scientific review begins."
-msgstr ""
-"قدّم ملفات طلبات الموافقة على الأدوية بصيغة eCTD الدولية. يتم التحقق الفني "
-"من كل حزمة تلقائياً، كما تفعل هيئتا FDA و EMA، قبل بدء المراجعة العلمية."
+msgid "Submit medicine approval dossiers in the international eCTD format. Every package is technically validated automatically, the way the FDA and EMA do it, before scientific review begins."
+msgstr "قدّم ملفات طلبات الموافقة على الأدوية بصيغة eCTD الدولية. يتم التحقق الفني من كل حزمة تلقائياً، كما تفعل هيئتا FDA و EMA، قبل بدء المراجعة العلمية."
 
 #: apps/applications/models.py:35 templates/applications/_tab_overview.html
 msgid "Submitted"
@@ -2269,6 +2434,10 @@ msgstr "لخّص هذا الملف"
 msgid "system"
 msgstr "النظام"
 
+#: apps/core/guide.py:24
+msgid "System"
+msgstr "النظام"
+
 #: templates/applications/_tab_history.html
 msgid "System (automatic assignment)"
 msgstr "النظام (تعيين تلقائي)"
@@ -2283,51 +2452,44 @@ msgstr "الهدف غير موجود"
 
 #: templates/core/dashboard_hod.html
 #, python-format
-msgid ""
-"Teams are assigned automatically from <a href=\"%(reviewers_url)s\" "
-"class=\"text-brand-700 hover:underline\">reviewer specialties</a>. "
-"Applications only wait here when a required module has no qualified "
-"reviewer."
-msgstr ""
-"تُعيَّن الفرق تلقائياً بناءً على <a href=\"%(reviewers_url)s\" class=\"text-"
-"brand-700 hover:underline\">تخصصات المراجعين</a>. لا تنتظر الطلبات هنا إلا "
-"إذا لم يكن لإحدى الوحدات المطلوبة مراجع مؤهل."
+msgid "Teams are assigned automatically from <a href=\"%(reviewers_url)s\" class=\"text-brand-700 hover:underline\">reviewer specialties</a>. Applications only wait here when a required module has no qualified reviewer."
+msgstr "تُعيَّن الفرق تلقائياً بناءً على <a href=\"%(reviewers_url)s\" class=\"text-brand-700 hover:underline\">تخصصات المراجعين</a>. لا تنتظر الطلبات هنا إلا إذا لم يكن لإحدى الوحدات المطلوبة مراجع مؤهل."
 
-#: apps/applications/models.py:36 apps/applications/views.py:43
+#: apps/applications/models.py:36 apps/applications/views.py:43 apps/core/guide.py:38
 msgid "Technical validation"
 msgstr "التحقق الفني"
 
+#: apps/core/guide.py:108
+msgid "Technical validation and correcting a failed package"
+msgstr "التحقق الفني وتصحيح الحزمة المرفوضة"
+
 #: apps/applications/views.py:274
 #, python-format
-msgid ""
-"Technical validation failed with %(count)s error(s). Review the report, fix "
-"the package and resubmit."
-msgstr ""
-"فشل التحقق الفني بعدد %(count)s خطأ. راجع التقرير وصحّح الحزمة ثم أعد "
-"التقديم."
+msgid "Technical validation failed with %(count)s error(s). Review the report, fix the package and resubmit."
+msgstr "فشل التحقق الفني بعدد %(count)s خطأ. راجع التقرير وصحّح الحزمة ثم أعد التقديم."
 
 #: templates/applications/_tab_overview.html
-msgid ""
-"Technical validation failed. Open the report, correct the package and "
-"resubmit."
+msgid "Technical validation failed. Open the report, correct the package and resubmit."
 msgstr "فشل التحقق الفني. افتح التقرير وصحّح الحزمة ثم أعد التقديم."
 
 #: templates/applications/_validation_progress.html
-msgid ""
-"Technical validation is in progress. This page refreshes when the result is "
-"ready."
+msgid "Technical validation is in progress. This page refreshes when the result is ready."
 msgstr "التحقق الفني جارٍ. ستُحدَّث هذه الصفحة عند جهوز النتيجة."
 
 #: templates/applications/_review_team.html
-msgid ""
-"The applicant answered questions about this module after its last "
-"assessment."
+msgid "The applicant answered questions about this module after its last assessment."
 msgstr "أجاب مقدم الطلب عن أسئلة تخص هذه الوحدة بعد آخر تقييم لها."
 
-#: templates/assistant/_drawer.html
-msgid ""
-"The assistant can be wrong. Check the cited pages before relying on an "
-"answer."
+#: apps/core/guide.py:63
+msgid "The application is refused. The justification is on the Assessment tab."
+msgstr "رُفض الطلب. المبررات في تبويب التقييم."
+
+#: apps/core/guide.py:156
+msgid "The application is Under review and every team member is notified."
+msgstr "يصبح الطلب «قيد المراجعة» ويُشعَر كل أعضاء الفريق."
+
+#: apps/core/guide.py:279 templates/assistant/_drawer.html
+msgid "The assistant can be wrong. Check the cited pages before relying on an answer."
 msgstr "قد يخطئ المساعد. راجع الصفحات المشار إليها قبل الاعتماد على الإجابة."
 
 #: templates/assistant/_drawer.html
@@ -2342,25 +2504,56 @@ msgstr "انتهى وقت المساعد. اطرح سؤالًا أكثر تحد�
 msgid "The assistant stopped after too many steps. Ask a narrower question."
 msgstr "توقف المساعد بعد خطوات كثيرة. اطرح سؤالًا أكثر تحديدًا."
 
+#: apps/core/guide.py:258
+msgid "The bell in the top bar lists notifications. Every status change also sends an email to the people involved."
+msgstr "يعرض الجرس في الشريط العلوي الإشعارات، ويُرسَل أيضًا بريد إلكتروني إلى المعنيين عند كل تغيّر في الحالة."
+
+#: apps/core/guide.py:48
+msgid "The company answers the lead reviewer's questions with a validated sequence."
+msgstr "تجيب الشركة عن أسئلة المراجع الرئيسي بتسلسل اجتاز التحقق."
+
+#: apps/core/guide.py:203
+msgid "The company answers with a new eCTD sequence, which is validated before it reaches the reviewers."
+msgstr "تجيب الشركة بتسلسل eCTD جديد يُتحقَّق منه قبل وصوله إلى المراجعين."
+
+#: apps/core/guide.py:47
+msgid "The company corrects the package and resubmits it."
+msgstr "تصحّح الشركة الحزمة وتعيد تقديمها."
+
+#: apps/core/guide.py:91
+msgid "The company enters the product details, uploads the first eCTD sequence (0000) and submits it."
+msgstr "تُدخل الشركة بيانات المستحضر، وترفع أول تسلسل eCTD (0000) وتقدّمه."
+
+#: apps/core/guide.py:55
+msgid "The company has submitted the first eCTD sequence."
+msgstr "قدّمت الشركة أول تسلسل eCTD."
+
+#: apps/core/guide.py:54
+msgid "The company is preparing the application. Only the company can see it."
+msgstr "تُعدّ الشركة الطلب، ولا يراه غيرها."
+
+#: apps/core/guide.py:245
+msgid "The company opens “Approval certificate” to print the bilingual certificate or save it as a PDF."
+msgstr "تفتح الشركة «شهادة الموافقة» لطباعة الشهادة ثنائية اللغة أو حفظها بصيغة PDF."
+
 #: templates/core/home.html
 msgid "The company uploads its eCTD sequence as a zip package."
 msgstr "ترفع الشركة تسلسل eCTD كحزمة مضغوطة."
 
 #: templates/applications/_tab_dossier.html
-msgid ""
-"The current dossier appears once a sequence passes technical validation."
+msgid "The current dossier appears once a sequence passes technical validation."
 msgstr "يظهر الملف الحالي عند اجتياز أحد التسلسلات للتحقق الفني."
 
 #: templates/applications/_tab_overview.html
-msgid ""
-"The dossier passed technical validation. Assign a specialist to each CTD "
-"module and name the lead reviewer."
-msgstr ""
-"اجتاز الملف التحقق الفني. عيّن متخصصًا لكل وحدة CTD وحدد المراجع الرئيسي."
+msgid "The dossier passed technical validation. Assign a specialist to each CTD module and name the lead reviewer."
+msgstr "اجتاز الملف التحقق الفني. عيّن متخصصًا لكل وحدة CTD وحدد المراجع الرئيسي."
+
+#: apps/core/guide.py:58
+msgid "The dossier passed validation and waits for a review team."
+msgstr "اجتاز الملف التحقق وينتظر فريق المراجعة."
 
 #: templates/applications/sequence_detail.html
-msgid ""
-"The dossier viewer is available once a sequence passes technical validation."
+msgid "The dossier viewer is available once a sequence passes technical validation."
 msgstr "يتوفر عارض الملف بعد اجتياز التسلسل للتحقق الفني."
 
 #: apps/validation/rules/regional.py:60
@@ -2368,9 +2561,7 @@ msgid "The envelope must be addressed to the receiving country and its agency"
 msgstr "يجب أن يكون الغلاف موجهاً إلى الدولة المستلمة وجهتها"
 
 #: apps/validation/rules/regional.py:83
-msgid ""
-"The envelope sequence and related sequences must match this application's "
-"lifecycle"
+msgid "The envelope sequence and related sequences must match this application's lifecycle"
 msgstr "يجب أن يتوافق تسلسل الغلاف والتسلسلات المرتبطة مع دورة حياة هذا الطلب"
 
 #: apps/validation/rules/regional.py:105
@@ -2394,38 +2585,64 @@ msgid "The GCC regional XML must be valid against the GCC regional DTD"
 msgstr "يجب أن يكون ملف XML الإقليمي الخليجي صالحاً وفق DTD الإقليمي الخليجي"
 
 #: apps/validation/rules/regional.py:26
-msgid ""
-"The GCC regional XML must have the gc:gc-backbone root in the "
-"http://sfda.gov.sa namespace"
-msgstr ""
-"يجب أن يكون جذر ملف XML الإقليمي الخليجي العنصر gc:gc-backbone ضمن النطاق "
-"http://sfda.gov.sa"
+msgid "The GCC regional XML must have the gc:gc-backbone root in the http://sfda.gov.sa namespace"
+msgstr "يجب أن يكون جذر ملف XML الإقليمي الخليجي العنصر gc:gc-backbone ضمن النطاق http://sfda.gov.sa"
 
 #: templates/core/home.html
 msgid "The Head of Department approves or rejects and issues the certificate."
 msgstr "يوافق رئيس القسم أو يرفض ويصدر الشهادة."
 
+#: apps/core/guide.py:238
+msgid "The Head of Department approves or rejects the application, or returns it to the reviewers."
+msgstr "يوافق رئيس القسم على الطلب أو يرفضه، أو يعيده إلى المراجعين."
+
 #: templates/applications/_review_team.html
-msgid ""
-"The Head of Department assigns a specialist reviewer to each CTD module "
-"after technical validation."
+msgid "The Head of Department assigns a specialist reviewer to each CTD module after technical validation."
 msgstr "يعيّن رئيس القسم مراجعًا متخصصًا لكل وحدة CTD بعد التحقق الفني."
+
+#: apps/core/guide.py:131
+msgid "The Head of Department decides which CTD modules each reviewer may assess. Automatic team assignment relies on these specialties."
+msgstr "يحدد رئيس القسم وحدات CTD التي يحق لكل مراجع تقييمها، ويعتمد التعيين التلقائي للفريق على هذه التخصصات."
 
 #: apps/applications/services.py:237
 msgid "The Head of Department has not assigned the modules yet."
 msgstr "لم يُسند رئيس القسم الوحدات بعد."
 
+#: apps/core/guide.py:49
+msgid "The Head of Department returns the application for further review."
+msgstr "يعيد رئيس القسم الطلب لمزيد من المراجعة."
+
 #: apps/assistant/context_processors.py:41
 msgid "The language model could not be reached. Try again in a moment."
 msgstr "تعذّر الوصول إلى النموذج اللغوي. حاول مرة أخرى بعد قليل."
+
+#: apps/core/guide.py:186
+msgid "The lead reviewer collects the team's questions and sends them to the company. The review clock stops until it answers."
+msgstr "يجمع المراجع الرئيسي أسئلة الفريق ويرسلها إلى الشركة، وتتوقف ساعة المراجعة حتى ترد."
+
+#: apps/core/guide.py:61
+msgid "The lead reviewer has sent a recommendation to the Head of Department."
+msgstr "أرسل المراجع الرئيسي توصيته إلى رئيس القسم."
+
+#: apps/core/guide.py:158
+msgid "The lead reviewer must also assess at least one module."
+msgstr "يجب أن يقيّم المراجع الرئيسي وحدة واحدة على الأقل."
 
 #: apps/applications/services.py:129
 msgid "The lead reviewer must be one of the module reviewers."
 msgstr "يجب أن يكون المراجع الرئيسي أحد مراجعي الوحدات."
 
+#: apps/core/guide.py:62
+msgid "The marketing authorisation is granted and the certificate can be printed."
+msgstr "مُنح ترخيص التسويق ويمكن طباعة الشهادة."
+
 #: apps/validation/rules/business.py:141
 msgid "The modules required for this application type must contain documents"
 msgstr "يجب أن تحتوي الوحدات المطلوبة لنوع الطلب هذا على مستندات"
+
+#: apps/core/guide.py:57
+msgid "The package has errors. The company corrects it and resubmits."
+msgstr "في الحزمة أخطاء، تصحّحها الشركة وتعيد تقديمها."
 
 #: apps/applications/forms.py:42
 #, python-format
@@ -2437,11 +2654,16 @@ msgid "The package must be a valid, safe ZIP archive"
 msgstr "يجب أن تكون الحزمة ملف ZIP سليماً وآمناً"
 
 #: apps/validation/rules/business.py:26
-msgid ""
-"The package must contain one sequence folder with the expected 4-digit "
-"number"
-msgstr ""
-"يجب أن تحتوي الحزمة على مجلد تسلسل واحد بالرقم المتوقع المكوّن من 4 أرقام"
+msgid "The package must contain one sequence folder with the expected 4-digit number"
+msgstr "يجب أن تحتوي الحزمة على مجلد تسلسل واحد بالرقم المتوقع المكوّن من 4 أرقام"
+
+#: apps/core/guide.py:259
+msgid "The progress bar at the top of each application shows its stage. The “Next step” panel on the Overview tab says what is expected and from whom."
+msgstr "يُظهر شريط التقدم أعلى كل طلب مرحلته، وتوضح لوحة «الخطوة التالية» في تبويب نظرة عامة المطلوب وممن."
+
+#: templates/core/guide.html
+msgid "The progress bar on every application shows these six stages."
+msgstr "يعرض شريط التقدم في كل طلب هذه المراحل الست."
 
 #: apps/assistant/context_processors.py:42
 msgid "The question could not be sent."
@@ -2451,19 +2673,24 @@ msgstr "تعذّر إرسال السؤال."
 msgid "The regional Module 1 XML must exist and be well-formed"
 msgstr "يجب وجود ملف XML الإقليمي للوحدة 1 وأن يكون سليم البنية"
 
+#: apps/core/guide.py:208
+msgid "The response sequence goes through the same three-layer validation. If it fails, correct it and upload again."
+msgstr "يمر تسلسل الرد بالتحقق نفسه ذي الطبقات الثلاث، وإذا فشل فصحّحه وارفعه مرة أخرى."
+
 #: templates/applications/_tab_review.html
 msgid "The review clock is stopped until the applicant responds."
 msgstr "ساعة المراجعة متوقفة حتى يرد مقدّم الطلب."
 
+#: apps/core/guide.py:60
+msgid "The review clock is stopped until the company answers the lead reviewer's questions."
+msgstr "ساعة المراجعة متوقفة حتى تجيب الشركة عن أسئلة المراجع الرئيسي."
+
 #: templates/applications/_tab_overview.html
-msgid ""
-"The review is complete. Read the recommendation and record your decision."
+msgid "The review is complete. Read the recommendation and record your decision."
 msgstr "اكتملت المراجعة. اطّلع على التوصية وسجّل قرارك."
 
 #: templates/applications/_tab_overview.html
-msgid ""
-"The reviewer has asked for more information. Respond with a new eCTD "
-"sequence."
+msgid "The reviewer has asked for more information. Respond with a new eCTD sequence."
 msgstr "طلب المراجع معلومات إضافية. قدّم الرد في تسلسل eCTD جديد."
 
 #: templates/core/dashboard_company.html
@@ -2482,31 +2709,65 @@ msgstr "يبدأ التقييم العلمي بعد تعيين مراجع."
 msgid "The sequence must contain an index.xml backbone file"
 msgstr "يجب أن يحتوي التسلسل على ملف index.xml الرئيسي"
 
+#: apps/core/guide.py:97
+msgid "The status changes to Submitted and then to Technical validation."
+msgstr "تتغير الحالة إلى «مقدَّم» ثم إلى «التحقق الفني»."
+
+#: apps/core/guide.py:247
+msgid "The status is Approved or Rejected. The decision cannot be changed in the system."
+msgstr "تصبح الحالة «تمت الموافقة» أو «مرفوض»، ولا يمكن تغيير القرار في النظام."
+
+#: apps/core/guide.py:192
+msgid "The status is Information requested. The application shows “Waiting for applicant” on the reviewers' dashboards."
+msgstr "تصبح الحالة «مطلوب معلومات»، ويظهر الطلب تحت «بانتظار مقدّم الطلب» في لوحات المراجعين."
+
+#: apps/core/guide.py:227
+msgid "The status is Review complete – awaiting decision and the Head of Department is notified."
+msgstr "تصبح الحالة «اكتملت المراجعة – بانتظار القرار» ويُشعَر رئيس القسم."
+
 #: templates/accounts/reviewers.html
-msgid ""
-"The system administrator creates reviewer accounts; you then set their "
-"specialties here."
+msgid "The system administrator creates reviewer accounts; you then set their specialties here."
 msgstr "ينشئ مدير النظام حسابات المراجعين، ثم تحدد أنت تخصصاتهم هنا."
+
+#: apps/core/guide.py:112
+msgid "The system checks every sequence in three layers, the way the FDA and the EMA do, before any scientific review."
+msgstr "يفحص النظام كل تسلسل على ثلاث طبقات، كما تفعل FDA وEMA، قبل أي مراجعة علمية."
 
 #: apps/api/models.py:17
 msgid "The system that uses this key."
 msgstr "النظام الذي يستخدم هذا المفتاح."
 
+#: apps/core/guide.py:56
+msgid "The three-layer technical validation is running on the sequence."
+msgstr "يجري التحقق الفني ذو الطبقات الثلاث على التسلسل."
+
 #: apps/validation/rules/business.py:247
 msgid "The util/dtd folder must contain the eCTD DTD"
 msgstr "يجب أن يحتوي المجلد util/dtd على ملف DTD الخاص بـ eCTD"
+
+#: apps/core/guide.py:99
+msgid "The validation report is ready within moments. The application is no longer a draft and the Head of Department can see it."
+msgstr "يجهز تقرير التحقق خلال لحظات. لم يعد الطلب مسودة، وأصبح رئيس القسم يراه."
 
 #: templates/core/home.html
 msgid "The validator returns an instant pass/fail report with every finding."
 msgstr "يُصدر المدقق تقريراً فورياً بالنجاح أو الفشل مع جميع الملاحظات."
 
+#: apps/core/guide.py:101
+msgid "The zip contains one sequence folder (for example 0000) with index.xml, index-md5.txt, the regional Module 1 XML and util/dtd/ich-ectd-3-2.dtd."
+msgstr "يحتوي ملف zip على مجلد تسلسل واحد (مثل 0000) فيه index.xml وindex-md5.txt وملف XML للوحدة 1 الإقليمية وutil/dtd/ich-ectd-3-2.dtd."
+
+#: apps/core/guide.py:260
+msgid "The “History” tab is the audit trail: every status change with the user, the time and the note."
+msgstr "تبويب «السجل» هو سجل التدقيق: كل تغيّر في الحالة مع المستخدم والوقت والملاحظة."
+
+#: apps/core/guide.py:159
+msgid "The “Reviewer workload” panel on your dashboard shows how many modules each reviewer is handling."
+msgstr "تعرض لوحة «عبء عمل المراجعين» في لوحة التحكم عدد الوحدات لدى كل مراجع."
+
 #: apps/applications/forms.py:113
-msgid ""
-"Their reviewers must assess the applicant's answer before you can complete "
-"the review."
-msgstr ""
-"يجب أن يقيّم مراجعو هذه الوحدات ردّ مقدم الطلب قبل أن تتمكن من إكمال "
-"المراجعة."
+msgid "Their reviewers must assess the applicant's answer before you can complete the review."
+msgstr "يجب أن يقيّم مراجعو هذه الوحدات ردّ مقدم الطلب قبل أن تتمكن من إكمال المراجعة."
 
 #: apps/applications/services.py:67
 msgid "There is no open information request."
@@ -2521,15 +2782,11 @@ msgid "This document could not be displayed."
 msgstr "تعذّر عرض هذا المستند."
 
 #: templates/accounts/auth_page.html
-msgid ""
-"This password reset link is invalid or has already been used. Request a new "
-"one."
+msgid "This password reset link is invalid or has already been used. Request a new one."
 msgstr "رابط إعادة التعيين غير صالح أو استُخدم من قبل. اطلب رابطاً جديداً."
 
 #: templates/applications/sequence_detail.html
-msgid ""
-"This sequence has not been validated yet. Submit it from the application "
-"page."
+msgid "This sequence has not been validated yet. Submit it from the application page."
 msgstr "لم يتم التحقق من هذا التسلسل بعد. قدّمه من صفحة الطلب."
 
 #: templates/applications/_tab_sequences.html
@@ -2541,6 +2798,22 @@ msgstr "سيصبح هذا الرفع التسلسل %(no)s."
 msgid "Three-layer technical validation"
 msgstr "تحقق فني ثلاثي الطبقات"
 
+#: apps/core/guide.py:189
+msgid "Tick the modules the questions concern, write the questions and, if needed, set the date the response is due."
+msgstr "حدّد الوحدات التي تخصها الأسئلة، واكتب الأسئلة، وعند الحاجة حدّد موعد الرد."
+
+#: apps/core/guide.py:243
+msgid "To ask for more work instead, write what the reviewer should re-examine and choose “Return for further review”."
+msgstr "ولطلب مزيد من العمل بدلًا من ذلك، اكتب ما يجب على المراجع إعادة فحصه واختر «إعادة لمزيد من المراجعة»."
+
+#: apps/core/guide.py:154
+msgid "To change the team later, use “Update review team”. A module given to another reviewer needs a new assessment from them."
+msgstr "لتغيير الفريق لاحقًا استخدم «تحديث فريق المراجعة». الوحدة التي تُسند إلى مراجع آخر تحتاج إلى تقييم جديد منه."
+
+#: apps/core/guide.py:76
+msgid "To change your password, open the account menu (your initial) at the end of the top bar and choose “Change password”. Passwords need at least 12 characters."
+msgstr "لتغيير كلمة المرور، افتح قائمة الحساب (الحرف الأول من اسمك) في نهاية الشريط العلوي واختر «تغيير كلمة المرور». يجب ألا تقل كلمة المرور عن 12 حرفًا."
+
 #: templates/core/dashboard_reviewer.html
 msgid "To review"
 msgstr "للمراجعة"
@@ -2548,6 +2821,18 @@ msgstr "للمراجعة"
 #: templates/accounts/locked_out.html
 msgid "Too many failed sign-in attempts"
 msgstr "محاولات تسجيل دخول فاشلة كثيرة"
+
+#: apps/core/guide.py:256
+msgid "Tools every user has for knowing what happened and what to do next."
+msgstr "أدوات متاحة لكل مستخدم لمعرفة ما حدث وما يجب فعله بعد ذلك."
+
+#: apps/core/guide.py:271
+msgid "Tools for reading a dossier faster. They never replace the reviewer's own assessment."
+msgstr "أدوات لقراءة الملف بسرعة أكبر، ولا تغني أبدًا عن تقييم المراجع نفسه."
+
+#: templates/base.html templates/base.html templates/base.html templates/base.html templates/core/guide.html
+msgid "Training guide"
+msgstr "دليل التدريب"
 
 #: templates/applications/list.html
 msgid "Try a different search or status filter."
@@ -2558,12 +2843,8 @@ msgid "Try again"
 msgstr "حاول مرة أخرى"
 
 #: templates/applications/search.html
-msgid ""
-"Try other words. Only accepted sequences are searched, and their text is "
-"indexed when they pass validation."
-msgstr ""
-"جرّب كلمات أخرى. يقتصر البحث على التسلسلات المقبولة، وتُفهرس نصوصها عند "
-"اجتيازها التحقق."
+msgid "Try other words. Only accepted sequences are searched, and their text is indexed when they pass validation."
+msgstr "جرّب كلمات أخرى. يقتصر البحث على التسلسلات المقبولة، وتُفهرس نصوصها عند اجتيازها التحقق."
 
 #: templates/components/application_table.html
 msgid "Type"
@@ -2572,6 +2853,14 @@ msgstr "النوع"
 #: apps/applications/models.py:39
 msgid "Under review"
 msgstr "قيد المراجعة"
+
+#: apps/core/guide.py:224
+msgid "Under “Complete review”, choose the recommendation (Approve or Reject) and write the assessment summary."
+msgstr "ضمن «إكمال المراجعة»، اختر التوصية (الموافقة أو الرفض) واكتب ملخص التقييم."
+
+#: apps/core/guide.py:242
+msgid "Under “Record your decision”, choose Approved or Rejected, write the justification and choose “Confirm decision”."
+msgstr "ضمن «سجّل قرارك»، اختر «تمت الموافقة» أو «مرفوض»، واكتب المبررات، ثم اختر «تأكيد القرار»."
 
 #: templates/assistant/_drawer.html
 msgid "Unpin document"
@@ -2615,9 +2904,7 @@ msgstr "رفع الرد"
 
 #: templates/applications/_tab_sequences.html
 #, python-format
-msgid ""
-"Upload your answers as sequence %(no)s. It is validated before it reaches "
-"the reviewer."
+msgid "Upload your answers as sequence %(no)s. It is validated before it reaches the reviewer."
 msgstr "ارفع إجاباتك كتسلسل %(no)s. سيتم التحقق منه قبل وصوله إلى المراجع."
 
 #: templates/core/dashboard_company.html
@@ -2632,9 +2919,25 @@ msgstr "ارفع تسلسل eCTD رقم 0000 وقدّمه للتحقق الفن�
 msgid "Uploaded"
 msgstr "تاريخ الرفع"
 
+#: apps/core/guide.py:103
+msgid "Uploading again before you submit replaces the waiting package."
+msgstr "الرفع مرة أخرى قبل التقديم يستبدل الحزمة المنتظرة."
+
 #: templates/accounts/login.html
 msgid "Use the account issued to you by the Pharmacy Department."
 msgstr "استخدم الحساب الصادر لك من دائرة الصيدلة."
+
+#: apps/core/guide.py:269
+msgid "Use the dossier assistant and review notes"
+msgstr "استخدام مساعد الملف وملاحظات المراجعة"
+
+#: apps/core/guide.py:212
+msgid "Use the eCTD lifecycle operations (replace, append, delete) so the reviewers see exactly what changed."
+msgstr "استخدم عمليات دورة حياة eCTD (استبدال، إلحاق، حذف) ليرى المراجعون ما تغيّر بدقة."
+
+#: apps/core/guide.py:75
+msgid "Use the language button in the top bar to switch between English and Arabic at any time."
+msgstr "استخدم زر اللغة في الشريط العلوي للتبديل بين العربية والإنجليزية في أي وقت."
 
 #: templates/companies/profile.html
 msgid "Users"
@@ -2656,8 +2959,7 @@ msgstr "تم التحقق – عيّن فريق المراجعة"
 msgid "Validated – awaiting assignment"
 msgstr "تم التحقق – بانتظار التعيين"
 
-#: templates/applications/_tab_sequences.html
-#: templates/applications/_tab_sequences.html
+#: templates/applications/_tab_sequences.html templates/applications/_tab_sequences.html
 msgid "Validating…"
 msgstr "جارٍ التحقق…"
 
@@ -2722,8 +3024,11 @@ msgstr "موثّقة"
 msgid "Verified applicant"
 msgstr "مقدّم طلب موثّق"
 
-#: templates/core/dashboard_company.html
-#: templates/notifications/_dropdown.html
+#: templates/core/guide.html
+msgid "Video walkthroughs"
+msgstr "شروحات بالفيديو"
+
+#: templates/core/dashboard_company.html templates/notifications/_dropdown.html
 msgid "View all"
 msgstr "عرض الكل"
 
@@ -2756,12 +3061,15 @@ msgstr "تحذيرات"
 msgid "Warnings"
 msgstr "التحذيرات"
 
+#: templates/core/guide.html
+msgid "Watch the video"
+msgstr "شاهد الفيديو"
+
 #: templates/core/home.html
 msgid "Welcome"
 msgstr "مرحباً"
 
-#: templates/core/dashboard_company.html
-#: templates/core/dashboard_reviewer.html
+#: templates/core/dashboard_company.html templates/core/dashboard_reviewer.html
 #, python-format
 msgid "Welcome, %(name)s"
 msgstr "مرحباً، %(name)s"
@@ -2774,9 +3082,17 @@ msgstr "ما القيم الرئيسية في هذا المستند؟"
 msgid "What is the proposed shelf life and storage condition?"
 msgstr "ما مدة الصلاحية وظروف التخزين المقترحة؟"
 
+#: templates/core/guide.html
+msgid "What it means"
+msgstr "المعنى"
+
 #: apps/applications/forms.py:137
 msgid "What should the reviewer re-examine?"
 msgstr "ما الذي يجب أن يعيد المراجع دراسته؟"
+
+#: apps/core/guide.py:151
+msgid "When a dossier passes validation, the system assigns the team automatically: each required module goes to the qualified reviewer with the fewest active modules, led by the default lead."
+msgstr "عندما يجتاز الملف التحقق، يعيّن النظام الفريق تلقائيًا: تذهب كل وحدة مطلوبة إلى المراجع المؤهل الأقل عددًا من الوحدات النشطة، بقيادة القائد الافتراضي."
 
 #: apps/assistant/context_processors.py:49
 msgid "Which applications can I see?"
@@ -2784,8 +3100,31 @@ msgstr "ما الطلبات التي يمكنني رؤيتها؟"
 
 #: apps/applications/forms.py:26
 msgid "WHO Anatomical Therapeutic Chemical code, e.g. N02BE01."
-msgstr ""
-"رمز التصنيف التشريحي العلاجي الكيميائي لمنظمة الصحة العالمية، مثل N02BE01."
+msgstr "رمز التصنيف التشريحي العلاجي الكيميائي لمنظمة الصحة العالمية، مثل N02BE01."
+
+#: templates/core/guide.html templates/core/guide.html
+msgid "Who does what"
+msgstr "من يقوم بماذا"
+
+#: templates/core/guide.html
+msgid "Workflow"
+msgstr "مسار العمل"
+
+#: templates/core/guide.html
+msgid "Workflow training guide"
+msgstr "دليل التدريب على مسارات العمل"
+
+#: templates/core/guide.html templates/core/guide.html
+msgid "Workflows"
+msgstr "مسارات العمل"
+
+#: apps/core/guide.py:207
+msgid "Write a short response summary, choose the zip of the next sequence and select “Upload and validate”."
+msgstr "اكتب ملخصًا قصيرًا للرد، واختر ملف zip للتسلسل التالي، ثم اختر «رفع وتحقق»."
+
+#: apps/core/guide.py:249
+msgid "Write the justification for the record: it appears on the Assessment tab and in the audit trail."
+msgstr "اكتب المبررات للتوثيق: فهي تظهر في تبويب التقييم وفي سجل التدقيق."
 
 #: templates/applications/_notes_list.html
 msgid "Write the note first."
@@ -2795,9 +3134,16 @@ msgstr "اكتب الملاحظة أولاً."
 msgid "XML schema validation"
 msgstr "التحقق من مخطط XML"
 
-#: apps/assistant/context_processors.py:27
-#: templates/applications/_review_team.html
+#: templates/core/guide.html
+msgid "Yes"
+msgstr "نعم"
+
+#: apps/assistant/context_processors.py:27 templates/applications/_review_team.html
 msgid "You"
+msgstr "أنت"
+
+#: templates/core/guide.html
+msgid "you"
 msgstr "أنت"
 
 #: apps/applications/services.py:212
@@ -2806,37 +3152,36 @@ msgid "You are not assigned to assess %(module)s for this application."
 msgstr "لست مكلفًا بتقييم %(module)s لهذا الطلب."
 
 #: templates/applications/_tab_overview.html
-msgid ""
-"You are the lead reviewer. When every module has its assessment, send "
-"questions or your recommendation to the Head of Department."
-msgstr ""
-"أنت المراجع الرئيسي. عند اكتمال تقييم كل الوحدات، أرسل الأسئلة أو توصيتك إلى"
-" رئيس القسم."
+msgid "You are the lead reviewer. When every module has its assessment, send questions or your recommendation to the Head of Department."
+msgstr "أنت المراجع الرئيسي. عند اكتمال تقييم كل الوحدات، أرسل الأسئلة أو توصيتك إلى رئيس القسم."
 
 #: templates/applications/_tab_overview.html
-msgid ""
-"You can change the review team. A module given to another reviewer needs a "
-"new assessment from them."
-msgstr ""
-"يمكنك تغيير فريق المراجعة. الوحدة المسندة إلى مراجع آخر تحتاج إلى تقييم جديد"
-" منه."
+msgid "You can change the review team. A module given to another reviewer needs a new assessment from them."
+msgstr "يمكنك تغيير فريق المراجعة. الوحدة المسندة إلى مراجع آخر تحتاج إلى تقييم جديد منه."
+
+#: apps/core/guide.py:176
+msgid "You can read the whole dossier, but you can only assess the modules assigned to you."
+msgstr "يمكنك قراءة الملف كاملًا، لكن لا يمكنك تقييم إلا الوحدات المسندة إليك."
 
 #: templates/403.html
 msgid "You can't do that here"
 msgstr "لا يمكنك تنفيذ هذا الإجراء"
 
 #: templates/accounts/reviewers.html
-msgid ""
-"You decide which CTD modules each reviewer may assess. Reviewers work only "
-"within these specialties and cannot change them. When an application passes "
-"validation, its review team is assigned automatically from these "
-"specialties: each required module goes to the qualified reviewer with the "
-"fewest active modules, led by the default lead."
-msgstr ""
-"أنت تحدد وحدات CTD التي يمكن لكل مراجع تقييمها. يعمل المراجعون ضمن هذه "
-"التخصصات فقط ولا يمكنهم تغييرها. عند اجتياز الطلب للتحقق، يُعيَّن فريق "
-"المراجعة تلقائياً بناءً على هذه التخصصات: تُسنَد كل وحدة مطلوبة إلى المراجع "
-"المؤهل صاحب أقل عدد من الوحدات النشطة، بقيادة القائد الافتراضي."
+msgid "You decide which CTD modules each reviewer may assess. Reviewers work only within these specialties and cannot change them. When an application passes validation, its review team is assigned automatically from these specialties: each required module goes to the qualified reviewer with the fewest active modules, led by the default lead."
+msgstr "أنت تحدد وحدات CTD التي يمكن لكل مراجع تقييمها. يعمل المراجعون ضمن هذه التخصصات فقط ولا يمكنهم تغييرها. عند اجتياز الطلب للتحقق، يُعيَّن فريق المراجعة تلقائياً بناءً على هذه التخصصات: تُسنَد كل وحدة مطلوبة إلى المراجع المؤهل صاحب أقل عدد من الوحدات النشطة، بقيادة القائد الافتراضي."
+
+#: apps/core/guide.py:277
+msgid "You find the relevant pages quickly and keep your notes with the dossier."
+msgstr "تصل إلى الصفحات ذات الصلة بسرعة، وتبقى ملاحظاتك محفوظة مع الملف."
+
+#: apps/core/guide.py:79
+msgid "You land on the dashboard for your role."
+msgstr "تنتقل إلى لوحة التحكم الخاصة بدورك."
+
+#: apps/core/guide.py:264
+msgid "You only ever see the applications your role allows: your company's, the ones assigned to you, or (Head of Department) every submitted one."
+msgstr "لا ترى إلا الطلبات التي يسمح بها دورك: طلبات شركتك، أو الطلبات المسندة إليك، أو (لرئيس القسم) كل الطلبات المقدَّمة."
 
 #: templates/notifications/_dropdown.html
 msgid "You're all caught up."
@@ -2845,6 +3190,10 @@ msgstr "لا توجد إشعارات جديدة."
 #: templates/core/no_role.html
 msgid "Your account has no role yet"
 msgstr "لم يُعيَّن دور لحسابك بعد"
+
+#: apps/core/guide.py:174
+msgid "Your module shows as assessed. When every module has its assessment, the lead reviewer can complete the review."
+msgstr "تظهر وحدتك على أنها مُقيَّمة. وعندما يكتمل تقييم كل الوحدات يمكن للمراجع الرئيسي إكمال المراجعة."
 
 #: apps/accounts/urls.py:80
 msgid "Your new password is set. You can sign in with it now."
@@ -2864,45 +3213,42 @@ msgstr "سؤالك"
 
 #: templates/assistant/_drawer.html
 #, python-format
-msgid ""
-"Your question and the dossier passages the assistant reads are sent to the "
-"language model at %(host)s."
-msgstr ""
-"يُرسَل سؤالك ومقاطع الملف التي يقرؤها المساعد إلى النموذج اللغوي على "
-"%(host)s."
+msgid "Your question and the dossier passages the assistant reads are sent to the language model at %(host)s."
+msgstr "يُرسَل سؤالك ومقاطع الملف التي يقرؤها المساعد إلى النموذج اللغوي على %(host)s."
 
 #: templates/core/dashboard_reviewer.html
 #, python-format
-msgid ""
-"Your review specialties: %(specialties)s (set by the Head of Department)"
+msgid "Your review specialties: %(specialties)s (set by the Head of Department)"
 msgstr "تخصصات المراجعة لديك: %(specialties)s (يحددها رئيس القسم)"
 
 #: templates/403.html
-msgid ""
-"Your role doesn't allow this action, or the application is not at the right "
-"stage."
+msgid "Your role doesn't allow this action, or the application is not at the right stage."
 msgstr "دورك لا يسمح بهذا الإجراء، أو أن الطلب ليس في المرحلة المناسبة."
 
 #: apps/applications/views.py:268
-msgid ""
-"Your submission is being validated. This page updates when the result is "
-"ready."
+msgid "Your submission is being validated. This page updates when the result is ready."
 msgstr "يجري التحقق من تقديمك. ستُحدَّث هذه الصفحة عند جهوز النتيجة."
 
 #: apps/applications/views.py:270
 msgid "Your submission passed technical validation and is waiting for review."
 msgstr "اجتاز طلبك التحقق الفني وهو بانتظار المراجعة."
 
-#: templates/applications/document_viewer.html
-#: templates/applications/document_viewer.html
+#: templates/applications/document_viewer.html templates/applications/document_viewer.html
 msgid "Zoom in"
 msgstr "تكبير"
 
-#: templates/applications/document_viewer.html
-#: templates/applications/document_viewer.html
+#: templates/applications/document_viewer.html templates/applications/document_viewer.html
 msgid "Zoom out"
 msgstr "تصغير"
 
 #: apps/applications/forms.py:75
 msgid "— not assigned —"
 msgstr "— غير مُسندة —"
+
+#: apps/core/guide.py:124
+msgid "“Report & dossier” on an accepted sequence opens its document tree and the built-in PDF viewer."
+msgstr "يفتح زر «التقرير والملف» في التسلسل المقبول شجرة مستنداته وعارض PDF المدمج."
+
+#: apps/core/guide.py:261
+msgid "“Search dossiers” searches every application you can open: its details and the text of its accepted documents."
+msgstr "يبحث «البحث في الملفات» في كل طلب يمكنك فتحه: بياناته ونصوص مستنداته المقبولة."
