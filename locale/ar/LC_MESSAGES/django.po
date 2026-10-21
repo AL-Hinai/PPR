@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PPR\n"
-"POT-Creation-Date: 2026-10-21 15:03+0000\n"
+"POT-Creation-Date: 2026-10-21 20:13+0000\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -58,6 +58,17 @@ msgstr[3] "%(counter)s وحدات"
 msgstr[4] "%(counter)s وحدة"
 msgstr[5] "%(counter)s وحدة"
 
+#: templates/accounts/login.html
+#, python-format
+msgid "%(counter)s more test account"
+msgid_plural "%(counter)s more test accounts"
+msgstr[0] "%(counter)s حساب اختبار إضافي"
+msgstr[1] "%(counter)s حساب اختبار إضافي"
+msgstr[2] "%(counter)s حسابا اختبار إضافيان"
+msgstr[3] "%(counter)s حسابات اختبار إضافية"
+msgstr[4] "%(counter)s حساب اختبار إضافي"
+msgstr[5] "%(counter)s حساب اختبار إضافي"
+
 #: templates/applications/notes_print.html
 #, python-format
 msgid "%(counter)s note"
@@ -106,7 +117,7 @@ msgstr "%(n)s سارٍ"
 msgid "%(name)s is not specialised in %(module)s."
 msgstr "%(name)s غير متخصص في %(module)s."
 
-#: apps/accounts/views.py:59
+#: apps/accounts/views.py:61
 #, python-format
 msgid "%(name)s now leads automatically assigned review teams."
 msgstr "أصبح %(name)s يقود فرق المراجعة المعيّنة تلقائياً."
@@ -616,7 +627,7 @@ msgstr "رقم السجل التجاري"
 msgid "Commercial registration no."
 msgstr "رقم السجل التجاري"
 
-#: apps/companies/apps.py:8
+#: apps/accounts/demo.py:49 apps/companies/apps.py:8
 msgid "Companies"
 msgstr "الشركات"
 
@@ -1484,7 +1495,7 @@ msgstr "لا توجد طلبات بعد"
 msgid "No decisions pending"
 msgstr "لا توجد قرارات معلقة"
 
-#: apps/accounts/views.py:60
+#: apps/accounts/views.py:62
 msgid "No default lead: each team is led by the reviewer covering the most modules."
 msgstr "لا يوجد قائد افتراضي: يقود كل فريق المراجعُ الذي يغطي أكبر عدد من الوحدات."
 
@@ -2136,7 +2147,7 @@ msgstr "عبء عمل المراجعين"
 msgid "Reviewer workspace"
 msgstr "مساحة عمل المراجع"
 
-#: templates/accounts/reviewers.html templates/accounts/reviewers.html templates/base.html templates/base.html
+#: apps/accounts/demo.py:50 templates/accounts/reviewers.html templates/accounts/reviewers.html templates/base.html templates/base.html
 msgid "Reviewers"
 msgstr "المراجعون"
 
@@ -2352,7 +2363,7 @@ msgstr "يقيّم المراجعون المتخصصون وحدات CTD المس
 msgid "Specialties"
 msgstr "التخصصات"
 
-#: apps/accounts/views.py:73
+#: apps/accounts/views.py:75
 #, python-format
 msgid "Specialties of %(name)s saved: %(modules)s."
 msgstr "تم حفظ تخصصات %(name)s: %(modules)s."

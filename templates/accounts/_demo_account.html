@@ -1,0 +1,10 @@
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="username" value="{{ account.username }}">
+  <input type="hidden" name="password" value="{{ demo_password }}">
+  <input type="hidden" name="next" value="{{ next }}">
+  <button class="w-full rounded-lg border border-slate-200 px-3 py-2 text-start transition hover:border-brand-400 hover:bg-brand-50">
+    <span class="block truncate text-sm text-slate-800">{{ account.get_full_name|default:account.username }}</span>
+    <span class="block truncate text-xs text-slate-400">{% if account.specialties %}{{ account.get_specialties_display }}{% elif account.company %}{{ account.company }}{% else %}{{ account.get_role_display }}{% endif %}</span>
+  </button>
+</form>

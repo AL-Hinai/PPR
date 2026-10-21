@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 from apps.applications.models import Application
 
 from . import services
-from .demo import demo_accounts
+from .demo import bulk_demo_accounts, demo_accounts
 from .forms import LoginForm
 from .models import CtdSection, User
 from .permissions import hod_required
@@ -26,12 +26,14 @@ class LoginView(auth_views.LoginView):
     redirect_authenticated_user = True
 
     def get_context_data(self, **kwargs):
-        accounts = demo_accounts()
+        accounts, bulk_groups = demo_accounts(), bulk_demo_accounts()
         return super().get_context_data(**kwargs) | {
             "sso_enabled": settings.SSO_ENABLED,
             "sso_label": settings.SSO_LABEL,
             "demo_accounts": accounts,
-            "demo_password": settings.DEMO_LOGIN_PASSWORD if accounts else "",
+            "bulk_demo_groups": bulk_groups,
+            "bulk_demo_count": sum(len(members) for _heading, members in bulk_groups),
+            "demo_password": settings.DEMO_LOGIN_PASSWORD if accounts or bulk_groups else "",
         }
 
 

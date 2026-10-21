@@ -24,6 +24,7 @@ from django.db.models import Q
 from django.test.utils import override_settings
 from django.utils import timezone
 
+from apps.accounts.demo import BULK_PREFIX
 from apps.accounts.models import User
 from apps.accounts.services import set_specialties
 from apps.applications import services
@@ -40,7 +41,7 @@ from .seed_demo import DEFAULT_PASSWORD
 from .seed_demo import Command as DemoCommand
 
 S = Application.Status
-USER_PREFIX = "bulk_"
+USER_PREFIX = BULK_PREFIX
 COMPANY_PREFIX = "BULK-"
 
 COMPANIES = [

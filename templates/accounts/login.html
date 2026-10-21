@@ -40,23 +40,26 @@
         <a href="{% url 'oidc_authentication_init' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="btn btn-secondary mt-3 w-full py-2.5">{% icon "shield" "size-4" %}{{ sso_label|default:_("Sign in with your Ministry account") }}</a>
       {% endif %}
       <p class="mt-4 text-center text-sm"><a href="{% url 'accounts:password_reset' %}" class="text-brand-700 hover:underline">{% trans "Forgot your password?" %}</a></p>
-      {% if demo_accounts %}
+      {% if demo_accounts or bulk_demo_groups %}
         <div data-demo-accounts>
         <div class="mt-8 flex items-center gap-3 text-xs text-slate-400"><span class="h-px flex-1 bg-slate-200"></span>{% trans "Demonstration accounts" %}<span class="h-px flex-1 bg-slate-200"></span></div>
         <div class="mt-3 grid grid-cols-2 gap-2">
-          {% for account in demo_accounts %}
-            <form method="post">
-              {% csrf_token %}
-              <input type="hidden" name="username" value="{{ account.username }}">
-              <input type="hidden" name="password" value="{{ demo_password }}">
-              <input type="hidden" name="next" value="{{ next }}">
-              <button class="w-full rounded-lg border border-slate-200 px-3 py-2 text-start transition hover:border-brand-400 hover:bg-brand-50">
-                <span class="block truncate text-sm text-slate-800">{{ account.get_full_name|default:account.username }}</span>
-                <span class="block truncate text-xs text-slate-400">{% if account.specialties %}{{ account.get_specialties_display }}{% else %}{{ account.get_role_display }}{% endif %}</span>
-              </button>
-            </form>
-          {% endfor %}
+          {% for account in demo_accounts %}{% include "accounts/_demo_account.html" %}{% endfor %}
         </div>
+        {% if bulk_demo_groups %}
+          <details class="group mt-4" data-bulk-demo-accounts>
+            <summary class="flex cursor-pointer list-none items-center justify-center gap-1.5 text-sm text-brand-700 hover:underline">
+              {% icon "chevron-right" "size-3.5 transition group-open:rotate-90" %}
+              {% blocktrans count counter=bulk_demo_count %}{{ counter }} more test account{% plural %}{{ counter }} more test accounts{% endblocktrans %}
+            </summary>
+            {% for heading, members in bulk_demo_groups %}
+              <p class="mt-4 text-xs font-medium uppercase tracking-wide text-slate-500">{{ heading }}</p>
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                {% for account in members %}{% include "accounts/_demo_account.html" %}{% endfor %}
+              </div>
+            {% endfor %}
+          </details>
+        {% endif %}
         </div>
       {% endif %}
     </div>

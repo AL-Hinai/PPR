@@ -133,3 +133,22 @@ def test_demo_login_offers_only_the_seeded_accounts(client, applicant):
     response = client.get(reverse("accounts:login"))
     assert b"Demonstration accounts" not in response.content
     assert applicant.username.encode() not in response.content
+
+
+@pytest.mark.django_db
+@override_settings(DEMO_LOGIN=True, DEMO_LOGIN_PASSWORD=PASSWORD)
+def test_seed_bulk_accounts_are_grouped_under_a_collapsed_list(client, applicant, reviewer):
+    """seed_bulk's accounts get buttons too, by role, behind a <details> so the page stays short."""
+    applicant.username, reviewer.username = "bulk_co2001", "bulk_rev_m3a"
+    applicant.save()
+    reviewer.save()
+    page = client.get(reverse("accounts:login")).content.decode()
+    group = page[page.index("data-bulk-demo-accounts"):]
+    assert "2 more test accounts" in group
+    assert group.index("Companies") < group.index('value="bulk_co2001"') < group.index("Reviewers")
+    assert group.index("Reviewers") < group.index('value="bulk_rev_m3a"')
+    assert "Acme Pharma" in group  # company buttons name the company
+
+    response = client.post(reverse("accounts:login"), {"username": "bulk_rev_m3a", "password": PASSWORD})
+    assert response.status_code == 302
+    assert client.session["_auth_user_id"] == str(reviewer.pk)
