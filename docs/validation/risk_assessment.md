@@ -7,7 +7,7 @@ verified control before go-live.
 
 | # | Hazard | Effect | S | L | Risk | Controls in PPR | Verified by |
 |---|---|---|---|---|---|---|---|
-| R1 | A defective dossier passes technical validation | Review of an unusable or tampered dossier | 3 | 2 | 6 | Official ICH DTD (checksum-pinned), 29 rules incl. GCC M1, MD5 of every file, one broken package per rule | URS-02–05 tests, PQ-02 benchmark |
+| R1 | A defective dossier passes technical validation | Review of an unusable or tampered dossier | 3 | 2 | 6 | Official ICH DTD (checksum-pinned), 31 rules incl. GCC M1, MD5 of every file, one broken package per rule | URS-02–05 tests, PQ-02 benchmark |
 | R2 | A valid dossier is rejected | Delay for the applicant; disputes | 2 | 2 | 4 | Rules aligned with GCC M1 v1.5; benchmark against EURSvalidator; warnings vs errors per specification | PQ-02 |
 | R3 | GCC regional DTD differs from SFDA's file (transcribed from the specification) | R1 or R2 for Module 1 | 2 | 2 | 4 | Transcription documented; replace with distributed files when available; GCC-02 tests | PQ-02, dtd/README.md |
 | R4 | A company sees another company's dossier or the internal assessment | Breach of confidential commercial information | 3 | 1 | 3 | `visible_to()` on every view and assistant tool; applicants never get assessments or notes; permission-checked file views; no public media | URS-13 tests, OQ-06 |

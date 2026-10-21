@@ -93,6 +93,30 @@ class PdfFontsEmbedded(Rule):
                 yield self.issue(f"Fonts not embedded: {listed}.", file_path=ctx.rel(path))
 
 
+class PdfTextLayer(Rule):
+    """A scan of a paper document carries no text: it cannot be searched, quoted or read back.
+
+    Only files with no text at all are reported. Single image pages (a chromatogram, a signed
+    certificate page) are normal inside an otherwise readable document and are left alone.
+    """
+
+    code = "FC-08"
+    layer = Layer.FILE
+    severity = Severity.WARNING
+    title = _("PDF files should contain searchable text, not only scanned images")
+
+    def check(self, ctx):
+        for path in ctx.pdf_files:
+            report = ctx.pdf(path)
+            if report.readable and report.is_scanned:
+                pages = report.pages_read
+                yield self.issue(
+                    f"No text could be extracted from {'the page' if pages == 1 else f'any of the first {pages} pages'}. "
+                    "A scanned document cannot be searched; file it with a text layer (OCR).",
+                    file_path=ctx.rel(path),
+                )
+
+
 class FileSizeLimit(Rule):
     code = "FC-06"
     layer = Layer.FILE
@@ -129,4 +153,5 @@ RULES = [
     PdfFontsEmbedded(),
     FileSizeLimit(),
     NoEmptyFiles(),
+    PdfTextLayer(),
 ]

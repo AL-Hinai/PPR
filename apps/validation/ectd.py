@@ -53,6 +53,17 @@ def attr(element, name: str) -> str:
     return ""
 
 
+def parent_path(tree, element) -> str:
+    """Structural path of the element's parent within ``tree``; empty when it cannot be worked out."""
+    parent = element.getparent()
+    if parent is None:
+        return ""
+    try:
+        return tree.getelementpath(parent)
+    except (ValueError, AttributeError):  # not an ElementTree, or the element is not in it
+        return ""
+
+
 def child_text(element, name: str) -> str:
     for child in element:
         if local_name(child) == name:
@@ -206,6 +217,9 @@ class Leaf:
     source: str  # XML file declaring the leaf, relative to the sequence folder
     base_dir: Path  # folder that href / modified-file are relative to
     line: int | None = None
+    # Structural path of the element holding the leaf, e.g. "m1-gc/m1-3-pi/m1-3-3-pil/pi-doc[2]".
+    # Leaves sharing it are the documents the dossier viewer lists together under one node.
+    parent: str = ""
 
     @property
     def location(self):
@@ -250,6 +264,7 @@ class Ectd32Reader(BackboneReader):
                 source=source,
                 base_dir=base_dir,
                 line=element.sourceline,
+                parent=parent_path(tree, element),
             )
             for element in tree.iter()
             if local_name(element) == "leaf"

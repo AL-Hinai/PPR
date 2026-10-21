@@ -285,19 +285,19 @@ WORKFLOWS = [
 # Recorded walkthroughs of the demo system, with captions in each language: static/core/training/<key>-<lang>.webm
 # (and a .jpg poster). Durations are those of the English recordings.
 VIDEOS = [
-    {"key": "01-getting-started", "title": _("Getting started with PPR"), "duration": "0:51",
+    {"key": "01-getting-started", "title": _("Getting started with PPR"), "duration": "1:21",
      "roles": [R.COMPANY, R.REVIEWER, R.HOD], "workflows": ["account", "tracking"]},
-    {"key": "02-company-submit", "title": _("Create and submit an application"), "duration": "1:15",
+    {"key": "02-company-submit", "title": _("Create and submit an application"), "duration": "1:40",
      "roles": [R.COMPANY], "workflows": ["create", "validation"]},
-    {"key": "03-hod-teams", "title": _("Reviewer specialties and review teams"), "duration": "0:50",
+    {"key": "03-hod-teams", "title": _("Reviewer specialties and review teams"), "duration": "1:13",
      "roles": [R.HOD], "workflows": ["specialties", "assign"]},
-    {"key": "04-reviewer-assess", "title": _("Assess your CTD module"), "duration": "0:48",
+    {"key": "04-reviewer-assess", "title": _("Assess your CTD module"), "duration": "1:21",
      "roles": [R.REVIEWER], "workflows": ["assess", "assistant"]},
-    {"key": "05-questions-response", "title": _("Questions to the applicant and the response"), "duration": "1:00",
+    {"key": "05-questions-response", "title": _("Questions to the applicant and the response"), "duration": "1:31",
      "roles": [R.REVIEWER, R.COMPANY], "workflows": ["questions", "respond"]},
-    {"key": "06-lead-recommend", "title": _("Complete the review"), "duration": "0:30",
+    {"key": "06-lead-recommend", "title": _("Complete the review"), "duration": "0:52",
      "roles": [R.REVIEWER], "workflows": ["recommend"]},
-    {"key": "07-hod-decide", "title": _("Decide and issue the certificate"), "duration": "0:44",
+    {"key": "07-hod-decide", "title": _("Decide and issue the certificate"), "duration": "1:09",
      "roles": [R.HOD, R.COMPANY], "workflows": ["decide"]},
 ]
 

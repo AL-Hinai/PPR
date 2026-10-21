@@ -71,6 +71,14 @@ if SSO_ENABLED:
     OIDC_STORE_ID_TOKEN = False
 SSO_LABEL = env("SSO_LABEL", default="")  # empty: the translated "Sign in with your Ministry account"
 
+# Proof of concept: one-click buttons on the login page for the accounts seed_demo creates, so the
+# workflow can be tried from every role without typing credentials. The buttons post the ordinary
+# login form with the demo password, so LoginForm, django-axes and every other check still run.
+# Off unless asked for; local.py turns it on for development. Never enable it on a public deployment:
+# the demo password is in the page source, and the demo accounts are the ones seed_demo creates.
+DEMO_LOGIN = env.bool("DEMO_LOGIN", default=False)
+DEMO_LOGIN_PASSWORD = env("DEMO_PASSWORD", default="Demo@2026")  # the same variable seed_demo reads
+
 # Login lockout (django-axes): 5 failures for the same username from the same address lock it for 1 hour.
 AXES_FAILURE_LIMIT = env.int("AXES_FAILURE_LIMIT", default=5)
 AXES_COOLOFF_TIME = env.int("AXES_COOLOFF_HOURS", default=1)

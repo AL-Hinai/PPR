@@ -9,6 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from apps.accounts.demo import DEMO_USERNAMES
 from apps.accounts.models import User
 from apps.accounts.services import set_default_lead, set_specialties
 from apps.applications import services
@@ -24,8 +25,6 @@ REVIEWERS = {
     "rev_nonclinical": ("Khalid", "Al-Hinai", ["M4"]),
     "rev_clinical": ("Aisha", "Al-Balushi", ["M5"]),
 }
-# reviewer1/reviewer2 were the generalist accounts before reviews were split by module.
-DEMO_USERNAMES = ["hod", *REVIEWERS, "reviewer1", "reviewer2", "acme", "gulfpharma"]
 
 
 class Command(BaseCommand):

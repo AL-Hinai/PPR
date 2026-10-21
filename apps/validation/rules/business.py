@@ -251,6 +251,42 @@ class UtilFolder(Rule):
             yield self.issue("util/dtd/ich-ectd-3-2.dtd was not found.", file_path="util/dtd/")
 
 
+class DistinctLeafTitles(Rule):
+    """Two documents filed in one place under one title are indistinguishable to the reviewer.
+
+    Scoped to the element holding the leaves, which is exactly the group the dossier viewer lists
+    under a single node: the Arabic and English leaflets, for instance, sit under a pi-doc of their
+    own each, so the same title there is not a clash. Neither the ICH eCTD 3.2 DTD nor the GCC
+    Module 1 leaf module requires titles to be unique, so this is a warning.
+    """
+
+    code = "BR-10"
+    layer = Layer.BUSINESS
+    severity = Severity.WARNING
+    title = _("Documents filed in the same place should have titles that tell them apart")
+    requires_index = True
+
+    def check(self, ctx):
+        groups: dict[tuple, list] = {}
+        for leaf in ctx.leaves:
+            # A delete keeps the title of the document it withdraws, and an untitled leaf is shown
+            # by its file name, so neither can be confused with another document.
+            if leaf.operation == "delete" or not leaf.title.strip():
+                continue
+            key = (leaf.source, leaf.parent, " ".join(leaf.title.split()).casefold())
+            groups.setdefault(key, []).append(leaf)
+
+        for leaves in groups.values():
+            if len(leaves) < 2:
+                continue
+            names = [leaf.href or leaf.id for leaf in leaves]
+            listed = ", ".join(names[:4]) + (f" (+{len(names) - 4} more)" if len(names) > 4 else "")
+            yield self.issue(
+                f"{len(leaves)} documents in the same section are titled '{leaves[0].title.strip()}': {listed}.",
+                location=leaves[0].location,
+            )
+
+
 RULES = [
     SequenceNumber(),
     IndexChecksum(),
@@ -261,4 +297,5 @@ RULES = [
     LifecycleOperations(),
     NamingConventions(),
     UtilFolder(),
+    DistinctLeafTitles(),
 ]

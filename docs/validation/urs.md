@@ -12,8 +12,8 @@ MOH draft eCTD guideline.
 |---|---|---|---|
 | URS-01 | Pharmaceutical companies create applications, upload eCTD sequences (zip) and submit them through the portal. | High | OQ-01 |
 | URS-02 | Every sequence is validated against the official ICH eCTD v3.2.2 DTD before review. | High | OQ-02 |
-| URS-03 | Business rules are enforced: sequence numbering, MD5 checksums of the backbone and every document, references, lifecycle operations, ICH file naming. | High | OQ-02 |
-| URS-04 | File compliance is enforced: accepted formats, PDF version 1.4–1.7, no passwords or security, no JavaScript, size limits, no empty files. | High | OQ-02 |
+| URS-03 | Business rules are enforced: sequence numbering, MD5 checksums of the backbone and every document, references, lifecycle operations, ICH file naming, titles that tell apart the documents filed under one node. | High | OQ-02 |
+| URS-04 | File compliance is enforced: accepted formats, PDF version 1.4–1.7, no passwords or security, no JavaScript, size limits, no empty files, searchable text rather than scanned images. | High | OQ-02 |
 | URS-05 | GCC Module 1 v1.5 is enforced: regional DTD, envelope addressed to Oman (OM-MOH), submission type and unit, required Module 1 documents including Arabic and English leaflets. | High | OQ-02, PQ-02 |
 | URS-06 | Validation results are shown per layer, exported as CSV and as a printable short/long report. | Medium | OQ-03 |
 | URS-07 | Validation of large dossiers runs in the background and does not block the web site; failed jobs are retried and reported. | High | IQ-05, OQ-04 |

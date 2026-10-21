@@ -5,6 +5,7 @@ import pytest
 from django.contrib.auth.password_validation import validate_password
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.test import override_settings
 from django.urls import reverse
 
 from apps.validation import samples
@@ -100,3 +101,35 @@ def test_production_settings_pass_the_deploy_checks():
     result = subprocess.run([sys.executable, "-c", script], env=env, capture_output=True, text=True, timeout=120)
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip().splitlines()[-1] == "[31536000, true, true, 28800, \"queue\"]"
+
+
+@pytest.mark.django_db
+def test_demo_login_buttons_are_absent_unless_switched_on(client, applicant):
+    """DEMO_LOGIN is off outside local development, so the login page offers no demo accounts."""
+    response = client.get(reverse("accounts:login"))
+    assert b"Demonstration accounts" not in response.content
+    assert applicant.username.encode() not in response.content
+
+
+@pytest.mark.django_db
+@override_settings(DEMO_LOGIN=True, DEMO_LOGIN_PASSWORD=PASSWORD)
+def test_demo_login_button_signs_in_through_the_ordinary_form(client, applicant):
+    """The button posts the login form, so authentication runs exactly as it does for a typed password."""
+    applicant.username = "hod"  # a username seed_demo creates; only those are offered
+    applicant.save()
+    page = client.get(reverse("accounts:login"))
+    assert b"Demonstration accounts" in page.content
+    assert b'value="hod"' in page.content
+
+    response = client.post(reverse("accounts:login"), {"username": "hod", "password": PASSWORD})
+    assert response.status_code == 302
+    assert client.session["_auth_user_id"] == str(applicant.pk)
+
+
+@pytest.mark.django_db
+@override_settings(DEMO_LOGIN=True, DEMO_LOGIN_PASSWORD=PASSWORD)
+def test_demo_login_offers_only_the_seeded_accounts(client, applicant):
+    """An ordinary account is never listed, however the setting is configured."""
+    response = client.get(reverse("accounts:login"))
+    assert b"Demonstration accounts" not in response.content
+    assert applicant.username.encode() not in response.content

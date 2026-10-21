@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PPR\n"
-"POT-Creation-Date: 2026-10-21 11:47+0000\n"
+"POT-Creation-Date: 2026-10-21 15:03+0000\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,7 +25,7 @@ msgstr[3] "%(counter)s طلبات"
 msgstr[4] "%(counter)s طلبًا"
 msgstr[5] "%(counter)s طلب"
 
-#: templates/applications/search.html
+#: templates/applications/_search_results.html
 #, python-format
 msgid "%(counter)s document"
 msgid_plural "%(counter)s documents"
@@ -106,7 +106,7 @@ msgstr "%(n)s سارٍ"
 msgid "%(name)s is not specialised in %(module)s."
 msgstr "%(name)s غير متخصص في %(module)s."
 
-#: apps/accounts/views.py:38
+#: apps/accounts/views.py:59
 #, python-format
 msgid "%(name)s now leads automatically assigned review teams."
 msgstr "أصبح %(name)s يقود فرق المراجعة المعيّنة تلقائياً."
@@ -176,6 +176,10 @@ msgstr "الصيغ المقبولة، إصدار PDF، عدم وجود كلما�
 #: templates/403.html
 msgid "Access denied"
 msgstr "تم رفض الوصول"
+
+#: templates/base.html
+msgid "Account"
+msgstr "الحساب"
 
 #: templates/accounts/locked_out.html
 msgid "Account locked"
@@ -323,7 +327,7 @@ msgstr "نوع الطلب"
 msgid "Application updated."
 msgstr "تم تحديث الطلب."
 
-#: apps/applications/apps.py:8 templates/applications/detail.html templates/applications/list.html templates/applications/list.html templates/applications/search.html templates/base.html templates/base.html
+#: apps/applications/apps.py:8 templates/applications/_search_results.html templates/applications/detail.html templates/applications/list.html templates/applications/list.html templates/base.html templates/base.html
 msgid "Applications"
 msgstr "الطلبات"
 
@@ -369,7 +373,7 @@ msgstr "موافق عليها"
 msgid "Approved under no. %(no)s, valid until %(date)s."
 msgstr "تمت الموافقة برقم %(no)s، صالحة حتى %(date)s."
 
-#: config/settings/base.py:132
+#: config/settings/base.py:140
 msgid "Arabic"
 msgstr "العربية"
 
@@ -512,11 +516,11 @@ msgstr "رجوع"
 msgid "Back to dashboard"
 msgstr "العودة إلى لوحة التحكم"
 
-#: apps/accounts/urls.py:65
+#: apps/accounts/urls.py:54
 msgid "Back to sign in"
 msgstr "العودة إلى تسجيل الدخول"
 
-#: apps/accounts/urls.py:43
+#: apps/accounts/urls.py:32
 msgid "Back to the dashboard"
 msgstr "العودة إلى لوحة التحكم"
 
@@ -532,7 +536,7 @@ msgstr "فحص قواعد العمل"
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: apps/accounts/urls.py:35 apps/accounts/urls.py:35 templates/base.html
+#: apps/accounts/urls.py:24 apps/accounts/urls.py:24 templates/base.html
 msgid "Change password"
 msgstr "تغيير كلمة المرور"
 
@@ -544,7 +548,7 @@ msgstr "راجع بطاقات التغطية في الأعلى: الوحدة ا�
 msgid "Check the file name shown, then choose “Submit for validation”. While it is still a draft you can correct the details with “Edit”."
 msgstr "تحقّق من اسم الملف المعروض، ثم اختر «التقديم للتحقق». ما دام الطلب مسودة يمكنك تصحيح البيانات من «تعديل»."
 
-#: apps/accounts/urls.py:63
+#: apps/accounts/urls.py:52
 msgid "Check your email"
 msgstr "تحقق من بريدك الإلكتروني"
 
@@ -552,7 +556,7 @@ msgstr "تحقق من بريدك الإلكتروني"
 msgid "Check “Section reviews” on the “Assessment” tab: every module needs an assessment and none may be waiting for re-assessment."
 msgstr "راجع «مراجعات الأقسام» في تبويب «التقييم»: يجب أن يكون لكل وحدة تقييم، وألا تكون أي وحدة بانتظار إعادة التقييم."
 
-#: apps/accounts/urls.py:73
+#: apps/accounts/urls.py:62
 msgid "Choose a new password"
 msgstr "اختر كلمة مرور جديدة"
 
@@ -780,6 +784,10 @@ msgstr "حذف هذه الملاحظة؟"
 msgid "deleted in %(s)s"
 msgstr "حُذف في %(s)s"
 
+#: templates/accounts/login.html
+msgid "Demonstration accounts"
+msgstr "حسابات تجريبية"
+
 #: apps/core/guide.py:74
 msgid "Department staff can use “Sign in with your Ministry account” instead of a password when single sign-on is switched on."
 msgstr "يمكن لموظفي الدائرة استخدام «تسجيل الدخول بحساب الوزارة» بدلًا من كلمة المرور عند تفعيل الدخول الموحّد."
@@ -820,9 +828,13 @@ msgstr "نص المستند"
 msgid "document texts"
 msgstr "نصوص المستندات"
 
-#: templates/applications/search.html
+#: templates/applications/_search_results.html
 msgid "Documents"
 msgstr "المستندات"
+
+#: apps/validation/rules/business.py:266
+msgid "Documents filed in the same place should have titles that tell them apart"
+msgstr "يجب أن تحمل المستندات المودعة في الموضع نفسه عناوين تميّز بينها"
 
 #: apps/validation/models.py:16
 msgid "Done"
@@ -875,7 +887,7 @@ msgstr "الموعد النهائي %(d)s"
 msgid "Due %(d)s"
 msgstr "الموعد النهائي %(d)s"
 
-#: templates/applications/search.html
+#: templates/applications/search.html templates/base.html
 msgid "e.g. shelf life, impurity C, MA-2026-00012"
 msgstr "مثال: مدة الصلاحية، الشائبة C، MA-2026-00012"
 
@@ -923,11 +935,11 @@ msgstr "تعديل الطلب"
 msgid "Electronic submission, eCTD technical validation and approval of medicinal products."
 msgstr "التقديم الإلكتروني والتحقق الفني بصيغة eCTD والموافقة على المستحضرات الدوائية."
 
-#: config/settings/base.py:132
+#: config/settings/base.py:140
 msgid "English"
 msgstr "الإنجليزية"
 
-#: apps/accounts/urls.py:55
+#: apps/accounts/urls.py:44
 msgid "Enter the email address of your account. We will send you a link to choose a new password."
 msgstr "أدخل البريد الإلكتروني لحسابك وسنرسل إليك رابطاً لاختيار كلمة مرور جديدة."
 
@@ -1009,7 +1021,7 @@ msgstr "يجب أن تكون أسماء الملفات بأحرف صغيرة، �
 msgid "Files in the package should be referenced by the XML backbone"
 msgstr "يُفضّل أن تكون جميع ملفات الحزمة مُشاراً إليها في ملف XML الرئيسي"
 
-#: apps/validation/rules/files.py:115
+#: apps/validation/rules/files.py:139
 msgid "Files must not be empty"
 msgstr "يجب ألا تكون الملفات فارغة"
 
@@ -1123,7 +1135,7 @@ msgstr "مسار الطلب"
 msgid "If a required module has no qualified reviewer, the application waits on your dashboard under “Validated – assign a review team”."
 msgstr "إذا لم يوجد مراجع مؤهل لوحدة مطلوبة، ينتظر الطلب في لوحة التحكم تحت «تم التحقق – عيّن فريق المراجعة»."
 
-#: apps/accounts/urls.py:64
+#: apps/accounts/urls.py:53
 msgid "If an account uses that address, a reset link is on its way. The link works once."
 msgstr "إذا كان هناك حساب بهذا العنوان فسيصلك رابط إعادة التعيين. يعمل الرابط مرة واحدة."
 
@@ -1175,7 +1187,7 @@ msgstr "يجب أن يكون index.xml ملف XML سليم البنية"
 msgid "index.xml must reference the GCC regional XML with operation 'new'"
 msgstr "يجب أن يشير index.xml إلى ملف XML الإقليمي الخليجي بالعملية 'new'"
 
-#: apps/validation/rules/files.py:99
+#: apps/validation/rules/files.py:123
 msgid "Individual files must not exceed the maximum file size"
 msgstr "يجب ألا يتجاوز أي ملف الحد الأقصى للحجم"
 
@@ -1408,7 +1420,7 @@ msgstr "الاسم (بالإنجليزية)"
 msgid "Name (English)"
 msgstr "الاسم (بالإنجليزية)"
 
-#: templates/applications/form.html templates/applications/list.html templates/base.html templates/base.html templates/core/dashboard_company.html
+#: templates/applications/form.html templates/applications/list.html templates/base.html templates/core/dashboard_company.html
 msgid "New application"
 msgstr "طلب جديد"
 
@@ -1472,11 +1484,11 @@ msgstr "لا توجد طلبات بعد"
 msgid "No decisions pending"
 msgstr "لا توجد قرارات معلقة"
 
-#: apps/accounts/views.py:39
+#: apps/accounts/views.py:60
 msgid "No default lead: each team is led by the reviewer covering the most modules."
 msgstr "لا يوجد قائد افتراضي: يقود كل فريق المراجعُ الذي يغطي أكبر عدد من الوحدات."
 
-#: templates/applications/search.html
+#: templates/applications/_search_results.html
 msgid "No documents match"
 msgstr "لا توجد مستندات مطابقة"
 
@@ -1652,6 +1664,10 @@ msgstr "افتح الصفحة المشار إليها"
 msgid "Open the dossier assistant"
 msgstr "افتح مساعد الملف"
 
+#: templates/applications/_search_results.html
+msgid "Open the results as a page"
+msgstr "فتح النتائج في صفحة"
+
 #: apps/core/guide.py:169
 msgid "Open your dashboard. “Modules awaiting your assessment” lists each application and the modules you still owe."
 msgstr "افتح لوحة التحكم. يعرض قسم «وحدات بانتظار تقييمك» كل طلب والوحدات التي لم تقيّمها بعد."
@@ -1711,11 +1727,11 @@ msgstr "ناجح"
 msgid "Passed with warnings"
 msgstr "ناجح مع تحذيرات"
 
-#: apps/accounts/urls.py:41
+#: apps/accounts/urls.py:30
 msgid "Password changed"
 msgstr "تم تغيير كلمة المرور"
 
-#: apps/accounts/urls.py:79
+#: apps/accounts/urls.py:68
 msgid "Password set"
 msgstr "تم تعيين كلمة المرور"
 
@@ -1730,6 +1746,10 @@ msgstr "يجب ألا تحتوي ملفات PDF على JavaScript أو أوام�
 #: apps/validation/rules/files.py:46
 msgid "PDF files must open without passwords or security restrictions"
 msgstr "يجب أن تُفتح ملفات PDF دون كلمات مرور أو قيود أمنية"
+
+#: apps/validation/rules/files.py:106
+msgid "PDF files should contain searchable text, not only scanned images"
+msgstr "يجب أن تحتوي ملفات PDF على نص قابل للبحث، لا صورًا ممسوحة ضوئيًا فقط"
 
 #: templates/applications/_review_team.html
 msgid "Pending"
@@ -1993,7 +2013,7 @@ msgstr "طلب معلومات"
 msgid "Request information from the company (clock stop)"
 msgstr "طلب معلومات من الشركة (إيقاف الساعة)"
 
-#: apps/accounts/urls.py:54 templates/accounts/auth_page.html templates/accounts/locked_out.html
+#: apps/accounts/urls.py:43 templates/accounts/auth_page.html templates/accounts/locked_out.html
 msgid "Reset password"
 msgstr "إعادة تعيين كلمة المرور"
 
@@ -2164,7 +2184,7 @@ msgstr "المراجعة العلمية"
 msgid "Search"
 msgstr "بحث"
 
-#: templates/applications/search.html templates/base.html templates/base.html templates/base.html
+#: templates/applications/search.html templates/base.html templates/base.html templates/base.html templates/base.html
 msgid "Search dossiers"
 msgstr "البحث في الملفات"
 
@@ -2172,7 +2192,7 @@ msgstr "البحث في الملفات"
 msgid "Search reference, product, ingredient or company"
 msgstr "ابحث بالرقم المرجعي أو المستحضر أو المادة الفعالة أو الشركة"
 
-#: templates/applications/search.html
+#: templates/applications/_search_results.html templates/applications/search.html
 msgid "Searches every application you can open: its details and the text of its accepted documents."
 msgstr "يبحث في كل طلب يمكنك فتحه: بياناته ونصوص مستنداته المقبولة."
 
@@ -2204,7 +2224,7 @@ msgstr "إرسال"
 msgid "Send questions (clock stop)"
 msgstr "إرسال الأسئلة (إيقاف الساعة)"
 
-#: apps/accounts/urls.py:56
+#: apps/accounts/urls.py:45
 msgid "Send reset link"
 msgstr "إرسال رابط إعادة التعيين"
 
@@ -2250,7 +2270,7 @@ msgstr "التسلسلات"
 msgid "Sessions end after a working day or when you close the browser. Sign out on shared computers."
 msgstr "تنتهي الجلسة بعد يوم عمل أو عند إغلاق المتصفح. سجّل الخروج على الأجهزة المشتركة."
 
-#: apps/accounts/urls.py:73
+#: apps/accounts/urls.py:62
 msgid "Set password"
 msgstr "تعيين كلمة المرور"
 
@@ -2287,7 +2307,7 @@ msgstr "إظهار %(r)s مستبدل و%(d)s محذوف"
 msgid "Show workflows for"
 msgstr "عرض مسارات العمل حسب الدور:"
 
-#: apps/accounts/urls.py:81 templates/accounts/login.html templates/accounts/login.html templates/accounts/login.html templates/core/home.html
+#: apps/accounts/urls.py:70 templates/accounts/login.html templates/accounts/login.html templates/accounts/login.html templates/core/home.html
 msgid "Sign in"
 msgstr "تسجيل الدخول"
 
@@ -2332,7 +2352,7 @@ msgstr "يقيّم المراجعون المتخصصون وحدات CTD المس
 msgid "Specialties"
 msgstr "التخصصات"
 
-#: apps/accounts/views.py:52
+#: apps/accounts/views.py:73
 #, python-format
 msgid "Specialties of %(name)s saved: %(modules)s."
 msgstr "تم حفظ تخصصات %(name)s: %(modules)s."
@@ -2830,7 +2850,7 @@ msgstr "أدوات متاحة لكل مستخدم لمعرفة ما حدث وم�
 msgid "Tools for reading a dossier faster. They never replace the reviewer's own assessment."
 msgstr "أدوات لقراءة الملف بسرعة أكبر، ولا تغني أبدًا عن تقييم المراجع نفسه."
 
-#: templates/base.html templates/base.html templates/base.html templates/base.html templates/core/guide.html
+#: templates/base.html templates/base.html templates/core/guide.html
 msgid "Training guide"
 msgstr "دليل التدريب"
 
@@ -2842,7 +2862,7 @@ msgstr "جرّب بحثاً مختلفاً أو حالة أخرى."
 msgid "Try again"
 msgstr "حاول مرة أخرى"
 
-#: templates/applications/search.html
+#: templates/applications/_search_results.html
 msgid "Try other words. Only accepted sequences are searched, and their text is indexed when they pass validation."
 msgstr "جرّب كلمات أخرى. يقتصر البحث على التسلسلات المقبولة، وتُفهرس نصوصها عند اجتيازها التحقق."
 
@@ -3195,7 +3215,7 @@ msgstr "لم يُعيَّن دور لحسابك بعد"
 msgid "Your module shows as assessed. When every module has its assessment, the lead reviewer can complete the review."
 msgstr "تظهر وحدتك على أنها مُقيَّمة. وعندما يكتمل تقييم كل الوحدات يمكن للمراجع الرئيسي إكمال المراجعة."
 
-#: apps/accounts/urls.py:80
+#: apps/accounts/urls.py:69
 msgid "Your new password is set. You can sign in with it now."
 msgstr "تم تعيين كلمة المرور الجديدة. يمكنك تسجيل الدخول بها الآن."
 
@@ -3203,7 +3223,7 @@ msgstr "تم تعيين كلمة المرور الجديدة. يمكنك تسج�
 msgid "Your note"
 msgstr "ملاحظتك"
 
-#: apps/accounts/urls.py:42
+#: apps/accounts/urls.py:31
 msgid "Your password has been changed."
 msgstr "تم تغيير كلمة المرور."
 

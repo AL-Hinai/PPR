@@ -29,7 +29,7 @@ audit trail (`StatusHistory`) and sends in-app and email notifications.
 | **Head of Department (HOD)** | Set each reviewer's specialties (a module cannot be removed while the reviewer holds it on an active review), assign the review team (only qualified specialists are offered per module), see KPIs, approve/reject, return to the lead |
 | Superuser | Django admin (`/admin/`): users, companies, roles |
 
-## eCTD technical validation (3 layers, 29 rules)
+## eCTD technical validation (3 layers, 31 rules)
 
 Code: `apps/validation/`. Each rule is a small class in `rules/`, so new rules can be added without touching the engine.
 Module 1 follows the **GCC Module 1 Specifications v1.5** (`apps/validation/regions/gcc.py`): the regional backbone is
@@ -52,6 +52,7 @@ Module 1 follows the **GCC Module 1 Specifications v1.5** (`apps/validation/regi
 | | BR-07 | Lifecycle operations (new/replace/append/delete) are valid; `modified-file` resolves to a leaf in an earlier accepted sequence |
 | | BR-08 | ICH naming: lowercase `a-z0-9-`, names ≤ 64 characters, paths ≤ 180 characters |
 | | BR-09 | `util/dtd/ich-ectd-3-2.dtd` present |
+| | BR-10 | Documents filed under one node have titles that tell them apart (warning) |
 | | GCC-03 | An envelope for the receiving country (or `common`) names its agency |
 | | GCC-04 | Envelope `sequence` is this sequence; each `related-sequence` is an earlier accepted one |
 | | GCC-05 | Submission type fits the application type (e.g. `new-gen` for a generic) |
@@ -66,6 +67,7 @@ Module 1 follows the **GCC Module 1 Specifications v1.5** (`apps/validation/regi
 | | FC-04 | No JavaScript or launch actions in PDFs |
 | | FC-05 | Fonts embedded (warning) |
 | | FC-06 / FC-07 | File size limit, no empty files |
+| | FC-08 | PDFs hold searchable text, not only scanned images (warning) |
 
 Any **error** fails the sequence. Warnings let it pass ("Passed with warnings"). Each run is stored as a
 `ValidationRun` with its `Finding`s, shown as a report with CSV export and a printable short/long report
@@ -95,7 +97,7 @@ validator such as EURSvalidator: see [docs/validation_benchmark.md](docs/validat
 - **Review notes** in the PDF viewer: notes on a page, optionally quoting selected text, never changing the
   file. Internal to the department. Collected on the *Assessment notes* page (print to PDF) and inserted into a
   module assessment with *Insert my notes on this module*.
-- **Search** (header box, `/applications/search/`): application details and the text of every accepted document
+- **Search** (search icon in the header, `/applications/search/`): application details and the text of every accepted document
   the reader may open, with page links. MySQL uses a FULLTEXT index.
 
 ## Accounts and security

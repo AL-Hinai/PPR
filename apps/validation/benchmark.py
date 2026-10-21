@@ -97,6 +97,19 @@ def _wrong_namespace():
     return refreshed_zip(f)
 
 
+def duplicate_titles():
+    """A second document filed under 2.2 with the title the introduction already has."""
+    docs = samples.initial_documents("NEW_DRUG")
+    introduction = next(doc for doc in docs if doc.path == INTRO)
+    docs.append(samples.Doc(
+        path="m2/22-intro/introduction-part-2.pdf",
+        title=introduction.title,
+        section=introduction.section,
+        content=samples.make_pdf("Introduction, continued"),
+    ))
+    return samples.build_package("0000", documents=docs)
+
+
 def _response_with_unknown_leaf():
     docs = samples.response_documents()
     docs[-1].modified_file = "../0000/index.xml#leaf-does-not-exist"
@@ -216,6 +229,11 @@ def benchmark_cases() -> list[Case]:
         Case("FC-05", "fc-05-font-not-embedded.zip",
              _extra_doc(path="m2/27-clin-sum/arial.pdf", content=samples.make_pdf("x", font="Arial")), {"FC-05"},
              "PDF with a non-embedded font (warning)"),
+        Case("FC-08", "fc-08-scanned-pdf.zip",
+             _extra_doc(path="m2/27-clin-sum/scan.pdf", content=samples.make_scanned_pdf()), {"FC-08"},
+             "Image-only PDF: a scan with no text layer (warning)"),
+        Case("BR-10", "br-10-duplicate-titles.zip", duplicate_titles, {"BR-10"},
+             "Two documents under 2.2 with the same title (warning)"),
         *broken_cases(),
         Case("BR-07 lifecycle 0000", "lifecycle-broken/0000.zip", lambda: samples.build_package("0000"),
              description="Initial sequence"),

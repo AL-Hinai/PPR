@@ -29,36 +29,21 @@
       </a>
 
       {% with url_name=request.resolver_match.url_name ns=request.resolver_match.namespace %}
-      <nav class="ms-4 hidden items-center gap-1 lg:flex" aria-label="{% trans 'Main' %}">
-        <a href="{% url 'core:dashboard' %}" class="nav-link {% if ns == 'core' and url_name == 'dashboard' %}nav-link-active{% endif %}">{% icon "home" "size-4" %}{% trans "Dashboard" %}</a>
-        <a href="{% url 'applications:list' %}" class="nav-link {% if ns == 'applications' %}nav-link-active{% endif %}">{% icon "folder" "size-4" %}{% trans "Applications" %}</a>
+      <nav class="ms-6 hidden items-center gap-1 lg:flex" aria-label="{% trans 'Main' %}">
+        <a href="{% url 'core:dashboard' %}" class="nav-link {% if ns == 'core' and url_name == 'dashboard' %}nav-link-active{% endif %}">{% trans "Dashboard" %}</a>
+        <a href="{% url 'applications:list' %}" class="nav-link {% if ns == 'applications' and url_name != 'search' %}nav-link-active{% endif %}">{% trans "Applications" %}</a>
         {% if user.is_hod %}
-          <a href="{% url 'accounts:reviewers' %}" class="nav-link {% if url_name == 'reviewers' %}nav-link-active{% endif %}">{% icon "users" "size-4" %}{% trans "Reviewers" %}</a>
+          <a href="{% url 'accounts:reviewers' %}" class="nav-link {% if url_name == 'reviewers' %}nav-link-active{% endif %}">{% trans "Reviewers" %}</a>
         {% endif %}
         {% if user.is_company %}
-          <a href="{% url 'companies:profile' %}" class="nav-link {% if ns == 'companies' %}nav-link-active{% endif %}">{% icon "building" "size-4" %}{% trans "Company" %}</a>
+          <a href="{% url 'companies:profile' %}" class="nav-link {% if ns == 'companies' %}nav-link-active{% endif %}">{% trans "Company" %}</a>
         {% endif %}
       </nav>
       {% endwith %}
 
-      <div class="ms-auto flex items-center gap-2">
-        <form action="{% url 'applications:search' %}" method="get" role="search" class="hidden xl:block">
-          <label class="relative block">
-            <span class="pointer-events-none absolute inset-y-0 start-2.5 grid place-items-center text-brand-200">{% icon "search" "size-4" %}</span>
-            <input type="search" name="q" value="{% if request.resolver_match.url_name == 'search' %}{{ request.GET.q }}{% endif %}"
-                   placeholder="{% trans 'Search dossiers' %}" aria-label="{% trans 'Search dossiers' %}"
-                   class="h-9 w-56 rounded-lg border-0 bg-white/10 ps-8 pe-3 text-sm text-white placeholder:text-brand-200 focus:bg-white/15 focus:ring-2 focus:ring-white/40 focus:outline-none">
-          </label>
-        </form>
-        <a href="{% url 'applications:search' %}" class="grid size-9 place-items-center rounded-lg text-brand-100 hover:bg-white/10 xl:hidden" aria-label="{% trans 'Search dossiers' %}">{% icon "search" "size-5" %}</a>
-        {% if user.is_company %}
-          <a href="{% url 'applications:create' %}" class="btn btn-sm hidden bg-white text-brand-800 hover:bg-brand-50 lg:inline-flex">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
-        {% endif %}
-
-        <a href="{% url 'core:guide' %}" title="{% trans 'Training guide' %}" aria-label="{% trans 'Training guide' %}"
-           class="hidden size-9 place-items-center rounded-lg text-brand-100 hover:bg-white/10 hover:text-white sm:grid {% if request.resolver_match.url_name == 'guide' %}bg-white/15 text-white{% endif %}">{% icon "book" "size-5" %}</a>
-
-        {% include "partials/language_switch.html" with dark=True %}
+      <div class="ms-auto flex items-center gap-1">
+        <a href="{% url 'applications:search' %}" @click.prevent="$dispatch('open-search')" title="{% trans 'Search dossiers' %} (Ctrl+K)" aria-label="{% trans 'Search dossiers' %}"
+           class="grid size-9 place-items-center rounded-lg text-brand-100 hover:bg-white/10 hover:text-white {% if request.resolver_match.url_name == 'search' %}bg-white/15 text-white{% endif %}">{% icon "search" "size-5" %}</a>
 
         <div class="relative" x-data="{ open: false }" @click.outside="open = false">
           <button type="button" class="relative grid size-9 place-items-center rounded-lg text-brand-100 hover:bg-white/10 hover:text-white"
@@ -72,21 +57,21 @@
           </div>
         </div>
 
-        <div class="relative hidden sm:block" x-data="{ open: false }" @click.outside="open = false">
-          <button type="button" @click="open = !open" class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-start hover:bg-white/10">
+        <div class="relative ms-1 hidden sm:block" x-data="{ open: false }" @click.outside="open = false">
+          <button type="button" @click="open = !open" title="{{ user.display_name }}" aria-label="{% trans 'Account' %}"
+                  class="grid size-9 place-items-center rounded-full hover:ring-2 hover:ring-white/30">
             <span class="grid size-8 place-items-center rounded-full bg-brand-500 text-xs font-bold text-white">{{ user.display_name|slice:":1"|upper }}</span>
-            <span class="hidden leading-tight xl:block">
-              <span class="block text-sm font-medium text-white">{{ user.display_name }}</span>
-              <span class="block text-[11px] text-brand-200">{{ user.get_role_display }}</span>
-            </span>
           </button>
-          <div x-show="open" x-cloak x-transition.origin.top class="absolute end-0 z-30 mt-2 w-56 rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+          <div x-show="open" x-cloak x-transition.origin.top class="absolute end-0 z-30 mt-2 w-60 rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
             <div class="px-3 py-2">
-              <p class="text-sm font-medium text-slate-900">{{ user.display_name }}</p>
+              <p class="truncate text-sm font-medium text-slate-900">{{ user.display_name }}</p>
               <p class="truncate text-xs text-slate-500">{% if user.company %}{{ user.company.name }}{% else %}{{ user.get_role_display }}{% endif %}</p>
             </div>
+            <div class="my-1 h-px bg-slate-100"></div>
             <a href="{% url 'core:guide' %}" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{% icon "book" "size-4" %}{% trans "Training guide" %}</a>
+            {% include "partials/language_menu_item.html" with button_class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" %}
             <a href="{% url 'accounts:password_change' %}" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{% icon "shield" "size-4" %}{% trans "Change password" %}</a>
+            <div class="my-1 h-px bg-slate-100"></div>
             <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
               <button class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{% icon "logout" "size-4 rtl:rotate-180" %}{% trans "Sign out" %}</button>
             </form>
@@ -109,11 +94,35 @@
         <a href="{% url 'applications:create' %}" class="nav-link w-full">{% icon "plus" "size-4" %}{% trans "New application" %}</a>
       {% endif %}
       <a href="{% url 'core:guide' %}" class="nav-link w-full">{% icon "book" "size-4" %}{% trans "Training guide" %}</a>
+      {% include "partials/language_menu_item.html" with button_class="nav-link w-full" %}
       <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
         <button class="nav-link w-full">{% icon "logout" "size-4 rtl:rotate-180" %}{% trans "Sign out" %} ({{ user.username }})</button>
       </form>
     </nav>
   </header>
+
+  {# Search dialog: opened by the search icon or Ctrl+K / Cmd+K; results load as the reader types. #}
+  <div x-data="{ show: false, open() { this.show = true; this.$nextTick(() => this.$refs.q.select()) } }" x-show="show" x-cloak
+       @open-search.window="open()" @keydown.window.ctrl.k.prevent="open()" @keydown.window.meta.k.prevent="open()"
+       @keydown.escape.window="show = false"
+       class="fixed inset-0 z-40 print:hidden" role="dialog" aria-modal="true" aria-label="{% trans 'Search dossiers' %}">
+    <div class="absolute inset-0 bg-slate-900/40" @click="show = false" x-show="show" x-transition.opacity></div>
+    <div class="relative mx-auto mt-16 flex max-h-[80vh] w-[calc(100%-2rem)] max-w-2xl flex-col overflow-hidden rounded-2xl bg-slate-50 shadow-2xl ring-1 ring-slate-200"
+         x-show="show" x-transition>
+      <form method="get" action="{% url 'applications:search' %}" role="search" @submit.prevent
+            class="flex items-center gap-3 border-b border-slate-200 bg-white px-4">
+        <span class="text-slate-400">{% icon "search" "size-5" %}</span>
+        <input x-ref="q" type="search" name="q" autocomplete="off" aria-label="{% trans 'Search dossiers' %}"
+               placeholder="{% trans 'e.g. shelf life, impurity C, MA-2026-00012' %}"
+               class="h-14 min-w-0 flex-1 border-0 bg-transparent text-base text-slate-900 placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+               hx-get="{% url 'applications:search' %}" hx-trigger="input changed delay:300ms, search" hx-target="#search-dialog-results" hx-sync="this:replace">
+        <button type="button" @click="show = false" class="rounded-md px-1.5 py-0.5 text-xs text-slate-400 ring-1 ring-slate-200 hover:text-slate-600">Esc</button>
+      </form>
+      <div id="search-dialog-results" class="overflow-y-auto p-4">
+        {% include "applications/_search_results.html" with in_dialog=True query="" %}
+      </div>
+    </div>
+  </div>
 {% endif %}
 
 <main class="{% block main_class %}mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8{% endblock %}">

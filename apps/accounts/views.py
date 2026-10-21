@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import views as auth_views
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
 from django.http import Http404
@@ -8,10 +10,29 @@ from django.utils.translation import gettext as _
 from apps.applications.models import Application
 
 from . import services
+from .demo import demo_accounts
+from .forms import LoginForm
 from .models import CtdSection, User
 from .permissions import hod_required
 
 ACTIVE = [Application.Status.UNDER_REVIEW, Application.Status.INFO_REQUESTED]
+
+
+class LoginView(auth_views.LoginView):
+    """The ordinary Django login. It only adds the demo accounts the page offers as buttons."""
+
+    template_name = "accounts/login.html"
+    authentication_form = LoginForm
+    redirect_authenticated_user = True
+
+    def get_context_data(self, **kwargs):
+        accounts = demo_accounts()
+        return super().get_context_data(**kwargs) | {
+            "sso_enabled": settings.SSO_ENABLED,
+            "sso_label": settings.SSO_LABEL,
+            "demo_accounts": accounts,
+            "demo_password": settings.DEMO_LOGIN_PASSWORD if accounts else "",
+        }
 
 
 def _pk(value):

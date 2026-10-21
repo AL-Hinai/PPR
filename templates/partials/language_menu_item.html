@@ -1,0 +1,11 @@
+{% load i18n ui %}{% get_current_language as LANGUAGE_CODE %}
+{# A menu row that switches the interface language. Pass button_class to match the surrounding menu. #}
+<form method="post" action="{% url 'set_language' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  {% if LANGUAGE_CODE == "ar" %}
+    <button name="language" value="en" lang="en" class="{{ button_class }}">{% icon "language" "size-4" %}English</button>
+  {% else %}
+    <button name="language" value="ar" lang="ar" class="{{ button_class }}">{% icon "language" "size-4" %}العربية</button>
+  {% endif %}
+</form>

@@ -59,3 +59,18 @@ def test_search_page(client, indexed, reviewer):
     assert response.status_code == 200
     assert b"Stability summary and conclusion" in response.content and b"#page=1" in response.content
     assert b'<script>' not in response.content  # snippets are escaped before highlighting
+
+
+@pytest.mark.django_db
+def test_search_dialog_gets_the_results_alone(indexed, reviewer, client):
+    """The header dialog asks over htmx and receives only the results, not a whole page."""
+    client.force_login(reviewer)
+    url = reverse("applications:search")
+    response = client.get(url, {"q": "shelf life storage"}, headers={"HX-Request": "true"})
+    assert response.status_code == 200
+    assert b"<html" not in response.content
+    assert b"Stability summary and conclusion" in response.content
+    assert b"Open the results as a page" in response.content
+
+    page = client.get(url, {"q": "shelf life storage"})
+    assert b"<html" in page.content and b"Stability summary and conclusion" in page.content

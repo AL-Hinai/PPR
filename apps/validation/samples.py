@@ -79,7 +79,36 @@ def make_pdf(text: str, version: str = "1.7", javascript: bool = False, font: st
     ]
     if javascript:
         objects.append(b"<< /S /JavaScript /JS (app.alert\\('hello'\\);) >>")
+    return _assemble_pdf(version, objects)
 
+
+def make_scanned_pdf(version: str = "1.7", width: int = 8, height: int = 8) -> bytes:
+    """A one-page PDF holding nothing but an image, the way a scan of a paper document looks.
+
+    It is a valid PDF in every other respect: no text can be extracted from it, and it has no
+    fonts, so only the text-layer rule has anything to say about it.
+    """
+    pixels = bytes(range(256))[: width * height].ljust(width * height, b"\xff")
+    image = (
+        b"<< /Type /XObject /Subtype /Image /Width %d /Height %d /ColorSpace /DeviceGray "
+        b"/BitsPerComponent 8 /Length %d >>\nstream\n" % (width, height, len(pixels))
+        + pixels
+        + b"\nendstream"
+    )
+    content = b"q 595 0 0 842 0 0 cm /Im1 Do Q"  # draw the image over the whole page
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] "
+        b"/Resources << /XObject << /Im1 4 0 R >> >> /Contents 5 0 R >>",
+        image,
+        b"<< /Length %d >>\nstream\n" % len(content) + content + b"\nendstream",
+    ]
+    return _assemble_pdf(version, objects)
+
+
+def _assemble_pdf(version: str, objects: list[bytes]) -> bytes:
+    """Write the objects out with the cross-reference table and trailer that make a readable PDF."""
     out = io.BytesIO()
     out.write(f"%PDF-{version}\n".encode() + b"%\xe2\xe3\xcf\xd3\n")
     offsets = []

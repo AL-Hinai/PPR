@@ -22,10 +22,17 @@ class PdfReport:
     version: str = ""
     active_content: list[str] = field(default_factory=list)
     unembedded_fonts: list[str] = field(default_factory=list)
+    pages_read: int = 0  # pages examined for text (at most MAX_PAGES_SCANNED)
+    text_pages: int = 0  # of those, the ones that yielded any text
 
     @property
     def readable(self):
         return not self.error and not self.encrypted
+
+    @property
+    def is_scanned(self):
+        """Pages were read but none held text: an image-only document, with nothing to search."""
+        return self.pages_read > 0 and self.text_pages == 0
 
 
 def _resolve(obj):
@@ -63,6 +70,7 @@ def inspect_pdf(path: Path) -> PdfReport:
                 report.version = candidate
         report.active_content = _active_content(reader, catalog)
         report.unembedded_fonts = _unembedded_fonts(reader)
+        report.pages_read, report.text_pages = _text_pages(reader)
     except Exception as exc:  # pypdf raises many types on damaged files
         report.error = f"The PDF cannot be read: {exc}"
     return report
@@ -94,6 +102,20 @@ def _active_content(reader, catalog) -> list[str]:
             if kind := _action_type(annot.get("/A")):
                 found.add(f"link action {kind}")
     return sorted(found)
+
+
+def _text_pages(reader) -> tuple[int, int]:
+    """(pages examined, how many of them yielded text). A scanned page holds an image and no text."""
+    pages_read = text_pages = 0
+    for page in reader.pages[:MAX_PAGES_SCANNED]:
+        pages_read += 1
+        try:
+            text = page.extract_text() or ""
+        except Exception:  # pypdf raises many types on damaged content streams
+            continue
+        if text.strip():
+            text_pages += 1
+    return pages_read, text_pages
 
 
 def _unembedded_fonts(reader) -> list[str]:

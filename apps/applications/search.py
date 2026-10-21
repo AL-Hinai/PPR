@@ -90,4 +90,7 @@ def search_dossiers(user, query: str) -> dict:
 
 @any_role_required
 def search(request):
-    return render(request, "applications/search.html", search_dossiers(request.user, request.GET.get("q", "")))
+    context = search_dossiers(request.user, request.GET.get("q", ""))
+    if request.htmx:  # the search dialog in the header: results only, as the reader types
+        return render(request, "applications/_search_results.html", context | {"in_dialog": True})
+    return render(request, "applications/search.html", context)

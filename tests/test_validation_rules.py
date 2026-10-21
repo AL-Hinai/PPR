@@ -8,7 +8,7 @@ from lxml import etree
 
 from apps.applications.models import Sequence
 from apps.validation import samples
-from apps.validation.benchmark import REGIONAL, broken_cases, files, with_doc
+from apps.validation.benchmark import REGIONAL, broken_cases, duplicate_titles, files, with_doc
 from apps.validation.ectd import heading_label
 
 pytestmark = [pytest.mark.req("URS-02"), pytest.mark.req("URS-03"), pytest.mark.req("URS-04"), pytest.mark.req("URS-05")]
@@ -109,6 +109,34 @@ def test_unembedded_font_is_a_warning(validate):
     sequence, _, codes = validate(data)
     assert codes == {"FC-05"}
     assert sequence.validation_status == V.PASSED_WITH_WARNINGS
+
+
+@pytest.mark.django_db
+def test_scanned_pdf_without_a_text_layer_is_a_warning(validate):
+    data = samples.to_zip(with_doc(path="m2/27-clin-sum/scan.pdf", content=samples.make_scanned_pdf()))
+    sequence, _, codes = validate(data)
+    assert codes == {"FC-08"}
+    assert sequence.validation_status == V.PASSED_WITH_WARNINGS
+
+
+@pytest.mark.django_db
+def test_duplicate_titles_in_one_section_are_a_warning(validate):
+    sequence, run, codes = validate(duplicate_titles())
+    assert codes == {"BR-10"}
+    assert sequence.validation_status == V.PASSED_WITH_WARNINGS
+    detail = run.findings.get(rule_code="BR-10").detail
+    assert "Introduction" in detail and "introduction-part-2.pdf" in detail
+
+
+@pytest.mark.django_db
+def test_the_same_title_under_different_nodes_is_not_a_clash(validate):
+    """The Arabic and English leaflets sit under a pi-doc of their own each: one title, two places."""
+    documents = samples.initial_documents("NEW_DRUG")
+    for document in documents:
+        if "133-leaflet" in document.path:
+            document.title = "Patient information leaflet"
+    _, _, codes = validate(samples.build_package("0000", documents=documents))
+    assert codes == set()
 
 
 @pytest.mark.django_db
